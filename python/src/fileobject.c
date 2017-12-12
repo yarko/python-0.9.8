@@ -4,10 +4,10 @@ Netherlands.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the names of Stichting Mathematisch
 Centrum or CWI not be used in advertising or publicity pertaining to
 distribution of the software without specific, written prior permission.
@@ -177,7 +177,7 @@ file_seek(f, args)
 	long offset;
 	int whence;
 	int ret;
-	
+
 	if (f->f_fp == NULL)
 		return err_closed();
 	whence = 0;
@@ -239,7 +239,7 @@ file_flush(f, args)
 	object *args;
 {
 	int res;
-	
+
 	if (f->f_fp == NULL)
 		return err_closed();
 	if (!getnoarg(args))
@@ -280,7 +280,7 @@ file_read(f, args)
 {
 	int n, n1, n2, n3;
 	object *v;
-	
+
 	if (f->f_fp == NULL)
 		return err_closed();
 	if (args == NULL) {
@@ -292,7 +292,7 @@ file_read(f, args)
 	}
 	else if (!getargs(args, "i", &n))
 		return NULL;
-	
+
 	n2 = n != 0 ? n : BUFSIZ;
 	v = newsizedstringobject((char *)NULL, n2);
 	if (v == NULL)
@@ -329,7 +329,7 @@ file_read(f, args)
 */
 
 object *
-getline(f, n)
+_getline(f, n)
 	fileobject *f;
 	int n;
 {
@@ -451,7 +451,7 @@ filegetline(f, n)
 	}
 	if (((fileobject*)f)->f_fp == NULL)
 		return err_closed();
-	return getline((fileobject *)f, n);
+	return _getline((fileobject *)f, n);
 }
 
 /* Python method */
@@ -476,7 +476,7 @@ file_readline(f, args)
 		}
 	}
 
-	return getline(f, n);
+	return _getline(f, n);
 }
 
 static object *
@@ -494,7 +494,7 @@ file_readlines(f, args)
 	if ((list = newlistobject(0)) == NULL)
 		return NULL;
 	for (;;) {
-		line = getline(f, 0);
+		line = _getline(f, 0);
 		if (line != NULL && getstringsize(line) == 0) {
 			DECREF(line);
 			break;
