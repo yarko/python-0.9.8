@@ -1,0 +1,12 @@
+#! /bin/sh
+
+wwwhunt.py -d http://info.cern.ch/default.html >>@hunt 2>&1
+echo "" >>@hunt
+echo "--- Exit status $? ---" >>@hunt
+
+while test -f @todo.dir
+do
+	wwwhunt.py -d >>@hunt 2>&1
+	echo "" >>@hunt
+	echo "--- Exit status $? ---" >>@hunt
+done

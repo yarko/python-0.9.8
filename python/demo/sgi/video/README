@@ -1,0 +1,96 @@
+CMIF video tools
+================
+
+This directory contains Python and C programs to manipulate files
+containing digitized video in the "CMIF video format".
+
+
+History
+-------
+
+We started this in October 1991, when we had a large framegrabber
+board on loan from SGI for a few weeks: we developed a movie recording
+program (camcorder.py) and added numerous features, including still
+frame capture and synchronous sound recording using a second machine
+(the machine holding the framegrabber board didn't have audio).
+
+During the following months, when we started using and processing the
+recorded film fragments, the "CMIF video format" was revised several
+times, and we eventually created an object-oriented interface for
+reading and writing various incarnations of these files, called VFile.
+(This module is also used by our flagship application, the CMIF
+editor, not in this directory but in /ufs/guido/mm/.)
+
+When we got our own Indigo entry-level video board (in June 1992) and
+a version of the Irix video library that supported capturing PAL
+format (in August 1992), Sjoerd added an interface to the video
+library to Python (sv) and Guido wrote Vrec.py (based upon a still
+frame grabber by Sjoerd, in turn based upon SGI demo code in C) to
+record a movie using it.  Vrec was soon followed by modernized
+versions of the other programs (Vinfo, Vplay, Vtime) and an
+interactive editor (Vedit).  Finally, VFile was rewritten for more
+modularity, functionality and robustness, and various other tools were
+added as needed.  Also, new options were added to existing tools, and
+several new video file formats were added.
+
+	Guido van Rossum
+	Jack Jansen
+	Sjoerd Mullender
+
+
+Overview of files
+-----------------
+
+cmif-film.ms	description of the CMIF video file format (more than a
+		little out of date -- read the source for VFile for
+		more info about new file formats)
+
+
+These are programs with a command line interface:
+
+Vrec.py		record video movies using the Indigo video library and
+		board
+
+Vplay.py	play video movies
+
+Vinfo.py	show statistics on movies
+
+Vtime.py	Copy a video file, manipulating the time codes (e.g.
+		faster/slower, or regenerate time codes, or drop
+		frames too close apart)
+
+Vcopy.py	selectively write frames from one movie file to another
+		usage: Vcopy [-t type] [-m treshold] [-a] infile outfile
+		commands: 'n' gets next frame; 'w' writes current frame
+
+Vmkjpeg.py	compress an rgb or grey video file to jpeg[grey] format
+
+Vunjpeg.py	expand a jpeg[grey] video file to rgb or grey format
+
+Vfix.py		truncate the scan line width of a video file to
+		a multiple of 4 ('grey' images only)
+
+Vedit.py	interactive video editing program (uses the FORMS library)
+
+Vsend.py	unicast or multicast live video as UDP packets
+
+Vreceive.py	receive transmissions from Vsend
+
+Vaddcache.py	add a "cached index" to a video file, for faster playing
+
+Vrecb.py	like Vrec.py but uses "burst capture" -- somewhat specialized
+
+
+These modules and files are used by the above programs:
+
+VFile.py	classes that read and write CMIF video files
+
+Viewer.py	two viewer classes used by Vedit
+
+LiveVideoIn.py	live video input class, used by Vsend
+
+LiveVideoOut.py	live video output class, used by Vsend and Vreceive
+
+senddefs.py	Defaults shared by Vsend and Vreceice
+
+VeditForm.fd	FORMS' fdesign definition for Vedit's form

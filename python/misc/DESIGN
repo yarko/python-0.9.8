@@ -1,0 +1,305 @@
+To: python-list@cwi.nl
+Subject: Why things are the way they are in Python
+From: Guido van Rossum <guido@cwi.nl>
+X-Organization: CWI, Kruislaan 413, 1098 SJ Amsterdam, The Netherlands
+X-Phone: +31 20 5924127 (work), +31 20 6225521 (home), +31 20 5924199 (fax)
+
+In the past few weeks I've had a lot of off-line discussions about
+various issues of Python's design with Tim Peters and Steven Majewski.
+Longer ago I had similar e-mail exchanges with Daniel LaLiberte.
+There was a discussion of variable length argument lists from which I
+still have to recover (more about that another time), but there were
+also a whole lot of questions raised about other parts of Python's
+design.  Rather than repeat my responses over and over again each time
+someone raises one such issues again, I've written a little "Socratic"
+dialogue that tries to explain why things are the way they are.
+
+The main subjects treated in this dialogue are, roughly:
+
+- why Python has both (immutable) tuples and (mutable) lists
+- the rationale behind singleton and empty tuples
+- why the parentheses in a function call can't be made optional
+
+It also explains why 'print' is a statement and not a function, and
+gives some examples of what you can do with None.
+
+
+<Q> Why does Python have both tuples and lists?
+
+<A> They serve different purposes.  Lists can get quite long, they are
+generally built incrementally, and therefore have to be mutable.
+Tuples on the other hand are generally short and created at once.
+
+<Q> Then why can't tuples be mutable and serve both purposes?
+
+<A> Imagine a graphics class that stores coordinates of graphical
+objects as tuples.  It may also store rectangles as a tuple of points,
+etc.  If tuples were mutable, the class would have to store copies of
+all points and rectangles it receives, since otherwise a caller who
+creates a point variable, passes its value to the graphics class, and
+later changes the point for its own use (e.g., to create another
+graphical object with slightly different coordinates) might violate
+the internal consistency of the graphics class.  Note that most
+callers woouldn't modify the points, but the graphics class has no way
+to tell, so it has to make the copies anyway.  (And now imaging the
+software is actually layered in such a way that coordinates are passed
+down several levels deep...)
+
+<Q> Then why can't lists be made immutable?  There are algorithms and
+data structures that guarantee O(log N) or O(N log N)
+insert/delete/concatenate/access operations, e.g., B-trees.
+
+<A> This was used in ABC for lists and tables, where I helped
+implement it.  My experiences with this were that the code was
+incredibly complex and thus difficult to maintain; the overhead for
+small lists (which are in the majority in most programs) was
+considerable, and the access time for single elements was O(log N).
+
+<Q> Why are there singleton and empty tuples at all in Python?
+Wouldn't it be easier to forbid them?  After all special syntax is
+used to construct them; this could be removed from the language and
+you would have no empty or singleton tuples (like in ABC).
+
+<A> You can also create empty and singleton tuples with slicing
+operations.
+
+<Q> But why are slicing operations needed for tuples?  ABC doesn't
+have them.
+
+Well, *sometimes* it is useful to treat tuples as sequences of
+elements, and use subscripting or slice operations on them.  E.g.,
+posix.stat returns an 11-tuple.  Some applications save the first
+three elements of such a tuple (mode, inode, device) as a "unique
+identifier" for a file.  Slicing (e.g., s[0:3]) is a convenient way of
+extracting this.  But using a slice operation it is easy to construct
+a singleton tuple (e.g., s[0:1]).
+
+<Q> Then why can't tuple slices that produce singleton tuples be
+forbidden or made to return the element instead, so that s[0:1] is the
+same as s[0]?
+
+There are many algorithms that can operate on all types of sequences
+(tuples, lists and strings) using only subscripting, slicing and
+concatenation, and in general these may construct singleton or empty
+sequences, if only as intermediate results.  E.g., here's a function
+to compute a list of all permutations of a sequence:
+
+	def perm(l):
+		if len(l) <= 1: return [l]
+		r = []
+		for i in range(len(l)):
+			p = perm(l[:i] + l[i+1:])
+			for x in p: r.append(l[i:i+1] + x)
+		return r
+
+For example, perm('abc') is ['abc', 'acb', 'bac', 'bca', 'cab', 'cba']
+and perm((1, 2)) is [(1, 2), (2, 1)].  The latter constructs the
+singletons (1,) and (2,) internally several times.
+
+<Q> But couldn't tuple concatenation be redefined so that if either
+argument were a single value, it would be promoted to a tuple?  Then
+tuple slices of one element could return that element, avoiding a
+sinleton tuple.
+
+<A> Then perm((1, 2)) above would yield [3, 3]!  Because the final
+results are constructing by concatenating the singletons (1,) and
+(2,), which would have been replaced by the numbers 1 and 2.
+
+<Q> But what if the concatenation operator were a different symbol
+than integer addition, e.g., '++'?
+
+<A> The perm() function would then require the dubious rule that that
+1++2 is defined as (1, 2).  Now compare this to 'a'++'b' -- this
+obviously means 'ab' (since strings can also be concatenated) but then
+the type of a++b would be hard to predict by the reader -- will it be
+of the same type as a and b, or will it be the type of (a, b)?  I'm
+sure this would cause lots of surprises.
+
+<Q> What about doing it the other way around then?  I.e., singleton
+tuples are not automatically degraded to their only element when
+created, but when a singleton tuple is the argument of an operation
+that requires a plain value, the first and only element of the tuple
+is used instead.
+
+<A> Well, the singleton may itself contain a singleton, e.g., ((1,),).
+If we degenerate this to its first element we've still got a
+singleton, (1,).
+
+<Q> OK, suppose we apply the rule recursively?
+
+<A> It will only confuse for users who wonder whether singletons
+actually exist or not.  They conveniently vanish in so many places
+that when first learning the language you believe they do not actually
+exist.  In other words, the user's model of what's happening will
+likely be one of the models rejected earlier, where singletons are
+discarded as soon as they are created.  By the time they encounter a
+counter-example it will be too late, and they may have written loads
+of broken code, like this function to extract the middle element from
+a tuple which returns a singleton tuple instead of an element from the
+tuple:
+
+	def middle(t):
+		i = len(t) / 2
+		return t[i:i+1]
+
+The code is broken, but will work for simple examples:
+
+	>>> a = 1, 10, 100, 1000, 10000
+	>>> print middle(a) / 2
+	50
+
+Only when applied to a tuple containing lists the bug will show up:
+
+	>>> p = []
+	>>> q = [1, 10, 100]
+	>>> r = range(10)
+	>>> b = p, q, r
+	>>> for x in middle(b): print x
+	[1, 10, 100]
+
+Expected was the same output as from:
+
+	>>> for x in q: print x
+	1
+	10
+	100
+
+<Q> OK, singletons are useful, but why does there have to be this ugly
+syntax like (1,) to create them?  Can't you just scrap that and make
+slicing the *only* way to create singletons?
+
+<A> Well, tuples have a representation on output, and as long as the
+values it contains are simple enough, you can read a tuple as written
+back in (with input() or eval()) and get an object with the same
+value.  Since singleton tuples exist, they must have a representation
+on output, and it is only fair that their representation can also be
+read back in.  Also the singleton notation makes it easy to play with
+singletons to find out how they work...
+
+<Q> OK, I give up on tuples, they are perfect :-)  Since you mention
+the way tuples are written on output, why are they *always* surrounded
+by parentheses?  I thought you said that it's not the parentheses but
+the comma that makes the tuple...
+
+<A> This makes it easier to write tuples containing tuples.  If the
+string representation of all object types is syntactically an atom,
+the function for writing a tuple (or converting it to a string, which
+uses the same rules) needn't know whether to surround the elements it
+writes with parentheses or not.  (ABC uses the latter strategy, which
+leads to more code.)
+
+<Q> Oh, and by the way, why isn't print a function?
+
+<A> Because it's such a heavily-used function that it deserves special
+treatment -- now that it is a statement, you don't need to type
+parentheses around the argument list.  Also, a statement it can use
+special syntax to distinguish whether a newline should be appended or
+not; if it were a function there would either have to be two functions
+(like Pascal's write/writeln) or a special argument value (like "echo
+-n" in the Bourne shell).
+
+<Q> Let's shift attention to the function call syntax.  Why can't the
+parentheses be optional, like in ABC, so I can write sin x instead of
+sin(x)?
+
+<A> And how do I call a function without parameters then?  Does x=f
+have to call f if it happens to be a parameterless function, as is the
+case in ABC [which has no function pointers] and also in Algol-68
+[which does have function pointers, so it calls f except when x is of
+type pointer to function]?
+
+<Q> No, assume there are no parameterless functions, but you can
+define a function of one argument that is discarded; you can call it
+as either f None or f().
+
+<A> Fair enough, although it's not particularly elegant -- I suppose
+if I call it as f(1) the argument also gets discarded?  Anyway, what
+do you do about the following ambiguity: a[1].  Does this call the
+function a with list argument [1], or does it take element 1 of
+sequence (list, tuple or string) a?  Surely requiring parentheses
+there would only be more confusing:
+
+	>>> def f x: return len x
+	>>> a = [1]
+	>>> f a
+	1
+	>>> f [1]
+	*** TypeError: subscripting unsubscriptable object
+
+<Q> Can't you resolve this ambiguity at run time, like you already do
+for the '+' operator or for the call operator x() (which creates a
+class instance if x happens to be a class object)?
+
+<A> I think that would be ugly.  Also I cannot think of a situation
+where the user would ever use the ambiguity in a polymorphic function,
+unlike for the other two:
+
+	# A function taking either strings or numbers
+	def f(a, b):
+		if a > b: return a
+		else: return a+b
+
+	# A function taking either a class or some other function that
+	# creates an instance
+	def g(creator):
+		for i in range(10):
+			instance = creator()
+			if instance.acceptable(): return instance
+		return None
+
+<Q> What other uses are there for None, besides as return value from a
+procedure?
+
+<A> Almost all the same uses that a NULL pointer has in C.  An
+important case it the use of None as an error return value (if for
+some reason the error doesn' warrant raising an exception), e.g., this
+function:
+
+	def openprofile():
+		for name in ('.profile', '/etc/Profile', '/usr/etc/Profile'):
+			try:
+				return open(name, 'r')
+			except IOError:
+				pass
+		return None # No profile -- use default settings
+
+which can be called like this:
+
+	f = openprofile()
+	if f:
+		<read the profile>
+		f.close()
+
+Another use is for a class that may want to postpone creation and
+initialization of a subcomponent to the first time it is needed.
+E.g.:
+
+	class C:
+		def init(self):
+			self.sub = None
+			return self
+		def usesub(self):
+			if self.sub is None:
+				self.sub = makesub()
+			<use self.sub>
+
+None is also useful if a value is required but you aren't interested
+in it, e.g., when using the keys of a dictionary to implement a set of
+strings:
+
+	class Set:
+		def init(self):
+			self.dict = {}
+			return self
+		def add(self, x):
+			self.dict[x] = None
+		def remove(self, x):
+			if self.dict.has_key(x):
+				del self.dict[x]
+		def ismember(self, x):
+			return self.dict.has_key(x)
+		# etc.
+
+
+--Guido van Rossum, CWI, Amsterdam <guido@cwi.nl>
+"What a senseless waste of human life"

@@ -1,0 +1,136 @@
+Mon Jan  4 10:14:08 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* More changes due to stricter argument passing rules
+
+Fri Jan  1 17:25:48 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Fixed calendar.py, mimetools.py, whrandom.py to cope with time.time()
+  returning a floating point number.  (And fix old bug in calendar)
+
+Mon Dec 21 18:02:45 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Add recursion level to mainloop.mainloop(), to make it reentrant.
+
+Mon Dec 14 13:46:25 1992  Guido van Rossum  (guido@dahlia.cwi.nl)
+
+* Many modules: fixes for new, stricter, argument passing rules
+  (most changes were automatic ones -- not all of this is tested!).
+
+Fri Dec 11 15:00:46 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* gwin.py: now uses mainloop.py for its main loop and window admin.
+
+* mainloop.py: always call dispatch() with event as a tuple!
+
+Mon Dec  7 12:48:44 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Fix bug in pdb's 'clear' command -- don't set the bpt but clear it!
+
+Fri Nov 27 21:47:20 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* New module autotest.py calls testall and compares output with
+  expected output (from file 'testall.out' somewhere on sys.path).
+
+* Added new tests to test_grammar.py,test_builtin.py.
+
+Thu Nov 26 10:12:39 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* mainloop.py: added facility for calling select().  Also added
+  embryonic facility for pseudo-modal dialogs.
+
+* stdwinevents.py: added modifier masks for key/mouse events
+
+* renamed exceptions in nntplib.py
+
+Thu Nov 12 11:30:48 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Changed string.join() to call string.joinfields() to profit of
+  strop.joinfields()
+
+Thu Nov  5 11:38:33 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* change default line numbers for 'list' in pdb.py
+
+* changed eval() into getattr() in cmd.py
+
+* added dirname(), basename() and (dummy) normath() to macpath.py
+
+* renamed nntp.py to nntplib.py
+
+Sun Nov  1 02:48:47 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Made string.index() compatible with strop.index()
+
+* Make string.atoi('') raise string.atoi_error rather than ValueError
+
+* Added dirname() and normpath() to posixpath.
+
+Sun Sep 20 23:33:23 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added new module regsub, containing sub, gsub and split (a la awk).
+
+* Changed string.splitfields(s, '') again to return [s].
+
+Sun Sep 13 22:36:20 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* os: added _exit if it is posix.
+
+Tue Sep  8 12:51:20 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added post_mortem() and pm() interfaces to pdb and wdb.
+
+* Added colorsys.py (color system conversions).
+
+Thu Sep  3 16:14:10 1992  Guido van Rossum  (guido@roos.cwi.nl)
+
+* SV.py: new version for new svideo.h (Sjoerd)
+
+* DEVICE.py: added VIDEO event type
+
+Wed Sep  2 16:05:01 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added a _v21 def to FL.py and added two new input field types
+
+* Added runcall(func, *args) interfaces to profile.py, bdb.py, pdb.py, wdb.py
+
+Tue Sep  1 10:47:17 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added new module bisect.py and used it in sched.py.
+
+* Mostly cosmetic changes to profile.py (changed output format).
+
+Tue Aug  4 10:59:25 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* string.py: fix atoi() to strip leading zeros
+
+Thu Jul 30 21:41:43 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* TextEdit.py: added gettext() method.
+
+Fri Jun  5 15:08:02 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* aiff.py: fix bogus call to skipchunk().
+
+* added SOCKET.py, definitions for socket stuff.
+
+Wed Jun  3 15:07:02 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* sunaudio.py: don't import audio, copy get_long_be from sndhdr.py.
+
+* added SUNAUDIODEV.py, defining useful constants for sunaudiodevmodule.c.
+
+Tue May 19 13:46:19 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added sndhdr.py (recognizes sound headers)
+
+Wed May  6 10:52:15 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* posixpath.py: rewrite ismount() to compare stats of path and path/..
+
+Thu Apr  9 09:27:00 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* posixpath.py: fix a typo in samestat() (ST_DEV, not STD_DEV)
+
+-------------------------------------------------------------------------------
+^^^ Log entries after release of 0.9.6 ^^^
+-------------------------------------------------------------------------------

@@ -1,0 +1,113 @@
+This is Info file python-lib.info, produced by Makeinfo-1.43 from the
+input file @out.texi.
+
+This file documents the python library XXX
+
+Copyright (C) 1992  Stichting Mathematisch Centrum XXX standard
+disclaimer here XXX Permission is granted to ...
+
+Indirect:
+python-lib.info-1: 250
+python-lib.info-2: 47611
+python-lib.info-3: 96071
+python-lib.info-4: 145056
+python-lib.info-5: 177305
+
+Tag Table:
+(Indirect)
+Node: Top252
+Node: Introduction1524
+Node: Built-in Objects2126
+Node: Types3066
+Node: Truth Value Testing4092
+Node: Boolean Operations4618
+Node: Comparisons5095
+Node: Numeric Types6429
+Node: Bit-string Operations on Integer Types9012
+Node: Sequence Types9624
+Node: Mutable Sequence Types11334
+Node: Mapping Types13100
+Node: Other Built-in Types14111
+Node: Modules14766
+Node: Classes and Class Instances15729
+Node: Functions15956
+Node: Methods16750
+Node: Type Objects17475
+Node: The Null Object17821
+Node: File Objects18179
+Node: Internal Objects20582
+Node: Special Attributes20763
+Node: Exceptions21466
+Node: Built-in Functions28570
+Node: Built-in Modules39066
+Node: sys39956
+Node: __main__44727
+Node: math45044
+Node: time46547
+Node: regex47613
+Node: marshal52435
+Node: struct54126
+Node: Standard Modules56889
+Node: string57519
+Node: rand61716
+Node: whrandom62439
+Node: regsub63071
+Node: os64396
+Node: MOST OPERATING SYSTEMS66676
+Node: posix67015
+Node: posixpath74552
+Node: getopt78848
+Node: UNIX ONLY80681
+Node: pwd81149
+Node: grp82085
+Node: socket83110
+Node: Socket Object87135
+Node: Socket Example91484
+Node: select92875
+Node: dbm94884
+Node: thread96073
+Node: AMOEBA ONLY99295
+Node: amoeba99483
+Node: Capability Operations101749
+Node: MACINTOSH ONLY103238
+Node: mac103555
+Node: macpath104045
+Node: STDWIN ONLY104504
+Node: stdwin104818
+Node: Functions Defined in Module stdwin106002
+Node: Window Object114699
+Node: Drawing Object117892
+Node: Menu Object121017
+Node: Text-edit Object121689
+Node: Stdwin Example123586
+Node: stdwinevents124395
+Node: rect124800
+Node: SGI MACHINES ONLY127649
+Node: al128593
+Node: AL (uppercase)133543
+Node: audio134011
+Node: gl137318
+Node: fm142042
+Node: Standard Modules GL and DEVICE144673
+Node: fl145058
+Node: Functions defined in module fl146948
+Node: Form object150632
+Node: FORMS object156279
+Node: FL (uppercase)158531
+Node: flp158997
+Node: panel159456
+Node: panelparser160417
+Node: pnl161073
+Node: jpeg161667
+Node: imgfile163667
+Node: SUN SPARC MACHINES ONLY165739
+Node: sunaudiodev165973
+Node: Audio device object methods167174
+Node: AUDIO TOOLS170231
+Node: audioop170434
+Node: Function Index177307
+Node: Variable Index203330
+Node: Module Index206793
+Node: Concept Index209056
+
+End Tag Table

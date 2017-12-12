@@ -1,0 +1,484 @@
+%% Master: lib.tex
+\chapter{Built-in Modules}
+
+The modules described in this section are built into the interpreter.
+They must be imported using \code{import}.
+Some modules are not always available; it is a configuration option to
+provide them.
+Details are listed with the descriptions, but the best way to see if
+a module exists in a particular implementation is to attempt to import
+it.
+
+\section{Built-in Module \sectcode{sys}}
+
+\bimodindex{sys}
+This module provides access to some variables used or maintained by the
+interpreter and to functions that interact strongly with the interpreter.
+It is always available.
+
+\renewcommand{\indexsubitem}{(in module sys)}
+\begin{datadesc}{argv}
+  The list of command line arguments passed to a Python script.
+  \code{sys.argv[0]} is the script name.
+  If no script name was passed to the Python interpreter,
+  \code{sys.argv} is empty.
+\end{datadesc}
+
+\begin{datadesc}{exc_type}
+\dataline{exc_value}
+\dataline{exc_traceback}
+  These three variables are not always defined; they are set when an
+  exception handler (an \code{except} clause of a \code{try} statement) is
+  invoked.  Their meaning is: \code{exc_type} gets the exception type of
+  the exception being handled; \code{exc_value} gets the exception
+  parameter (its \dfn{associated value} or the second argument to
+  \code{raise}); \code{exc_traceback} gets a traceback object which
+  encapsulates the call stack at the point where the exception
+  originally occurred.
+\end{datadesc}
+
+\begin{funcdesc}{exit}{n}
+  Exit from Python with numeric exit status \var{n}.  This is
+  implemented by raising the \code{SystemExit} exception, so cleanup
+  actions specified by \code{finally} clauses of \code{try} statements
+  are honored, and it is possible to catch the exit attempt at an outer
+  level.
+\end{funcdesc}
+
+\begin{datadesc}{exitfunc}
+  This value is not actually defined by the module, but can be set by
+  the user (or by a program) to specify a clean-up action at program
+  exit.  When set, it should be a parameterless function.  This function
+  will be called when the interpreter exits in any way (but not when a
+  fatal error occurs: in that case the interpreter's internal state
+  cannot be trusted).
+\end{datadesc}
+
+\begin{datadesc}{last_type}
+\dataline{last_value}
+\dataline{last_traceback}
+  These three variables are not always defined; they are set when an
+  exception is not handled and the interpreter prints an error message
+  and a stack traceback.  Their intended use is to allow an interactive
+  user to import a debugger module and engage in post-mortem debugging
+  without having to re-execute the command that cause the error (which
+  may be hard to reproduce).  The meaning of the variables is the same
+  as that of \code{exc_type}, \code{exc_value} and \code{exc_tracaback},
+  respectively.
+\end{datadesc}
+
+\begin{datadesc}{modules}
+  Gives the list of modules that have already been loaded.
+  This can be manipulated to force reloading of modules and other tricks.
+\end{datadesc}
+
+\begin{datadesc}{path}
+  A list of strings that specifies the search path for modules.
+  Initialized from the environment variable \code{PYTHONPATH}, or an
+  installation-dependent default.
+\end{datadesc}
+
+\begin{datadesc}{ps1}
+\dataline{ps2}
+  Strings specifying the primary and secondary prompt of the
+  interpreter.  These are only defined if the interpreter is in
+  interactive mode.  Their initial values in this case are
+  \code{'>>> '} and \code{'... '}.
+\end{datadesc}
+
+\begin{funcdesc}{settrace}{tracefunc}
+  Set the system's trace function, which allows you to implement a
+  Python source code debugger in Python.  The standard modules
+  \code{pdb} and \code{wdb} are such debuggers; the difference is that
+  \code{wdb} uses windows and needs STDWIN, while \code{pdb} has a
+  line-oriented interface not unlike dbx.  See the file \file{pdb.doc}
+  in the Python library source directory for more documentation (both
+  about \code{pdb} and \code{sys.trace}).
+\end{funcdesc}
+\stmodindex{pdb}
+\stmodindex{wdb}
+\index{trace function}
+
+\begin{funcdesc}{setprofile}{profilefunc}
+  Set the system's profile function, which allows you to implement a
+  Python source code profiler in Python.  The system's profile function
+  is called similarly to the system's trace function (see
+  \code{sys.settrace}), but it isn't called for each executed line of
+  code (only on call and return and when an exception occurs).  Also,
+  its return value is not used, so it can just return \code{None}.
+\end{funcdesc}
+\index{profile function}
+
+\begin{datadesc}{stdin}
+\dataline{stdout}
+\dataline{stderr}
+  File objects corresponding to the interpreter's standard input,
+  output and error streams.  \code{sys.stdin} is used for all
+  interpreter input except for scripts but including calls to
+  \code{input()} and \code{raw_input()}.  \code{sys.stdout} is used
+  for the output of \code{print} and expression statements and for the
+  prompts of \code{input()} and \code{raw_input()}.  The interpreter's
+  own prompts and its error messages are written to stderr.  Assigning
+  to \code{sys.stderr} has no effect on the interpreter; it can be
+  used to write error messages to stderr using \code{print}.
+%JHXXX is this still correct??
+\end{datadesc}
+
+\section{Built-in Module \sectcode{__main__}}
+
+\bimodindex{__main__}
+This module represents the (otherwise anonymous) scope in which the
+interpreter's main program executes --- commands read either from
+standard input or from a script file.
+
+\section{Built-in Module \sectcode{math}}
+
+\bimodindex{math}
+\renewcommand{\indexsubitem}{(in module math)}
+This module is always available.
+It provides access to the mathematical functions defined by the C
+standard.
+They are:
+\iftexi
+\begin{funcdesc}{acos}{x}
+\funcline{asin}{x}
+\funcline{atan}{x}
+\funcline{atan2}{x, y}
+\funcline{ceil}{x}
+\funcline{cos}{x}
+\funcline{cosh}{x}
+\funcline{exp}{x}
+\funcline{fabs}{x}
+\funcline{floor}{x}
+\funcline{fmod}{x, y}
+\funcline{frexp}{x}
+\funcline{ldexp}{x, y}
+\funcline{log}{x}
+\funcline{log10}{x}
+\funcline{modf}{x}
+\funcline{pow}{x, y}
+\funcline{sin}{x}
+\funcline{sinh}{x}
+\funcline{sqrt}{x}
+\funcline{tan}{x}
+\funcline{tanh}{x}
+\end{funcdesc}
+\else
+\code{acos(\varvars{x})},
+\code{asin(\varvars{x})},
+\code{atan(\varvars{x})},
+\code{atan2(\varvars{x\, y})},
+\code{ceil(\varvars{x})},
+\code{cos(\varvars{x})},
+\code{cosh(\varvars{x})},
+\code{exp(\varvars{x})},
+\code{fabs(\varvars{x})},
+\code{floor(\varvars{x})},
+\code{fmod(\varvars{x\, y})},
+\code{frexp(\varvars{x})},
+\code{ldexp(\varvars{x\, y})},
+\code{log(\varvars{x})},
+\code{log10(\varvars{x})},
+\code{modf(\varvars{x})},
+\code{pow(\varvars{x\, y})},
+\code{sin(\varvars{x})},
+\code{sinh(\varvars{x})},
+\code{sqrt(\varvars{x})},
+\code{tan(\varvars{x})},
+\code{tanh(\varvars{x})}.
+\fi
+
+Note that \code{frexp} and \code{modf} have a different call/return
+pattern than their C equivalents: they take a single argument and
+return a pair of values, rather than returning their second return
+value through an `output parameter' (there is no such thing in Python).
+
+The module also defines two mathematical constants:
+\iftexi
+\begin{datadesc}{pi}
+\dataline{e}
+\end{datadesc}
+\else
+\code{pi} and \code{e}.
+\fi
+
+\section{Built-in Module \sectcode{time}}
+
+\bimodindex{time}
+This module provides various time-related functions.
+It is always available.
+Functions are:
+
+\renewcommand{\indexsubitem}{(in module time)}
+\begin{funcdesc}{sleep}{secs}
+Suspend execution for the given number of seconds.  The argument may
+be a floating point number to indicate a more precise sleep time; the
+precision obtainable depends on the accuracy of the system clock but
+is usually in the order of 1/100th or 1/60th of a second.
+\end{funcdesc}
+
+\begin{funcdesc}{time}{}
+Return the ``wall clock time'' as a floating point number expressed in
+seconds since the ``Epoch'' (Thursday January 1, 00:00:00, 1970 UCT on
+\UNIX{} machines).  Note that even though the time is always returned
+as a floating point number, not all systems provide wall clock time
+with a better precision than 1 second.  An alternative for measuring
+precise intervals is \code{millitimer}, described below.
+\end{funcdesc}
+
+\noindent
+In most versions the following functions also exist:
+
+\begin{funcdesc}{millisleep}{msecs}
+Suspend execution for the given number of milliseconds.  (Obsolete,
+you can now use use \code{sleep} with a floating point argument.)
+\end{funcdesc}
+
+\begin{funcdesc}{millitimer}{}
+  Return the number of milliseconds of real time elapsed since some
+  point in the past that is fixed per execution of the python
+  interpreter (but may change in each following run).  The return
+  value may be negative, and it may wrap around.
+\end{funcdesc}
+
+\noindent
+The granularity of the milliseconds functions may be more than a
+millisecond (100 msecs on Amoeba, 1/60 sec on the Mac).
+
+\section{Built-in Module \sectcode{regex}}
+
+\bimodindex{regex}
+This module provides regular expression matching operations similar to
+those found in Emacs.  It is always available.
+
+By default the patterns are Emacs-style regular expressions; there is
+a way to change the syntax to match that of several well-known
+\UNIX{} utilities.
+
+This module is 8-bit clean: both patterns and strings may contain null
+bytes and characters whose high bit is set.
+
+\strong{Please note:} There is a little-known fact about Python string literals
+which means that you don't usually have to worry about doubling
+backslashes, even though they are used to escape special characters in
+string literals as well as in regular expressions.  This is because
+Python doesn't remove backslashes from string literals if they are
+followed by an unrecognized escape character.  \emph{However}, if you
+want to include a literal \dfn{backslash} in a regular expression
+represented as a string literal, you have to \emph{quadruple} it.  E.g.
+to extract LaTeX \samp{\e section\{{\rm \ldots}\}} headers from a document, you can
+use this pattern: \code{'\e \e \e\e section\{\e (.*\e )\}'}.
+
+The module defines these functions, and an exception:
+
+\renewcommand{\indexsubitem}{(in module regex)}
+\begin{funcdesc}{match}{pattern\, string}
+  Return how many characters at the beginning of \var{string} match
+  the regular expression \var{pattern}.  Return \code{-1} if the
+  string does not match the pattern (this is different from a
+  zero-length match!).
+\end{funcdesc}
+
+\begin{funcdesc}{search}{pattern\, string}
+  Return the first position in \var{string} that matches the regular
+  expression \var{pattern}.  Return -1 if no position in the string
+  matches the pattern (this is different from a zero-length match
+  anywhere!).
+\end{funcdesc}
+
+\begin{funcdesc}{compile}{pattern}
+  Compile a regular expression pattern into a regular expression
+  object, which can be used for matching using its \code{match} and
+  \code{search} methods, described below.  The sequence
+
+\bcode\begin{verbatim}
+prog = regex.compile(pat)
+result = prog.match(str)
+\end{verbatim}\ecode
+
+is equivalent to
+
+\bcode\begin{verbatim}
+result = regex.match(pat, str)
+\end{verbatim}\ecode
+
+but the version using \code{compile()} is more efficient when multiple
+regular expressions are used concurrently in a single program.  (The
+compiled version of the last pattern passed to \code{regex.match()} or
+\code{regex.search()} is cached, so programs that use only a single
+regular expression at a time needn't worry about compiling regular
+expressions.)
+\end{funcdesc}
+
+\begin{funcdesc}{set_syntax}{flags}
+  Set the syntax to be used by future calls to \code{compile},
+  \code{match} and \code{search}.  (Already compiled expression objects
+  are not affected.)  The argument is an integer which is the OR of
+  several flag bits.  The return value is the previous value of
+  the syntax flags.  Names for the flags are defined in the standard
+  module \code{regex_syntax}; read the file \file{regex_syntax.py} for
+  more information.
+\end{funcdesc}
+
+\begin{excdesc}{error}
+  Exception raised when a string passed to one of the functions here
+  is not a valid regular expression (e.g., unmatched parentheses) or
+  when some other error occurs during compilation or matching.  (It is
+  never an error if a string contains no match for a pattern.)
+\end{excdesc}
+
+\noindent
+Compiled regular expression objects support these methods:
+
+\renewcommand{\indexsubitem}{(regex method)}
+\begin{funcdesc}{match}{string\, pos}
+  Return how many characters at the beginning of \var{string} match
+  the compiled regular expression.  Return \code{-1} if the string
+  does not match the pattern (this is different from a zero-length
+  match!).
+  
+  The optional second parameter \var{pos} gives an index in the string
+  where the search is to start; it defaults to \code{0}.  This is not
+  completely equivalent to slicing the string; the \code{'\^'} pattern
+  character matches at the real begin of the string and at positions
+  just after a newline, not necessarily at the index where the search
+  is to start.
+%JHXXX added \var{pos} in description
+\end{funcdesc}
+
+\begin{funcdesc}{search}{string\, pos}
+  Return the first position in \var{string} that matches the regular
+  expression \code{pattern}.  Return \code{-1} if no position in the
+  string matches the pattern (this is different from a zero-length
+  match anywhere!).
+  
+  The optional second parameter has the same meaning as for the
+  \code{match} method.
+\end{funcdesc}
+
+\noindent
+Compiled regular expressions support one data attribute:
+
+\renewcommand{\indexsubitem}{(regex attribute)}
+\begin{datadesc}{regs}
+  This attribute is only valid when the last call to the \code{match}
+  or \code{search} method found a match.  Its value is a tuple of
+  pairs of indices corresponding to the beginning and end of all
+  parenthesized groups in the pattern.  Indices are relative to the
+  string argument passed to \code{match} or \code{search}.  The 0-th
+  tuple gives the beginning and end or the whole pattern.
+\end{datadesc}
+
+\section{Built-in Module \sectcode{marshal}}
+
+\bimodindex{marshal}
+This module contains two functions that can read and write Python
+values in a binary format.  The format is specific to Python, but
+independent of machine architecture issues (e.g., you can write a
+Python value to a file on a VAX, transport the file to a Mac, and read
+it back there).  Details of the format not explained here; read the
+source if you're interested.
+
+Not all Python object types are supported; in general, only objects
+whose value is independent from a particular invocation of Python can
+be written and read by this module.  The following types are supported:
+\code{None}, integers, long integers, floating point numbers,
+strings, tuples, lists, dictionaries, and code objects, where it
+should be understood that tuples, lists and dictionaries are only
+supported as long as the values contained therein are themselves
+supported; and recursive lists and dictionaries should not be written
+(they will cause an infinite loop).
+
+The module defines these functions:
+
+\renewcommand{\indexsubitem}{(in module marshal)}
+\begin{funcdesc}{dump}{value\, file}
+  Write the value on the open file.  The value must be a supported
+  type.  The file must be an open file object such as
+  \code{sys.stdout} or returned by \code{open()} or
+  \code{posix.popen()}.
+  
+  If the value has an unsupported type, garbage is written which cannot
+  be read back by \code{load()}.
+\end{funcdesc}
+
+\begin{funcdesc}{load}{file}
+  Read one value from the open file and return it.  If no valid value
+  is read, raise \code{EOFError}, \code{ValueError} or
+  \code{TypeError}.  The file must be an open file object.
+\end{funcdesc}
+
+\section{Built-in module \sectcode{struct}}
+\indexii{C}{structures}
+
+This module performs conversions between Python values and C
+structs represented as Python strings.  It uses \dfn{format strings}
+(explained below) as a compact descriptions of the lay-out of the C
+structs and the intended conversion to/from Python values.
+
+The module defines the following exception and functions:
+
+\renewcommand{\indexsubitem}{(in module struct)}
+\begin{excdesc}{error}
+  Exception raised on various occasions; argument is a string
+  describing what is wrong.
+\end{excdesc}
+
+\begin{funcdesc}{pack}{fmt\, v1\, v2\, {\rm \ldots}}
+  Return a string containing the values
+  \code{\var{v1}, \var{v2}, {\rm \ldots}} packed according to the given
+  format.  The arguments must match the values required by the format
+  exactly.
+\end{funcdesc}
+
+\begin{funcdesc}{unpack}{fmt\, string}
+  Unpack the string (presumably packed by \code{pack(\var{fmt}, {\rm \ldots})})
+  according to the given format.  The result is a tuple even if it
+  contains exactly one item.  The string must contain exactly the
+  amount of data required by the format (i.e.  \code{len(\var{string})} must
+  equal \code{calcsize(\var{fmt})}).
+\end{funcdesc}
+
+\begin{funcdesc}{calcsize}{fmt}
+  Return the size of the struct (and hence of the string)
+  corresponding to the given format.
+\end{funcdesc}
+
+Format characters have the following meaning; the conversion between C
+and Python values should be obvious given their types:
+
+\begin{tableiii}{|c|l|l|}{samp}{Format}{C}{Python}
+  \lineiii{x}{pad byte}{no value}
+  \lineiii{c}{char}{string of length 1}
+  \lineiii{b}{signed char}{integer}
+  \lineiii{h}{short}{integer}
+  \lineiii{i}{int}{integer}
+  \lineiii{l}{long}{integer}
+  \lineiii{f}{float}{float}
+  \lineiii{d}{double}{float}
+\end{tableiii}
+
+A format character may be preceded by an integral repeat count; e.g.
+the format string \code{'4h'} means exactly the same as \code{'hhhh'}.
+
+C numbers are represented in the machine's native format and byte
+order, and properly aligned by skipping pad bytes if necessary
+(according to the rules used by the C compiler).
+
+Examples (all on a big-endian machine):
+
+\bcode\begin{verbatim}
+pack('hhl', 1, 2, 3) == '\000\001\000\002\000\000\000\003'
+unpack('hhl', '\000\001\000\002\000\000\000\003') == (1, 2, 3)
+calcsize('hhl') == 8
+\end{verbatim}\ecode
+
+Hint: to align the end of a structure to the alignment requirement of
+a particular type, end the format with the code for that type with a
+repeat count of zero, e.g. the format \code{'llh0l'} specifies two
+pad bytes at the end, assuming longs are aligned on 4-byte boundaries.
+
+(More format characters are planned, e.g. \code{'s'} for character
+arrays, upper case for unsigned variants, and a way to specify the
+byte order, which is useful for [de]constructing network packets and
+reading/writing portable binary file formats like TIFF and AIFF.)

@@ -1,0 +1,61 @@
+Building Python on the Mac
+--------------------------
+
+You normally don't need to do this, since I am making a Mac binary
+available by ftp (see "./FTP"), but in case you're interested, here
+are some hints for compiling Python on the Mac.
+
+I am currently using THINK C 5.0, but I expect that it won't take too
+much work to port it back to THINK C 4.0 if you must (I did most of
+the development under 4.0 and then ported to 5.0 in a hurry).  3.0 or
+earlier will be harder.  You'll need more than 1 Meg of main memory
+when using THINK C 5.0 (all the header files have become bigger,
+sigh...).
+
+I have tried it on MPW 3.1 and managed to get a binary but it crashed
+or hung somewhere in the parser; I didn't have the time or incentive
+to investigate further (hint: search for "applec" in the source).
+
+Turn of strict pointer checking (else you have to add a lot of casts
+for function pointers used to initialize methods arrays).  Turn on
+definition of __STDC__.  Don't use <MacHeaders>.  It may save a lot of
+compilation time to precompile "allobjects.h" (rename it to
+allobjects.c, choose Precompile..., and save the precompiled version
+as allobjects.h), but then again I got some weird errors when I tried
+this, like complaints about perfectly good functions being
+redefined...
+
+You don't need STDWIN, but it makes using Python on the Mac all the
+more exciting; see "./FTP".  You may need a later version of STDWIN
+than released; mail me if you have problems with missing functions.
+
+You need a copy of getopt.c.  There's a version in the STDWIN Tools
+directory.  You can also just turn off option processing in
+pythonmain.c.
+
+You need some files from my "unix emulation for the Mac" package (big
+name for a small number of library functions), else macmodule.c won't
+work (the UNIX emulation in the THINK C library is missing the
+functions for manipulating directories).  This is avaiable by ftp as
+maclibunix.shar, see "./FTP".
+
+I should probably just list the files to add to the project here, but
+it's hard to extract this from the project and I don't want to type it
+in myself just now, so you'll have to read and understand the UNIX
+Makefile to figure out which files to use...  In any case, don't
+include everything from the source directory; some sources are only
+used by the parser generator, some are UNIX-specific modules.
+
+Don't bother with the parser generator unless you have to: it runs on
+the Mac, but why bother?  Just run it on UNIX and copy graminit.[ch]
+to the Mac with the other sources.
+
+Instead of config.c, use configmac.c.  Forget all of the optional
+modules (*module.c) listed in the Makefile, except stdwinmodule.c if
+you want to use STDWIN.  Instead of posixmodule.c, use macmodule.c.
+Forget pwdmodule.c.  You need sysmodule.c, bltinmodule.c,
+timemodule.c, mathmodule.c.  (Actually, you can figure out which of
+the *module.c files are needed for a particular Python version by
+looking which init functions are listed in 'inittab' at the end of
+config*.c.)  If you don't use STDWIN, undefine USE_STDWIN in
+configmac.c.

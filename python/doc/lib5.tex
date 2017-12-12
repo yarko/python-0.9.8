@@ -1,0 +1,2442 @@
+%% Master: lib.tex
+\chapter{STDWIN ONLY}
+
+\section{Built-in Module \sectcode{stdwin}}
+
+\bimodindex{stdwin}
+This module defines several new object types and functions that
+provide access to the functionality of the Standard Window System
+Interface, STDWIN [CWI report CR-R8817].
+It is available on systems to which STDWIN has been ported (which is
+most systems).
+It is only available if the \code{DISPLAY} environment variable is set
+or an explicit \samp{-display \var{displayname}} argument is passed to
+the interpreter.
+
+Functions have names that usually resemble their C STDWIN counterparts
+with the initial `w' dropped.
+Points are represented by pairs of integers; rectangles
+by pairs of points.
+For a complete description of STDWIN please refer to the documentation
+of STDWIN for C programmers (aforementioned CWI report).
+
+\subsection{Functions Defined in Module \sectcode{stdwin}}
+
+The following functions are defined in the \code{stdwin} module:
+
+\renewcommand{\indexsubitem}{(in module stdwin)}
+\begin{funcdesc}{open}{title}
+Open a new window whose initial title is given by the string argument.
+Return a window object; window object methods are described below.%
+\footnote{The Python version of STDWIN does not support draw procedures; all
+	drawing requests are reported as draw events.}
+\end{funcdesc}
+
+\begin{funcdesc}{getevent}{}
+Wait for and return the next event.
+An event is returned as a triple: the first element is the event
+type, a small integer; the second element is the window object to which
+the event applies, or
+\code{None}
+if it applies to no window in particular;
+the third element is type-dependent.
+Names for event types and command codes are defined in the standard
+module
+\code{stdwinevent}.
+\end{funcdesc}
+
+\begin{funcdesc}{pollevent}{}
+Return the next event, if one is immediately available.
+If no event is available, return \code{()}.
+\end{funcdesc}
+
+\begin{funcdesc}{setdefscrollbars}{hflag\, vflag}
+Set the flags controlling whether subsequently opened windows will
+have horizontal and/or vertical scroll bars.
+\end{funcdesc}
+
+\begin{funcdesc}{setdefwinpos}{h\, v}
+Set the default window position for windows opened subsequently.
+\end{funcdesc}
+
+\begin{funcdesc}{setdefwinsize}{width\, height}
+Set the default window size for windows opened subsequently.
+\end{funcdesc}
+
+\begin{funcdesc}{getdefscrollbars}{}
+Return the flags controlling whether subsequently opened windows will
+have horizontal and/or vertical scroll bars.
+\end{funcdesc}
+
+\begin{funcdesc}{getdefwinpos}{}
+Return the default window position for windows opened subsequently.
+\end{funcdesc}
+
+\begin{funcdesc}{getdefwinsize}{}
+Return the default window size for windows opened subsequently.
+\end{funcdesc}
+
+\begin{funcdesc}{getscrsize}{}
+Return the screen size in pixels.
+\end{funcdesc}
+
+\begin{funcdesc}{getscrmm}{}
+Return the screen size in millimeters.
+\end{funcdesc}
+
+\begin{funcdesc}{fetchcolor}{colorname}
+Return the pixel value corresponding to the given color name.
+Return the default foreground color for unknown color names.
+Hint: the following code tests wheter you are on a machine that
+supports more than two colors:
+\bcode\begin{verbatim}
+if stdwin.fetchcolor('black') <> \
+          stdwin.fetchcolor('red') <> \
+          stdwin.fetchcolor('white'):
+    print 'color machine'
+else:
+    print 'monochrome machine'
+\end{verbatim}\ecode
+\end{funcdesc}
+
+\begin{funcdesc}{setfgcolor}{pixel}
+Set the default foreground color.
+This will become the default foreground color of windows opened
+subsequently, including dialogs.
+\end{funcdesc}
+
+\begin{funcdesc}{setbgcolor}{pixel}
+Set the default background color.
+This will become the default background color of windows opened
+subsequently, including dialogs.
+\end{funcdesc}
+
+\begin{funcdesc}{getfgcolor}{}
+Return the pixel value of the current default foreground color.
+\end{funcdesc}
+
+\begin{funcdesc}{getbgcolor}{}
+Return the pixel value of the current default background color.
+\end{funcdesc}
+
+\begin{funcdesc}{setfont}{fontname}
+Set the current default font.
+This will become the default font for windows opened subsequently,
+and is also used by the text measuring functions \code{textwidth},
+\code{textbreak}, \code{lineheight} and \code{baseline} below.
+This accepts two more optional parameters, size and style:
+Size is the font size (in `points').
+Style is a single character specifying the style, as follows:
+\code{'b'} = bold,
+\code{'i'} = italic,
+\code{'o'} = bold + italic,
+\code{'u'} = underline;
+default style is roman.
+Size and style are ignored under X11 but used on the Macintosh.
+(Sorry for all this complexity --- a more uniform interface is being designed.)
+\end{funcdesc}
+
+\begin{funcdesc}{menucreate}{title}
+Create a menu object referring to a global menu (a menu that appears in
+all windows).
+Methods of menu objects are described below.
+Note: normally, menus are created locally; see the window method
+\code{menucreate} below.
+\strong{Warning:} the menu only appears in a window as long as the object
+returned by this call exists.
+\end{funcdesc}
+
+\begin{funcdesc}{fleep}{}
+Cause a beep or bell (or perhaps a `visual bell' or flash, hence the
+name).
+\end{funcdesc}
+
+\begin{funcdesc}{message}{string}
+Display a dialog box containing the string.
+The user must click OK before the function returns.
+\end{funcdesc}
+
+\begin{funcdesc}{askync}{prompt\, default}
+Display a dialog that prompts the user to answer a question with yes or
+no.
+Return 0 for no, 1 for yes.
+If the user hits the Return key, the default (which must be 0 or 1) is
+returned.
+If the user cancels the dialog, the
+\code{KeyboardInterrupt}
+exception is raised.
+\end{funcdesc}
+
+\begin{funcdesc}{askstr}{prompt\, default}
+Display a dialog that prompts the user for a string.
+If the user hits the Return key, the default string is returned.
+If the user cancels the dialog, the
+\code{KeyboardInterrupt}
+exception is raised.
+\end{funcdesc}
+
+\begin{funcdesc}{askfile}{prompt\, default\, new}
+Ask the user to specify a filename.
+If
+\var{new}
+is zero it must be an existing file; otherwise, it must be a new file.
+If the user cancels the dialog, the
+\code{KeyboardInterrupt}
+exception is raised.
+\end{funcdesc}
+
+\begin{funcdesc}{setcutbuffer}{i\, string}
+Store the string in the system's cut buffer number
+\var{i},
+where it can be found (for pasting) by other applications.
+On X11, there are 8 cut buffers (numbered 0..7).
+Cut buffer number 0 is the `clipboard' on the Macintosh.
+\end{funcdesc}
+
+\begin{funcdesc}{getcutbuffer}{i}
+Return the contents of the system's cut buffer number
+\var{i}.
+\end{funcdesc}
+
+\begin{funcdesc}{rotatecutbuffers}{n}
+On X11, rotate the 8 cut buffers by
+\var{n}.
+Ignored on the Macintosh.
+\end{funcdesc}
+
+\begin{funcdesc}{getselection}{i}
+Return X11 selection number
+\var{i.}
+Selections are not cut buffers.
+Selection numbers are defined in module
+\code{stdwinevents}.
+Selection \code{WS_PRIMARY} is the
+\dfn{primary}
+selection (used by
+xterm,
+for instance);
+selection \code{WS_SECONDARY} is the
+\dfn{secondary}
+selection; selection \code{WS_CLIPBOARD} is the
+\dfn{clipboard}
+selection (used by
+xclipboard).
+On the Macintosh, this always returns an empty string.
+\end{funcdesc}
+
+\begin{funcdesc}{resetselection}{i}
+Reset selection number
+\var{i},
+if this process owns it.
+(See window method
+\code{setselection()}).
+\end{funcdesc}
+
+\begin{funcdesc}{baseline}{}
+Return the baseline of the current font (defined by STDWIN as the
+vertical distance between the baseline and the top of the
+characters).%
+\footnote{There is no way yet to set the current font.
+	This will change in a future version.}
+\end{funcdesc}
+
+\begin{funcdesc}{lineheight}{}
+Return the total line height of the current font.
+\end{funcdesc}
+
+\begin{funcdesc}{textbreak}{str\, width}
+Return the number of characters of the string that fit into a space of
+\var{width}
+bits wide when drawn in the curent font.
+\end{funcdesc}
+
+\begin{funcdesc}{textwidth}{str}
+Return the width in bits of the string when drawn in the current font.
+\end{funcdesc}
+
+\begin{funcdesc}{connectionnumber}{}
+\funcline{fileno}{}
+(X11 under \UNIX{} only) Return the ``connection number'' used by the
+underlying X11 implementation.  (This is normally the file number of
+the socket.)  Both functions return the same value;
+\code{connectionnumber()} is named after the corresponding function in
+X11 and STDWIN, while \code{fileno()} makes it possible to use the
+\code{stdwin} module as a ``file'' object parameter to
+\code{select.select()}.  Note that if \code{select()} implies that
+input is possible on \code{stdwin}, this does not guarantee that an
+event is ready --- it may be some internal communication going on
+between the X server and the client library.  Thus, you should call
+\code{stdwin.pollevent()} until it returns \code{None} to check for
+events if you don't want your program to block.  Because of internal
+buffering in X11, it is also possible that \code{stdwin.pollevent()}
+returns an event while \code{select()} does not find \code{stdwin} to
+be ready, so you should read any pending events with
+\code{stdwin.pollevent()} until it returns \code{None} before entering
+a blocking \code{select()} call.
+\bimodindex{select}
+\end{funcdesc}
+
+\subsection{Window Object Methods}
+
+Window objects are created by
+\code{stdwin.open()}.
+There is no explicit function to close a window; windows are closed when
+they are garbage-collected.
+Window objects have the following methods:
+
+\renewcommand{\indexsubitem}{(window method)}
+\begin{funcdesc}{begindrawing}{}
+Return a drawing object, whose methods (described below) allow drawing
+in the window.
+\end{funcdesc}
+
+\begin{funcdesc}{change}{rect}
+Invalidate the given rectangle; this may cause a draw event.
+\end{funcdesc}
+
+\begin{funcdesc}{gettitle}{}
+Returns the window's title string.
+\end{funcdesc}
+
+\begin{funcdesc}{getdocsize}{}
+\begin{sloppypar}
+Return a pair of integers giving the size of the document as set by
+\code{setdocsize()}.
+\end{sloppypar}
+\end{funcdesc}
+
+\begin{funcdesc}{getorigin}{}
+Return a pair of integers giving the origin of the window with respect
+to the document.
+\end{funcdesc}
+
+\begin{funcdesc}{gettitle}{}
+Return the window's title string.
+\end{funcdesc}
+
+\begin{funcdesc}{getwinsize}{}
+Return a pair of integers giving the size of the window.
+\end{funcdesc}
+
+\begin{funcdesc}{menucreate}{title}
+Create a menu object referring to a local menu (a menu that appears
+only in this window).
+Methods of menu objects are described below.
+{\bf Warning:} the menu only appears as long as the object
+returned by this call exists.
+\end{funcdesc}
+
+\begin{funcdesc}{scroll}{rect\, point}
+Scroll the given rectangle by the vector given by the point.
+\end{funcdesc}
+
+\begin{funcdesc}{setdocsize}{point}
+Set the size of the drawing document.
+\end{funcdesc}
+
+\begin{funcdesc}{setorigin}{point}
+Move the origin of the window (its upper left corner)
+to the given point in the document.
+\end{funcdesc}
+
+\begin{funcdesc}{setselection}{i\, str}
+Attempt to set X11 selection number
+\var{i}
+to the string
+\var{str}.
+(See stdwin method
+\code{getselection()}
+for the meaning of
+\var{i}.)
+Return true if it succeeds.
+If  succeeds, the window ``owns'' the selection until
+(a) another applications takes ownership of the selection; or
+(b) the window is deleted; or
+(c) the application clears ownership by calling
+\code{stdwin.resetselection(\var{i})}.
+When another application takes ownership of the selection, a
+\code{WE_LOST_SEL}
+event is received for no particular window and with the selection number
+as detail.
+Ignored on the Macintosh.
+\end{funcdesc}
+
+\begin{funcdesc}{settimer}{dsecs}
+Schedule a timer event for the window in
+\code{\var{dsecs}/10}
+seconds.
+\end{funcdesc}
+
+\begin{funcdesc}{settitle}{title}
+Set the window's title string.
+\end{funcdesc}
+
+\begin{funcdesc}{setwincursor}{name}
+\begin{sloppypar}
+Set the window cursor to a cursor of the given name.
+It raises the
+\code{RuntimeError}
+exception if no cursor of the given name exists.
+Suitable names include
+\code{'ibeam'},
+\code{'arrow'},
+\code{'cross'},
+\code{'watch'}
+and
+\code{'plus'}.
+On X11, there are many more (see
+\file{<X11/cursorfont.h>}).
+\end{sloppypar}
+\end{funcdesc}
+
+\begin{funcdesc}{show}{rect}
+Try to ensure that the given rectangle of the document is visible in
+the window.
+\end{funcdesc}
+
+\begin{funcdesc}{textcreate}{rect}
+Create a text-edit object in the document at the given rectangle.
+Methods of text-edit objects are described below.
+\end{funcdesc}
+
+\subsection{Drawing Object Methods}
+
+Drawing objects are created exclusively by the window method
+\code{begindrawing()}.
+Only one drawing object can exist at any given time; the drawing object
+must be deleted to finish drawing.
+No drawing object may exist when
+\code{stdwin.getevent()}
+is called.
+Drawing objects have the following methods:
+
+\renewcommand{\indexsubitem}{(drawing method)}
+\begin{funcdesc}{box}{rect}
+Draw a box just inside a rectangle.
+\end{funcdesc}
+
+\begin{funcdesc}{circle}{center\, radius}
+Draw a circle with given center point and radius.
+\end{funcdesc}
+
+\begin{funcdesc}{elarc}{center\, \(rh\, rv\)\, \(a1\, a2\)}
+Draw an elliptical arc with given center point.
+\code{(\var{rh}, \var{rv})}
+gives the half sizes of the horizontal and vertical radii.
+\code{(\var{a1}, \var{a2})}
+gives the angles (in degrees) of the begin and end points.
+0 degrees is at 3 o'clock, 90 degrees is at 12 o'clock.
+\end{funcdesc}
+
+\begin{funcdesc}{erase}{rect}
+Erase a rectangle.
+\end{funcdesc}
+
+\begin{funcdesc}{fillcircle}{center\, radius}
+Draw a filled circle with given center point and radius.
+\end{funcdesc}
+
+\begin{funcdesc}{fillelarc}{center\, \(rh\, rv\)\, \(a1\, a2\)}
+Draw a filled elliptical arc; arguments as for \code{elarc}.
+\end{funcdesc}
+
+\begin{funcdesc}{fillpoly}{points}
+Draw a filled polygon given by a list (or tuple) of points.
+\end{funcdesc}
+
+\begin{funcdesc}{invert}{rect}
+Invert a rectangle.
+\end{funcdesc}
+
+\begin{funcdesc}{line}{p1\, p2}
+Draw a line from point
+\var{p1}
+to
+\var{p2}.
+\end{funcdesc}
+
+\begin{funcdesc}{paint}{rect}
+Fill a rectangle.
+\end{funcdesc}
+
+\begin{funcdesc}{poly}{points}
+Draw the lines connecting the given list (or tuple) of points.
+\end{funcdesc}
+
+\begin{funcdesc}{text}{p\, str}
+Draw a string starting at point p (the point specifies the
+top left coordinate of the string).
+\end{funcdesc}
+
+\begin{funcdesc}{shade}{rect\, percent}
+Fill a rectangle with a shading pattern that is about
+\var{percent}
+percent filled.
+\end{funcdesc}
+
+\begin{funcdesc}{xorline}{p1\, p2}
+Draw a line in XOR mode.
+\end{funcdesc}
+
+\begin{funcdesc}{setfgcolor}{}
+\funcline{setbgcolor}{}
+\funcline{getfgcolor}{}
+\funcline{getbgcolor}{}
+These functions are similar to the corresponding functions described
+above for the
+\code{stdwin}
+module, but affect or return the colors currently used for drawing
+instead of the global default colors.
+When a drawing object is created, its colors are set to the window's
+default colors, which are in turn initialized from the global default
+colors when the window is created.
+\end{funcdesc}
+
+\begin{funcdesc}{setfont}{}
+\funcline{baseline}{}
+\funcline{lineheight}{}
+\funcline{textbreak}{}
+\funcline{textwidth}{}
+These functions are similar to the corresponding functions described
+above for the
+\code{stdwin}
+module, but affect or use the current drawing font instead of
+the global default font.
+When a drawing object is created, its font is set to the window's
+default font, which is in turn initialized from the global default
+font when the window is created.
+\end{funcdesc}
+
+\subsection{Menu Object Methods}
+
+A menu object represents a menu.
+The menu is destroyed when the menu object is deleted.
+The following methods are defined:
+
+\renewcommand{\indexsubitem}{(menu method)}
+\begin{funcdesc}{additem}{text\, shortcut}
+Add a menu item with given text.
+The shortcut must be a string of length 1, or omitted (to specify no
+shortcut).
+\end{funcdesc}
+
+\begin{funcdesc}{setitem}{i\, text}
+Set the text of item number
+\var{i}.
+\end{funcdesc}
+
+\begin{funcdesc}{enable}{i\, flag}
+Enable or disables item
+\var{i}.
+\end{funcdesc}
+
+\begin{funcdesc}{check}{i\, flag}
+Set or clear the
+\dfn{check mark}
+for item
+\var{i}.
+\end{funcdesc}
+
+\subsection{Text-edit Object Methods}
+
+A text-edit object represents a text-edit block.
+For semantics, see the STDWIN documentation for C programmers.
+The following methods exist:
+
+\renewcommand{\indexsubitem}{(text-edit method)}
+\begin{funcdesc}{arrow}{code}
+Pass an arrow event to the text-edit block.
+The
+\var{code}
+must be one of
+\code{WC_LEFT},
+\code{WC_RIGHT},
+\code{WC_UP}
+or
+\code{WC_DOWN}
+(see module
+\code{stdwinevents}).
+\end{funcdesc}
+
+\begin{funcdesc}{draw}{rect}
+Pass a draw event to the text-edit block.
+The rectangle specifies the redraw area.
+\end{funcdesc}
+
+\begin{funcdesc}{event}{type\, window\, detail}
+Pass an event gotten from
+\code{stdwin.getevent()}
+to the text-edit block.
+Return true if the event was handled.
+\end{funcdesc}
+
+\begin{funcdesc}{getfocus}{}
+Return 2 integers representing the start and end positions of the
+focus, usable as slice indices on the string returned by
+\code{gettext()}.
+\end{funcdesc}
+
+\begin{funcdesc}{getfocustext}{}
+Return the text in the focus.
+\end{funcdesc}
+
+\begin{funcdesc}{getrect}{}
+Return a rectangle giving the actual position of the text-edit block.
+(The bottom coordinate may differ from the initial position because
+the block automatically shrinks or grows to fit.)
+\end{funcdesc}
+
+\begin{funcdesc}{gettext}{}
+Return the entire text buffer.
+\end{funcdesc}
+
+\begin{funcdesc}{move}{rect}
+Specify a new position for the text-edit block in the document.
+\end{funcdesc}
+
+\begin{funcdesc}{replace}{str}
+Replace the text in the focus by the given string.
+The new focus is an insert point at the end of the string.
+\end{funcdesc}
+
+\begin{funcdesc}{setfocus}{i\, j}
+Specify the new focus.
+Out-of-bounds values are silently clipped.
+\end{funcdesc}
+
+\begin{funcdesc}{settext}{str}
+Replace the entire text buffer by the given string and set the focus
+to \code{(0, 0)}.
+\end{funcdesc}
+
+\subsection{Example}
+\nodename{Stdwin Example}
+
+Here is a minimal example of using STDWIN in Python.
+It creates a window and draws the string ``Hello world'' in the top
+left corner of the window.
+The window will be correctly redrawn when covered and re-exposed.
+The program quits when the close icon or menu item is requested.
+
+\bcode\begin{verbatim}
+import stdwin
+from stdwinevents import *
+
+def main():
+    mywin = stdwin.open('Hello')
+    #
+    while 1:
+        (type, win, detail) = stdwin.getevent()
+        if type == WE_DRAW:
+            draw = win.begindrawing()
+            draw.text((0, 0), 'Hello, world')
+            del draw
+        elif type == WE_CLOSE:
+            break
+
+main()
+\end{verbatim}\ecode
+
+\section{Standard Module \sectcode{stdwinevents}}
+
+\stmodindex{stdwinevents}
+This module defines constants used by STDWIN for event types
+(\code{WE_ACTIVATE} etc.), command codes (\code{WC_LEFT} etc.)
+and selection types (\code{WS_PRIMARY} etc.).
+Read the file for details.
+Suggested usage is
+
+\bcode\begin{verbatim}
+>>> from stdwinevents import *
+>>> 
+\end{verbatim}\ecode
+
+\section{Standard Module \sectcode{rect}}
+
+\stmodindex{rect}
+This module contains useful operations on rectangles.
+A rectangle is defined as in module
+\code{stdwin}:
+a pair of points, where a point is a pair of integers.
+For example, the rectangle
+
+\bcode\begin{verbatim}
+(10, 20), (90, 80)
+\end{verbatim}\ecode
+
+is a rectangle whose left, top, right and bottom edges are 10, 20, 90
+and 80, respectively.
+Note that the positive vertical axis points down (as in
+\code{stdwin}).
+
+The module defines the following objects:
+
+\renewcommand{\indexsubitem}{(in module rect)}
+\begin{excdesc}{error}
+The exception raised by functions in this module when they detect an
+error.
+The exception argument is a string describing the problem in more
+detail.
+\end{excdesc}
+
+\begin{datadesc}{empty}
+The rectangle returned when some operations return an empty result.
+This makes it possible to quickly check whether a result is empty:
+
+\bcode\begin{verbatim}
+>>> import rect
+>>> r1 = (10, 20), (90, 80)
+>>> r2 = (0, 0), (10, 20)
+>>> r3 = rect.intersect(r1, r2)
+>>> if r3 is rect.empty: print 'Empty intersection'
+Empty intersection
+>>> 
+\end{verbatim}\ecode
+\end{datadesc}
+
+\begin{funcdesc}{is_empty}{r}
+Returns true if the given rectangle is empty.
+A rectangle
+\code{(\var{left}, \var{top}), (\var{right}, \var{bottom})}
+is empty if
+\iftexi
+\code{\var{left} >= \var{right}} or \code{\var{top} => \var{bottom}}.
+\else
+$\var{left} \geq \var{right}$ or $\var{top} \geq \var{bottom}$.
+%%JHXXX{\em left~$\geq$~right} or {\em top~$\leq$~bottom}.
+\fi
+\end{funcdesc}
+
+\begin{funcdesc}{intersect}{list}
+Returns the intersection of all rectangles in the list argument.
+It may also be called with a tuple argument or with two or more
+rectangles as arguments.
+Raises
+\code{rect.error}
+if the list is empty.
+Returns
+\code{rect.empty}
+if the intersection of the rectangles is empty.
+\end{funcdesc}
+
+\begin{funcdesc}{union}{list}
+Returns the smallest rectangle that contains all non-empty rectangles in
+the list argument.
+It may also be called with a tuple argument or with two or more
+rectangles as arguments.
+Returns
+\code{rect.empty}
+if the list is empty or all its rectangles are empty.
+\end{funcdesc}
+
+\begin{funcdesc}{pointinrect}{point\, rect}
+Returns true if the point is inside the rectangle.
+By definition, a point
+\code{(\var{h}, \var{v})}
+is inside a rectangle
+\code{(\var{left}, \var{top}), (\var{right}, \var{bottom})} if
+\iftexi
+\code{\var{left} <= \var{h} < \var{right}} and
+\code{\var{top} <= \var{v} < \var{bottom}}.
+\else
+$\var{left} \leq \var{h} < \var{right}$ and
+$\var{top} \leq \var{v} < \var{bottom}$.
+\fi
+\end{funcdesc}
+
+\begin{funcdesc}{inset}{rect\, \(dh\, dv\)}
+Returns a rectangle that lies inside the
+\code{rect}
+argument by
+\var{dh}
+pixels horizontally
+and
+\var{dv}
+pixels
+vertically.
+If
+\var{dh}
+or
+\var{dv}
+is negative, the result lies outside
+\var{rect}.
+\end{funcdesc}
+
+\begin{funcdesc}{rect2geom}{rect}
+Converts a rectangle to geometry representation:
+\code{(\var{left}, \var{top}), (\var{width}, \var{height})}.
+\end{funcdesc}
+
+\begin{funcdesc}{geom2rect}{geom}
+Converts a rectangle given in geometry representation back to the
+standard rectangle representation
+\code{(\var{left}, \var{top}), (\var{right}, \var{bottom})}.
+\end{funcdesc}
+
+\chapter{SGI MACHINES ONLY}
+
+\section{Built-in Module \sectcode{al}}
+
+\bimodindex{al}
+This module provides access to the audio facilities of the Indigo and
+4D/35 workstations, described in section 3A of the IRIX 4.0 man pages
+(and also available as an option in IRIX 3.3).  You'll need to read
+those man pages to understand what these functions do!
+
+Symbolic constants from the C header file \file{<audio.h>} are defined
+in the standard module \code{AL}, see below.
+
+\strong{Warning:} the current version of the audio library may dump core
+when bad argument values are passed rather than returning an error
+status.  Unfortunately, since the precise circumstances under which
+this may happen are undocumented and hard to check, the Python
+interface can provide no protection against this kind of problems.
+(One example is specifying an excessive queue size --- there is no
+documented upper limit.)
+
+Module \code{al} defines the following functions:
+
+\renewcommand{\indexsubitem}{(in module al)}
+\begin{funcdesc}{openport}{name\, direction\, config}
+Equivalent to the C function ALopenport().  The name and direction
+arguments are strings.  The optional config argument is an opaque
+configuration object as returned by \code{al.newconfig()}.  The return
+value is an opaque port object; methods of port objects are described
+below.
+\end{funcdesc}
+
+\begin{funcdesc}{newconfig}{}
+Equivalent to the C function ALnewconfig().  The return value is a new
+opaque configuration object; methods of configuration objects are
+described below.
+\end{funcdesc}
+
+\begin{funcdesc}{queryparams}{device}
+Equivalent to the C function ALqueryparams().  The device argument is
+an integer.  The return value is a list of integers containing the
+data returned by ALqueryparams().
+\end{funcdesc}
+
+\begin{funcdesc}{getparams}{device\, list}
+Equivalent to the C function ALgetparams().  The device argument is an
+integer.  The list argument is a list such as returned by
+\code{queryparams}; it is modified in place (!).
+\end{funcdesc}
+
+\begin{funcdesc}{setparams}{device\, list}
+Equivalent to the C function ALsetparams().  The device argument is an
+integer.The list argument is a list such as returned by
+\code{al.queryparams}.
+\end{funcdesc}
+
+Configuration objects (returned by \code{al.newconfig()} have the
+following methods:
+
+\renewcommand{\indexsubitem}{(audio configuration object method)}
+\begin{funcdesc}{getqueuesize}{}
+Return the queue size; equivalent to the C function ALgetqueuesize().
+\end{funcdesc}
+
+\begin{funcdesc}{setqueuesize}{size}
+Set the queue size; equivalent to the C function ALsetqueuesize().
+\end{funcdesc}
+
+\begin{funcdesc}{getwidth}{}
+Get the sample width; equivalent to the C function ALgetwidth().
+\end{funcdesc}
+
+\begin{funcdesc}{getwidth}{width}
+Set the sample width; equivalent to the C function ALsetwidth().
+\end{funcdesc}
+
+\begin{funcdesc}{getchannels}{}
+Get the channel count; equivalent to the C function ALgetchannels().
+\end{funcdesc}
+
+\begin{funcdesc}{setchannels}{nchannels}
+Set the channel count; equivalent to the C function ALsetchannels().
+\end{funcdesc}
+
+Port objects (returned by \code{al.openport()} have the following
+methods:
+
+\renewcommand{\indexsubitem}{(audio port object method)}
+\begin{funcdesc}{closeport}{}
+Close the port; equivalent to the C function ALcloseport().
+\end{funcdesc}
+
+\begin{funcdesc}{getfd}{}
+Return the file descriptor as an int; equivalent to the C function
+ALgetfd().
+\end{funcdesc}
+
+\begin{funcdesc}{getfilled}{}
+Return the number of filled samples; equivalent to the C function
+ALgetfilled().
+\end{funcdesc}
+
+\begin{funcdesc}{getfillable}{}
+Return the number of fillable samples; equivalent to the C function
+ALgetfillable().
+\end{funcdesc}
+
+\begin{funcdesc}{readsamps}{nsamples}
+Read a number of samples from the queue, blocking if necessary;
+equivalent to the C function ALreadsamples.  The data is returned as a
+string containing the raw data (e.g. 2 bytes per sample in big-endian
+byte order (high byte, low byte) if you have set the sample width to 2
+bytes.
+\end{funcdesc}
+
+\begin{funcdesc}{writesamps}{samples}
+Write samples into the queue, blocking if necessary; equivalent to the
+C function ALwritesamples.  The samples are encoded as described for
+the \code{readsamps} return value.
+\end{funcdesc}
+
+\begin{funcdesc}{getfillpoint}{}
+Return the `fill point'; equivalent to the C function ALgetfillpoint().
+\end{funcdesc}
+
+\begin{funcdesc}{setfillpoint}{fillpoint}
+Set the `fill point'; equivalent to the C function ALsetfillpoint().
+\end{funcdesc}
+
+\begin{funcdesc}{getconfig}{}
+Return a configuration object containing the current configuration of
+the port; equivalent to the C function ALgetconfig().
+\end{funcdesc}
+
+\begin{funcdesc}{setconfig}{config}
+Set the configuration from the argument, a configuration object;
+equivalent to the C function ALsetconfig().
+\end{funcdesc}
+
+\section{Standard Module \sectcode{AL}}
+\nodename{AL (uppercase)}
+
+\stmodindex{AL}
+This module defines symbolic constants needed to use the built-in
+module \code{al} (see above); they are equivalent to those defined in
+the C header file \file{<audio.h>} except that the name prefix
+\samp{AL_} is omitted.  Read the module source for a complete list of
+the defined names.  Suggested use:
+
+\bcode\begin{verbatim}
+import al
+from AL import *
+\end{verbatim}\ecode
+
+\section{Built-in Module \sectcode{audio}}
+
+\bimodindex{audio}
+\strong{Note:} This module is obsolete, since the hardware to which it
+interfaces is obsolete.  For audio on the Indigo or 4D/35, see
+built-in module \code{al} above.
+
+This module provides rudimentary access to the audio I/O device
+\file{/dev/audio} on the Silicon Graphics Personal IRIS 4D/25;
+see {\it audio}(7). It supports the following operations:
+
+\renewcommand{\indexsubitem}{(in module audio)}
+\begin{funcdesc}{setoutgain}{n}
+Sets the output gain.
+\iftexi
+\code{0 <= \var{n} < 256}.
+\else
+$0 \leq \var{n} < 256$.
+%%JHXXX Sets the output gain (0-255).
+\fi
+\end{funcdesc}
+
+\begin{funcdesc}{getoutgain}{}
+Returns the output gain.
+\end{funcdesc}
+
+\begin{funcdesc}{setrate}{n}
+Sets the sampling rate: \code{1} = 32K/sec, \code{2} = 16K/sec,
+\code{3} = 8K/sec.
+\end{funcdesc}
+
+\begin{funcdesc}{setduration}{n}
+Sets the `sound duration' in units of 1/100 seconds.
+\end{funcdesc}
+
+\begin{funcdesc}{read}{n}
+Reads a chunk of
+\var{n}
+sampled bytes from the audio input (line in or microphone).
+The chunk is returned as a string of length n.
+Each byte encodes one sample as a signed 8-bit quantity using linear
+encoding.
+This string can be converted to numbers using \code{chr2num()} described
+below.
+\end{funcdesc}
+
+\begin{funcdesc}{write}{buf}
+Writes a chunk of samples to the audio output (speaker).
+\end{funcdesc}
+
+These operations support asynchronous audio I/O:
+
+\renewcommand{\indexsubitem}{(in module audio)}
+\begin{funcdesc}{start_recording}{n}
+Starts a second thread (a process with shared memory) that begins reading
+\var{n}
+bytes from the audio device.
+The main thread immediately continues.
+\end{funcdesc}
+
+\begin{funcdesc}{wait_recording}{}
+Waits for the second thread to finish and returns the data read.
+\end{funcdesc}
+
+\begin{funcdesc}{stop_recording}{}
+Makes the second thread stop reading as soon as possible.
+Returns the data read so far.
+\end{funcdesc}
+
+\begin{funcdesc}{poll_recording}{}
+Returns true if the second thread has finished reading (so
+\code{wait_recording()} would return the data without delay).
+\end{funcdesc}
+
+\begin{funcdesc}{start_playing}{}
+\funcline{wait_playing}{}
+\funcline{stop_playing}{}
+\funcline{poll_playing}{}
+\begin{sloppypar}
+Similar but for output.
+\code{stop_playing()}
+returns a lower bound for the number of bytes actually played (not very
+accurate).
+\end{sloppypar}
+\end{funcdesc}
+
+The following operations do not affect the audio device but are
+implemented in C for efficiency:
+
+\renewcommand{\indexsubitem}{(in module audio)}
+\begin{funcdesc}{amplify}{buf\, f1\, f2}
+Amplifies a chunk of samples by a variable factor changing from
+\code{\var{f1}/256} to \code{\var{f2}/256.}
+Negative factors are allowed.
+Resulting values that are to large to fit in a byte are clipped.         
+\end{funcdesc}
+
+\begin{funcdesc}{reverse}{buf}
+Returns a chunk of samples backwards.
+\end{funcdesc}
+
+\begin{funcdesc}{add}{buf1\, buf2}
+Bytewise adds two chunks of samples.
+Bytes that exceed the range are clipped.
+If one buffer is shorter, it is assumed to be padded with zeros.
+\end{funcdesc}
+
+\begin{funcdesc}{chr2num}{buf}
+Converts a string of sampled bytes as returned by \code{read()} into
+a list containing the numeric values of the samples.
+\end{funcdesc}
+
+\begin{funcdesc}{num2chr}{list}
+\begin{sloppypar}
+Converts a list as returned by
+\code{chr2num()}
+back to a buffer acceptable by
+\code{write()}.
+\end{sloppypar}
+\end{funcdesc}
+
+\section{Built-in Module \sectcode{gl}}
+
+\bimodindex{gl}
+This module provides access to the Silicon Graphics
+{\em Graphics Library}.
+It is available only on Silicon Graphics machines.
+
+\strong{Warning:}
+Some illegal calls to the GL library cause the Python interpreter to dump
+core.
+In particular, the use of most GL calls is unsafe before the first
+window is opened.
+
+The module is too large to document here in its entirety, but the
+following should help you to get started.
+The parameter conventions for the C functions are translated to Python as
+follows:
+
+\begin{itemize}
+\item
+All (short, long, unsigned) int values are represented by Python
+integers.
+\item
+All float and double values are represented by Python floating point
+numbers.
+In most cases, Python integers are also allowed.
+\item
+All arrays are represented by one-dimensional Python lists.
+In most cases, tuples are also allowed.
+\item
+\begin{sloppypar}
+All string and character arguments are represented by Python strings,
+for instance,
+\code{winopen('Hi There!')}
+and
+\code{rotate(900, 'z')}.
+\end{sloppypar}
+\item
+All (short, long, unsigned) integer arguments or return values that are
+only used to specify the length of an array argument are omitted.
+For example, the C call
+
+\bcode\begin{verbatim}
+lmdef(deftype, index, np, props)
+\end{verbatim}\ecode
+
+is translated to Python as
+
+\bcode\begin{verbatim}
+lmdef(deftype, index, props)
+\end{verbatim}\ecode
+
+\item
+Output arguments are omitted from the argument list; they are
+transmitted as function return values instead.
+If more than one value must be returned, the return value is a tuple.
+If the C function has both a regular return value (that is not omitted
+because of the previous rule) and an output argument, the return value
+comes first in the tuple.
+Examples: the C call
+
+\bcode\begin{verbatim}
+getmcolor(i, &red, &green, &blue)
+\end{verbatim}\ecode
+
+is translated to Python as
+
+\bcode\begin{verbatim}
+red, green, blue = getmcolor(i)
+\end{verbatim}\ecode
+
+\end{itemize}
+
+The following functions are non-standard or have special argument
+conventions:
+
+\renewcommand{\indexsubitem}{(in module gl)}
+\begin{funcdesc}{varray}{argument}
+%JHXXX the argument-argument added
+Equivalent to but faster than a number of
+\code{v3d()}
+calls.
+The \var{argument} is a list (or tuple) of points.
+Each point must be a tuple of coordinates
+\code{(\var{x}, \var{y}, \var{z})} or \code{(\var{x}, \var{y})}.
+The points may be 2- or 3-dimensional but must all have the
+same dimension.
+Float and int values may be mixed however.
+The points are always converted to 3D double precision points
+by assuming \code{\var{z} = 0.0} if necessary (as indicated in the man page),
+and for each point
+\code{v3d()}
+is called.
+\end{funcdesc}
+
+\begin{funcdesc}{nvarray}{}
+Equivalent to but faster than a number of
+\code{n3f}
+and
+\code{v3f}
+calls.
+The argument is an array (list or tuple) of pairs of normals and points.
+Each pair is a tuple of a point and a normal for that point.
+Each point or normal must be a tuple of coordinates
+\code{(\var{x}, \var{y}, \var{z})}.
+Three coordinates must be given.
+Float and int values may be mixed.
+For each pair,
+\code{n3f()}
+is called for the normal, and then
+\code{v3f()}
+is called for the point.
+\end{funcdesc}
+
+\begin{funcdesc}{vnarray}{}
+Similar to 
+\code{nvarray()}
+but the pairs have the point first and the normal second.
+\end{funcdesc}
+
+\begin{funcdesc}{nurbssurface}{s_k\, t_k\, ctl\, s_ord\, t_ord\, type}
+% XXX s_k[], t_k[], ctl[][]
+%\itembreak
+Defines a nurbs surface.
+The dimensions of
+\code{\var{ctl}[][]}
+are computed as follows:
+\code{[len(\var{s_k}) - \var{s_ord}]},
+\code{[len(\var{t_k}) - \var{t_ord}]}.
+\end{funcdesc}
+
+\begin{funcdesc}{nurbscurve}{knots\, ctlpoints\, order\, type}
+Defines a nurbs curve.
+The length of ctlpoints is
+\code{len(\var{knots}) - \var{order}}.
+\end{funcdesc}
+
+\begin{funcdesc}{pwlcurve}{points\, type}
+Defines a piecewise-linear curve.
+\var{points}
+is a list of points.
+\var{type}
+must be
+\code{N_ST}.
+\end{funcdesc}
+
+\begin{funcdesc}{pick}{n}
+\funcline{select}{n}
+The only argument to these functions specifies the desired size of the
+pick or select buffer.
+\end{funcdesc}
+
+\begin{funcdesc}{endpick}{}
+\funcline{endselect}{}
+These functions have no arguments.
+They return a list of integers representing the used part of the
+pick/select buffer.
+No method is provided to detect buffer overrun.
+\end{funcdesc}
+
+Here is a tiny but complete example GL program in Python:
+
+\bcode\begin{verbatim}
+import gl, GL, time
+
+def main():
+    gl.foreground()
+    gl.prefposition(500, 900, 500, 900)
+    w = gl.winopen('CrissCross')
+    gl.ortho2(0.0, 400.0, 0.0, 400.0)
+    gl.color(GL.WHITE)
+    gl.clear()
+    gl.color(GL.RED)
+    gl.bgnline()
+    gl.v2f(0.0, 0.0)
+    gl.v2f(400.0, 400.0)
+    gl.endline()
+    gl.bgnline()
+    gl.v2f(400.0, 0.0)
+    gl.v2f(0.0, 400.0)
+    gl.endline()
+    time.sleep(5)
+
+main()
+\end{verbatim}\ecode
+
+\section{Built-in Module \sectcode{fm}}
+
+\bimodindex{fm}
+This module provides access to the IRIS {\em Font Manager} library.
+It is available only on Silicon Graphics machines.
+See also: 4Sight User's Guide, Section 1, Chapter 5: Using the IRIS
+Font Manager.
+
+This is not yet a full interface to the IRIS Font Manager.
+Among the unsupported features are: matrix operations; cache
+operations; character operations (use string operations instead); some
+details of font info; individual glyph metrics; and printer matching.
+
+It supports the following operations:
+
+\renewcommand{\indexsubitem}{(in module fm)}
+\begin{funcdesc}{init}{}
+Initialization function.
+Calls \code{fminit()}.
+It is normally not necessary to call this function, since it is called
+automatically the first time the \code{fm} module is imported.
+\end{funcdesc}
+
+\begin{funcdesc}{findfont}{fontname}
+Return a font handle object.
+Calls \code{fmfindfont(\var{fontname})}.
+\end{funcdesc}
+
+\begin{funcdesc}{enumerate}{}
+Returns a list of available font names.
+This is an interface to \code{fmenumerate()}.
+\end{funcdesc}
+
+\begin{funcdesc}{prstr}{string}
+Render a string using the current font (see the \code{setfont()} font
+handle method below).
+Calls \code{fmprstr(\var{string})}.
+\end{funcdesc}
+
+\begin{funcdesc}{setpath}{string}
+Sets the font search path.
+Calls \code{fmsetpath(string)}.
+(XXX Does not work!?!)
+\end{funcdesc}
+
+\begin{funcdesc}{fontpath}{}
+Returns the current font search path.
+\end{funcdesc}
+
+Font handle objects support the following operations:
+
+\renewcommand{\indexsubitem}{(font handle method)}
+\begin{funcdesc}{scalefont}{factor}
+Returns a handle for a scaled version of this font.
+Calls \code{fmscalefont(\var{fh}, \var{factor})}.
+\end{funcdesc}
+
+\begin{funcdesc}{setfont}{}
+Makes this font the current font.
+Note: the effect is undone silently when the font handle object is
+deleted.
+Calls \code{fmsetfont(\var{fh})}.
+\end{funcdesc}
+
+\begin{funcdesc}{getfontname}{}
+Returns this font's name.
+Calls \code{fmgetfontname(\var{fh})}.
+\end{funcdesc}
+
+\begin{funcdesc}{getcomment}{}
+Returns the comment string associated with this font.
+Raises an exception if there is none.
+Calls \code{fmgetcomment(\var{fh})}.
+\end{funcdesc}
+
+\begin{funcdesc}{getfontinfo}{}
+Returns a tuple giving some pertinent data about this font.
+This is an interface to \code{fmgetfontinfo()}.
+The returned tuple contains the following numbers:
+\code{(\var{printermatched}, \var{fixed_width}, \var{xorig}, \var{yorig}, \var{xsize}, \var{ysize}, \var{height}, \var{nglyphs})}.
+\end{funcdesc}
+
+\begin{funcdesc}{getstrwidth}{string}
+Returns the width, in pixels, of the string when drawn in this font.
+Calls \code{fmgetstrwidth(\var{fh}, \var{string})}.
+\end{funcdesc}
+
+\section{Standard Modules \sectcode{GL} and \sectcode{DEVICE}}
+
+\stmodindex{GL}
+\stmodindex{DEVICE}
+These modules define the constants used by the Silicon Graphics
+{\em Graphics Library}
+that C programmers find in the header files
+\file{<gl/gl.h>}
+and
+\file{<gl/device.h>}.
+Read the module source files for details.
+
+\section{Built-in Module \sectcode{fl}}
+
+\bimodindex{fl}
+This module provides an interface to the FORMS Library by Mark
+Overmars, version 2.0b.  For more info about FORMS, write to
+{\tt markov@cs.ruu.nl}.
+
+Most functions are literal translations of their C equivalents,
+dropping the initial \samp{fl_} from their name.  Constants used by the
+library are defined in module \code{FL} described below.
+
+The creation of objects is a little different in Python than in C:
+instead of the `current form' maintained by the library to which new
+FORMS objects are added, all functions that add a FORMS object to a
+button are methods of the Python object representing the form.
+Consequently, there are no Python equivalents for the C functions
+\code{fl_addto_form} and \code{fl_end_form}, and the equivalent of
+\code{fl_bgn_form} is called \code{fl.make_form}.
+
+Watch out for the somewhat confusing terminology: FORMS uses the word
+\dfn{object} for the buttons, sliders etc. that you can place in a form.
+In Python, `object' means any value.  The Python interface to FORMS
+introduces two new Python object types: form objects (representing an
+entire form) and FORMS objects (representing one button, slider etc.).
+Hopefully this isn't too confusing...
+
+There are no `free objects' in the Python interface to FORMS, nor is
+there an easy way to add object classes written in Python.  The FORMS
+interface to GL event handling is avaiable, though, so you can mix
+FORMS with pure GL windows.
+
+\strong{Please note:} importing \code{fl} implies a call to the GL function
+\code{foreground()} and to the FORMS routine \code{fl_init()}.
+
+\subsection{Functions defined in module \sectcode{fl}}
+
+Module \code{fl} defines the following functions.  For more information
+about what they do, see the description of the equivalent C function
+in the FORMS documentation:
+
+\renewcommand{\indexsubitem}{(in module fl)}
+\begin{funcdesc}{make_form}{type\, width\, height}
+Create a form with given type, width and height.  This returns a
+\dfn{form} object, whose methods are described below.
+\end{funcdesc}
+
+\begin{funcdesc}{do_forms}{}
+The standard FORMS main loop.  Returns a Python object representing
+the FORMS object needing interaction, or the special value
+\code{FL.EVENT}.
+\end{funcdesc}
+
+\begin{funcdesc}{check_forms}{}
+Check for FORMS events.  Returns what \code{do_forms} above returns,
+or \code{None} if there is no event that immediately needs
+interaction.
+\end{funcdesc}
+
+\begin{funcdesc}{set_event_call_back}{function}
+Set the event callback function.
+\end{funcdesc}
+
+\begin{funcdesc}{set_graphics_mode}{rgbmode\, doublebuffering}
+Set the graphics modes.
+\end{funcdesc}
+
+\begin{funcdesc}{get_rgbmode}{}
+Return the current rgb mode.  This is the value of the C global
+variable \code{fl_rgbmode}.
+\end{funcdesc}
+
+\begin{funcdesc}{show_message}{str1\, str2\, str3}
+Show a dialog box with a three-line message and an OK button.
+\end{funcdesc}
+
+\begin{funcdesc}{show_question}{str1\, str2\, str3}
+Show a dialog box with a three-line message and YES and NO buttons.
+It returns \code{1} if the user pressed YES, \code{0} if NO.
+\end{funcdesc}
+
+\begin{funcdesc}{show_choice}{str1\, str2\, str3\, but1\, but2\, but3}
+Show a dialog box with a three-line message and up to three buttons.
+It returns the number of the button clicked by the user
+(\code{1}, \code{2} or \code{3}).
+The \var{but2} and \var{but3} arguments are optional.
+\end{funcdesc}
+
+\begin{funcdesc}{show_input}{prompt\, default}
+Show a dialog box with a one-line prompt message and text field in
+which the user can enter a string.  The second argument is the default
+input string.  It returns the string value as edited by the user.
+\end{funcdesc}
+
+\begin{funcdesc}{show_file_selector}{message\, directory\, pattern\, default}
+Show a dialog box inm which the user can select a file.  It returns
+the absolute filename selected by the user, or \code{None} if the user
+presses Cancel.
+\end{funcdesc}
+
+\begin{funcdesc}{get_directory}{}
+\funcline{get_pattern}{}
+\funcline{get_filename}{}
+These functions return the directory, pattern and filename (the tail
+part only) selected by the user in the last \code{show_file_selector}
+call.
+\end{funcdesc}
+
+\begin{funcdesc}{qdevice}{dev}
+\funcline{unqdevice}{dev}
+\funcline{isqueued}{dev}
+\funcline{qtest}{}
+\funcline{qread}{}
+%\funcline{blkqread}{?}
+\funcline{qreset}{}
+\funcline{qenter}{dev\, val}
+\funcline{get_mouse}{}
+\funcline{tie}{button\, valuator1\, valuator2}
+These functions are the FORMS interfaces to the corresponding GL
+functions.  Use these if you want to handle some GL events yourself
+when using \code{fl.do_events}.  When a GL event is detected that
+FORMS cannot handle, \code{fl.do_forms()} returns the special value
+\code{FL.EVENT} and you should call \code{fl.qread()} to read the
+event from the queue.  Don't use the equivalent GL functions!
+\end{funcdesc}
+
+\begin{funcdesc}{color}{}
+\funcline{mapcolor}{}
+\funcline{getmcolor}{}
+See the description in the FORMS documentation of \code{fl_color},
+\code{fl_mapcolor} and \code{fl_getmcolor}.
+\end{funcdesc}
+
+\subsection{Form object methods and data attributes}
+
+Form objects (returned by \code{fl.make_form()} above) have the
+following methods.  Each method corresponds to a C function whose name
+is prefixed with \samp{fl_}; and whose first argument is a form
+pointer; please refer to the official FORMS documentation for
+descriptions.
+
+All the \samp{add_{\rm \ldots}} functions return a Python object representing
+the FORMS object.  Methods of FORMS objects are described below.  Most
+kinds of FORMS object also have some methods specific to that kind;
+these methods are listed here.
+
+\begin{flushleft}
+\renewcommand{\indexsubitem}{(form object method)}
+\begin{funcdesc}{show_form}{placement\, bordertype\, name}
+  Show the form.
+\end{funcdesc}
+
+\begin{funcdesc}{hide_form}{}
+  Hide the form.
+\end{funcdesc}
+
+\begin{funcdesc}{redraw_form}{}
+  Redraw the form.
+\end{funcdesc}
+
+\begin{funcdesc}{set_form_position}{x\, y}
+Set the form's position.
+\end{funcdesc}
+
+\begin{funcdesc}{freeze_form}{}
+Freeze the form.
+\end{funcdesc}
+
+\begin{funcdesc}{unfreeze_form}{}
+  Unfreeze the form.
+\end{funcdesc}
+
+\begin{funcdesc}{activate_form}{}
+  Activate the form.
+\end{funcdesc}
+
+\begin{funcdesc}{deactivate_form}{}
+  Deactivate the form.
+\end{funcdesc}
+
+\begin{funcdesc}{bgn_group}{}
+  Begin a new group of objects; return a group object.
+\end{funcdesc}
+
+\begin{funcdesc}{end_group}{}
+  End the current group of objects.
+\end{funcdesc}
+
+\begin{funcdesc}{find_first}{}
+  Find the first object in the form.
+\end{funcdesc}
+
+\begin{funcdesc}{find_last}{}
+  Find the last object in the form.
+\end{funcdesc}
+
+%---
+
+\begin{funcdesc}{add_box}{type\, x\, y\, w\, h\, name}
+Add a box object to the form.
+No extra methods.
+\end{funcdesc}
+
+\begin{funcdesc}{add_text}{type\, x\, y\, w\, h\, name}
+Add a text object to the form.
+No extra methods.
+\end{funcdesc}
+
+%\begin{funcdesc}{add_bitmap}{type\, x\, y\, w\, h\, name}
+%Add a bitmap object to the form.
+%\end{funcdesc}
+
+\begin{funcdesc}{add_clock}{type\, x\, y\, w\, h\, name}
+Add a clock object to the form. \\
+Method:
+\code{get_clock}.
+\end{funcdesc}
+
+%---
+
+\begin{funcdesc}{add_button}{type\, x\, y\, w\, h\,  name}
+Add a button object to the form. \\
+Methods:
+\code{get_button},
+\code{set_button}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_lightbutton}{type\, x\, y\, w\, h\, name}
+Add a lightbutton object to the form. \\
+Methods:
+\code{get_button},
+\code{set_button}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_roundbutton}{type\, x\, y\, w\, h\, name}
+Add a roundbutton object to the form. \\
+Methods:
+\code{get_button},
+\code{set_button}.
+\end{funcdesc}
+
+%---
+
+\begin{funcdesc}{add_slider}{type\, x\, y\, w\, h\, name}
+Add a slider object to the form. \\
+Methods:
+\code{set_slider_value},
+\code{get_slider_value},
+\code{set_slider_bounds},
+\code{get_slider_bounds},
+\code{set_slider_return},
+\code{set_slider_size},
+\code{set_slider_precision},
+\code{set_slider_step}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_valslider}{type\, x\, y\, w\, h\, name}
+Add a valslider object to the form. \\
+Methods:
+\code{set_slider_value},
+\code{get_slider_value},
+\code{set_slider_bounds},
+\code{get_slider_bounds},
+\code{set_slider_return},
+\code{set_slider_size},
+\code{set_slider_precision},
+\code{set_slider_step}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_dial}{type\, x\, y\, w\, h\, name}
+Add a dial object to the form. \\
+Methods:
+\code{set_dial_value},
+\code{get_dial_value},
+\code{set_dial_bounds},
+\code{get_dial_bounds}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_positioner}{type\, x\, y\, w\, h\, name}
+Add a positioner object to the form. \\
+Methods:
+\code{set_positioner_xvalue},
+\code{set_positioner_yvalue},
+\code{set_positioner_xbounds},
+\code{set_positioner_ybounds},
+\code{get_positioner_xvalue},
+\code{get_positioner_yvalue},
+\code{get_positioner_xbounds},
+\code{get_positioner_ybounds}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_counter}{type\, x\, y\, w\, h\, name}
+Add a counter object to the form. \\
+Methods:
+\code{set_counter_value},
+\code{get_counter_value},
+\code{set_counter_bounds},
+\code{set_counter_step},
+\code{set_counter_precision},
+\code{set_counter_return}.
+\end{funcdesc}
+
+%---
+
+\begin{funcdesc}{add_input}{type\, x\, y\, w\, h\, name}
+Add a input object to the form. \\
+Methods:
+\code{set_input},
+\code{get_input},
+\code{set_input_color},
+\code{set_input_return}.
+\end{funcdesc}
+
+%---
+
+\begin{funcdesc}{add_menu}{type\, x\, y\, w\, h\, name}
+Add a menu object to the form. \\
+Methods:
+\code{set_menu},
+\code{get_menu},
+\code{addto_menu}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_choice}{type\, x\, y\, w\, h\, name}
+Add a choice object to the form. \\
+Methods:
+\code{set_choice},
+\code{get_choice},
+\code{clear_choice},
+\code{addto_choice},
+\code{replace_choice},
+\code{delete_choice},
+\code{get_choice_text},
+\code{set_choice_fontsize},
+\code{set_choice_fontstyle}.
+\end{funcdesc}
+
+\begin{funcdesc}{add_browser}{type\, x\, y\, w\, h\, name}
+Add a browser object to the form. \\
+Methods:
+\code{set_browser_topline},
+\code{clear_browser},
+\code{add_browser_line},
+\code{addto_browser},
+\code{insert_browser_line},
+\code{delete_browser_line},
+\code{replace_browser_line},
+\code{get_browser_line},
+\code{load_browser},
+\code{get_browser_maxline},
+\code{select_browser_line},
+\code{deselect_browser_line},
+\code{deselect_browser},
+\code{isselected_browser_line},
+\code{get_browser},
+\code{set_browser_fontsize},
+\code{set_browser_fontstyle},
+\code{set_browser_specialkey}.
+\end{funcdesc}
+
+%---
+
+\begin{funcdesc}{add_timer}{type\, x\, y\, w\, h\, name}
+Add a timer object to the form. \\
+Methods:
+\code{set_timer},
+\code{get_timer}.
+\end{funcdesc}
+\end{flushleft}
+
+Form objects have the following data attributes; see the FORMS
+documentation:
+
+\begin{tableiii}{|l|c|l|}{code}{Name}{Type}{Meaning}
+  \lineiii{window}{int (read-only)}{GL window id}
+  \lineiii{w}{float}{form width}
+  \lineiii{h}{float}{form height}
+  \lineiii{x}{float}{form x origin}
+  \lineiii{y}{float}{form y origin}
+  \lineiii{deactivated}{int}{nonzero if form is deactivated}
+  \lineiii{visible}{int}{nonzero if form is visible}
+  \lineiii{frozen}{int}{nonzero if form is frozen}
+  \lineiii{doublebuf}{int}{nonzero if double buffering on}
+\end{tableiii}
+
+\subsection{FORMS object methods and data attributes}
+
+Besides methods specific to particular kinds of FORMS objects, all
+FORMS objects also have the following methods:
+
+\renewcommand{\indexsubitem}{(FORMS object method)}
+\begin{funcdesc}{set_call_back}{function\, argument}
+Set the object's callback function and argument.  When the object
+needs interaction, the callback function will be called with two
+arguments: the object, and the callback argument.  (FORMS objects
+without a callback function are returned by \code{fl.do_forms()} or
+\code{fl.check_forms()} when they need interaction.)  Call this method
+without arguments to remove the callback function.
+\end{funcdesc}
+
+\begin{funcdesc}{delete_object}{}
+  Delete the object.
+\end{funcdesc}
+
+\begin{funcdesc}{show_object}{}
+  Show the object.
+\end{funcdesc}
+
+\begin{funcdesc}{hide_object}{}
+  Hide the object.
+\end{funcdesc}
+
+\begin{funcdesc}{redraw_object}{}
+  Redraw the object.
+\end{funcdesc}
+
+\begin{funcdesc}{freeze_object}{}
+  Freeze the object.
+\end{funcdesc}
+
+\begin{funcdesc}{unfreeze_object}{}
+  Unfreeze the object.
+\end{funcdesc}
+
+%\begin{funcdesc}{handle_object}{} XXX
+%\end{funcdesc}
+
+%\begin{funcdesc}{handle_object_direct}{} XXX
+%\end{funcdesc}
+
+FORMS objects have these data attributes; see the FORMS documentation:
+
+\begin{tableiii}{|l|c|l|}{code}{Name}{Type}{Meaning}
+  \lineiii{objclass}{int (read-only)}{object class}
+  \lineiii{type}{int (read-only)}{object type}
+  \lineiii{boxtype}{int}{box type}
+  \lineiii{x}{float}{x origin}
+  \lineiii{y}{float}{y origin}
+  \lineiii{w}{float}{width}
+  \lineiii{h}{float}{height}
+  \lineiii{col1}{int}{primary color}
+  \lineiii{col2}{int}{secondary color}
+  \lineiii{align}{int}{alignment}
+  \lineiii{lcol}{int}{label color}
+  \lineiii{lsize}{float}{label font size}
+  \lineiii{label}{string}{label string}
+  \lineiii{lstyle}{int}{label style}
+  \lineiii{pushed}{int (read-only)}{(see FORMS docs)}
+  \lineiii{focus}{int (read-only)}{(see FORMS docs)}
+  \lineiii{belowmouse}{int (read-only)}{(see FORMS docs)}
+  \lineiii{frozen}{int (read-only)}{(see FORMS docs)}
+  \lineiii{active}{int (read-only)}{(see FORMS docs)}
+  \lineiii{input}{int (read-only)}{(see FORMS docs)}
+  \lineiii{visible}{int (read-only)}{(see FORMS docs)}
+  \lineiii{radio}{int (read-only)}{(see FORMS docs)}
+  \lineiii{automatic}{int (read-only)}{(see FORMS docs)}
+\end{tableiii}
+
+\section{Standard Module \sectcode{FL}}
+\nodename{FL (uppercase)}
+
+\stmodindex{FL}
+This module defines symbolic constants needed to use the built-in
+module \code{fl} (see above); they are equivalent to those defined in
+the C header file \file{<forms.h>} except that the name prefix
+\samp{FL_} is omitted.  Read the module source for a complete list of
+the defined names.  Suggested use:
+
+\bcode\begin{verbatim}
+import fl
+from FL import *
+\end{verbatim}\ecode
+
+\section{Standard Module \sectcode{flp}}
+
+\stmodindex{flp}
+This module defines functions that can read form definitions created
+by the `form designer' (\code{fdesign}) program that comes with the
+FORMS library (see module \code{fl} above).
+
+For now, see the file \file{flp.doc} in the Python library source
+directory for a description.
+
+XXX A complete description should be inserted here!
+
+\section{Standard Module \sectcode{panel}}
+
+\stmodindex{panel}
+\strong{Please note:} The FORMS library, to which the \code{fl} module described
+above interfaces, is a simpler and more accessible user interface
+library for use with GL than the Panel Module (besides also being by a
+Dutch author).
+
+This module should be used instead of the built-in module
+\code{pnl}
+to interface with the
+{\em Panel Library}.
+
+The module is too large to document here in its entirety.
+One interesting function:
+
+\renewcommand{\indexsubitem}{(in module panel)}
+\begin{funcdesc}{defpanellist}{filename}
+Parses a panel description file containing S-expressions written by the
+{\em Panel Editor}
+that accompanies the Panel Library and creates the described panels.
+It returns a list of panel objects.
+\end{funcdesc}
+
+\strong{Warning:}
+the Python interpreter will dump core if you don't create a GL window
+before calling
+\code{panel.mkpanel()}
+or
+\code{panel.defpanellist()}.
+
+\section{Standard Module \sectcode{panelparser}}
+
+\stmodindex{panelparser}
+This module defines a self-contained parser for S-expressions as output
+by the Panel Editor (which is written in Scheme so it can't help writing
+S-expressions).
+The relevant function is
+\code{panelparser.parse_file(\var{file})}
+which has a file object (not a filename!) as argument and returns a list
+of parsed S-expressions.
+Each S-expression is converted into a Python list, with atoms converted
+to Python strings and sub-expressions (recursively) to Python lists.
+For more details, read the module file.
+% XXXXJH should be funcdesc, I think
+
+\section{Built-in Module \sectcode{pnl}}
+
+\bimodindex{pnl}
+This module provides access to the
+{\em Panel Library}
+built by NASA Ames (to get it, send e-mail to
+{\tt panel-request@nas.nasa.gov}).
+All access to it should be done through the standard module
+\code{panel},
+which transparantly exports most functions from
+\code{pnl}
+but redefines
+\code{pnl.dopanel()}.
+
+\strong{Warning:}
+the Python interpreter will dump core if you don't create a GL window
+before calling
+\code{pnl.mkpanel()}.
+
+The module is too large to document here in its entirety.
+
+\section{Built-in Module \sectcode{jpeg}}
+
+\bimodindex{jpeg}
+The module jpeg provides access to the jpeg compressor and
+decompressor written by the Independent JPEG Group. JPEG is a (draft?)
+standard for compressing pictures.  For details on jpeg or the
+Indepent JPEG Group software refer to the JPEG standard or the
+documentation provided with the software.
+
+The jpeg module defines these functions:
+
+\renewcommand{\indexsubitem}{(in module jpeg)}
+\begin{funcdesc}{compress}{data\, w\, h\, b}
+Treat data as a pixmap of width w and height h, with b bytes per
+pixel.  The data is in sgi gl order, so the first pixel is in the
+lower-left corner. This means that lrectread return data can
+immedeately be passed to compress.  Currently only 1 byte and 4 byte
+pixels are allowed, the former being treaded as greyscale and the
+latter as RGB color.  Compress returns a string that contains the
+compressed picture, in JFIF format.
+\end{funcdesc}
+
+\begin{funcdesc}{decompress}{data}
+Data is a string containing a picture in JFIF format. It returns a
+tuple
+\code{(\var{data}, \var{width}, \var{height}, \var{bytesperpixel})}.
+Again, the data is suitable to pass to lrectwrite.
+\end{funcdesc}
+
+\begin{funcdesc}{setoption}{name\, value}
+Set various options.  Subsequent compress and decompress calls
+will use these options.  The following options are available:
+\begin{description}
+\item[\code{'forcegray'}]
+Force output to be grayscale, even if input is RGB.
+
+\item[\code{'quality'}]
+Set the quality of the compressed image to a
+value between \code{0} and \code{100} (default is \code{75}).  Compress only.
+
+\item[\code{'optimize'}]
+Perform huffman table optimization.  Takes longer, but results in
+smaller compressed image.  Compress only.
+
+\item[\code{'smooth'}]
+Perform inter-block smoothing on uncompressed image.  Only useful for
+low-quality images.  Decompress only.
+\end{description}
+\end{funcdesc}
+
+Compress and uncompress raise the error jpeg.error in case of errors.
+
+\section{Built-in module \sectcode{imgfile}}
+
+The imgfile module allows python programs to access SGI imglib image
+files (also known as \file{.rgb} files).  The module is far from
+complete, but is provided anyway since the functionality that there is
+is enough in some cases.  Currently, colormap files are not supported
+and neither is creating imglib files.
+
+The module defines the following variables and functions:
+
+\renewcommand{\indexsubitem}{(in module imgfile)}
+\begin{excdesc}{error}
+This exception is raised on all errors, such as unsupported file type, etc.
+\end{excdesc}
+
+\begin{funcdesc}{getsizes}{file}
+This function returns a tuple \code{(\var{x}, \var{y}, \var{z})} where
+\var{x} and \var{y} are the size of the image in pixels and
+\var{z} is the number of
+bytes per pixel. Only 3 byte RGB pixels and 1 byte greyscale pixels
+are currently supported.
+\end{funcdesc}
+
+\begin{funcdesc}{read}{file}
+This function reads and decodes the image on the specified file, and
+returns it as a python string. The string has either 1 byte greyscale
+pixels or 4 byte RGBA pixels. The bottom left pixel is the first in
+the string. This format is suitable to pass to \code{gl.lrectwrite},
+for instance.
+\end{funcdesc}
+
+\begin{funcdesc}{readscaled}{file\, x\, y}
+This function is identical to read but it returns an image that is
+scaled to the given \var{x} and \var{y} sizes. Scaling is done by
+simply dropping or duplicating pixels, so the result will be less than
+perfect, especially for computer-generated images. Readscaled makes no
+attempt to keep the aspect ratio correct, so that is the users'
+responsibility.
+\end{funcdesc}
+
+\begin{funcdesc}{write}{file\, data\, x\, y\, z}
+This function writes the RGB or greyscale data in \var{data} to image
+file \var{file}. \var{x} and \var{y} give the size of the image,
+\var{z} is 1 for 1 byte greyscale images or 3 for RGB images (which are
+stored as 4 byte values of which only the lower three bytes are used).
+These are the formats returned by \code{gl.lrectread}.
+\end{funcdesc}
+
+\section{Built-in module \sectcode{imageop}}
+
+The imageop module contains some useful operations on images.
+It operates on images consisting of 8 or 32 bit pixels
+stored in python strings. This is the same format as used
+by \code{gl.lrectwrite} and the \code{imgfile} module.
+
+The module defines the following variables and functions:
+
+\renewcommand{\indexsubitem}{(in module imageop)}
+
+\begin{excdesc}{error}
+This exception is raised on all errors, such as unknown number of bits
+per pixel, etc.
+\end{excdesc}
+
+
+\begin{funcdesc}{crop}{image\, psize\, width\, height\, x0\, y0\, x1\, y1}
+This function takes the image in \code{image}, which should by
+\code{width} by \code{height} in size and consist of pixels of
+\code{psize} bytes, and returns the selected part of that image. \code{X0},
+\code{y0}, \code{x1} and \code{y1} are like the \code{lrectread}
+parameters, i.e. the boundary is included in the new image.
+The new boundaries need not be inside the picture. Pixels that fall
+outside the old image will have their value set to zero.
+If \code{x0} is bigger than \code{x1} the new image is mirrored. The
+same holds for the y coordinates.
+\end{funcdesc}
+
+\begin{funcdesc}{scale}{image\, psize\, width\, height\, newwidth\, newheight}
+This function returns a \code{image} scaled to size \code{newwidth} by
+\code{newheight}. No interpolation is done, scaling is done by
+simple-minded pixel duplication or removal. Therefore, computer-generated
+images or dithered images will not look nice after scaling.
+\end{funcdesc}
+
+\begin{funcdesc}{grey2mono}{image\, width\, height\, threshold}
+This function converts a 8-bit deep greyscale image to a 1-bit deep
+image by tresholding all the pixels. The resulting image is tightly
+packed and is probably only useful as an argument to \code{mono2grey}.
+\end{funcdesc}
+
+\begin{funcdesc}{dither2mono}{image\, width\, height}
+This function also converts an 8-bit greyscale image to a 1-bit
+monochrome image but it uses a (simple-minded) dithering algorithm.
+\end{funcdesc}
+
+\begin{funcdesc}{mono2grey}{image\, width\, height\, p0\, p1}
+This function converts a 1-bit monochrome image to an 8 bit greyscale
+or color image. All pixels that are zero-valued on input get value
+\code{p0} on output and all one-value input pixels get value \code{p1}
+on output. To convert a monochrome black-and-white image to greyscale
+pass the values \code{0} and \code{255} respectively.
+\end{funcdesc}
+
+\chapter{SUN SPARC MACHINES ONLY}
+
+\section{Built-in module \sectcode{sunaudiodev}}
+
+This module allows you to access the sun audio interface. The sun
+audio hardware is capable of recording and playing back audio data
+in U-LAW format with a sample rate of 8K per second. A full
+description can be gotten with \samp{man audio}.
+
+The module defines the following variables and functions:
+
+\renewcommand{\indexsubitem}{(in module sunaudiodev)}
+\begin{excdesc}{error}
+This exception is raised on all errors. The argument is a string
+describing what went wrong.
+\end{excdesc}
+
+\begin{funcdesc}{open}{mode}
+This function opens the audio device and returns a sun audio device
+object. This object can then be used to do I/O on. The \var{mode} parameter
+is one of \code{'r'} for record-only access, \code{'w'} for play-only
+access, \code{'rw'} for both and \code{'control'} for access to the
+control device. Since only one process is allowed to have the recorder
+or player open at the same time it is a good idea to open the device
+only for the activity needed. See the audio manpage for details.
+\end{funcdesc}
+
+\subsection{Audio device object methods}
+
+The audio device objects are returned by \code{open} define the
+following methods (except \code{control} objects which only provide
+getinfo, setinfo and drain):
+
+\renewcommand{\indexsubitem}{(audio device method)}
+\begin{funcdesc}{drain}{}
+This method waits until all pending output is flushed and then returns.
+Calling this method is often not necessary: destroying the object will
+automatically close the audio device and this will do an implicit drain.
+\end{funcdesc}
+
+\begin{funcdesc}{getinfo}{}
+This method retrieves status information like input and output volume,
+etc. and returns it in the form of
+an audio status object. This object has no methods but it contains a
+number of attributes describing the current device status. The names
+and meanings of the attributes are described in
+\file{/usr/include/sun/audioio.h} and in the audio man page. Member names
+are slightly different from their C counterparts: a status object is
+only a single structure. Members of the \code{play} substructure have
+\samp{o_} prepended to their name and members of the \code{record}
+structure have \samp{i_}. So, the C member \code{play.sample_rate} is
+accessed as \code{o_sample_rate}, \code{record.gain} as \code{i_gain}
+and \code{monitor_gain} plainly as \code{monitor_gain}.
+\end{funcdesc}
+
+\begin{funcdesc}{ibufcount}{}
+This method returns the number of samples that are buffered on the
+recording side, i.e.
+the program will not block on a \code{read} call of so many samples.
+\end{funcdesc}
+
+\begin{funcdesc}{obufcount}{}
+This method returns the number of samples buffered on the playback
+side. Unfortunately, this number cannot be used to determine a number
+of samples that can be written without blocking since the kernel
+output queue length seems to be variable.
+\end{funcdesc}
+
+\begin{funcdesc}{read}{size}
+This method reads \var{size} samples from the audio input and returns
+them as a python string. The function blocks until enough data is available.
+\end{funcdesc}
+
+\begin{funcdesc}{setinfo}{status}
+This method sets the audio device status parameters. The \var{status}
+parameter is an device status object as returned by \code{getinfo} and
+possibly modified by the program.
+\end{funcdesc}
+
+\begin{funcdesc}{write}{samples}
+Write is passed a python string containing audio samples to be played.
+If there is enough buffer space free it will immedeately return,
+otherwise it will block.
+\end{funcdesc}
+
+There is a companion module, \code{SUNAUDIODEV}, which defines useful
+symbolic constants like \code{MIN_GAIN}, \code{MAX_GAIN},
+\code{SPEAKER}, etc. The names of
+the constants are the same names as used in the C include file
+\file{<sun/audioio.h>}, with the leading string \samp{AUDIO_} stripped.
+
+Useability of the control device is limited at the moment, since there
+is no way to use the 'wait for something to happen' feature the device
+provides. This is because that feature makes heavy use of signals, and
+these do not map too well onto Python.
+
+\chapter{AUDIO TOOLS}
+
+\section{Built-in module \sectcode{audioop}}
+
+The audioop module contains some useful operations on sound fragments.
+It operates on sound fragments consisting of samples of 8, 16 or 32
+bits wide, stored in Python strings.  This is the same format as used
+by the \code{al} and \code{sunaudiodev} modules.  All scalar items are
+integers, unless specified otherwise.
+
+The module defines the following variables and functions:
+
+\renewcommand{\indexsubitem}{(in module audioop)}
+\begin{excdesc}{error}
+This exception is raised on all errors, such as unknown number of bits
+per sample, etc.
+\end{excdesc}
+
+\begin{funcdesc}{add}{fragment1\, fragment2\, width}
+This function returns a fragment that is the addition of the two samples
+passed as parameters. \var{width} is the sample width in bytes, either
+\code{1}, \code{2} or \code{4}. Both fragments should have the same length.
+\end{funcdesc}
+
+\begin{funcdesc}{adpcm2lin}{adpcmfragment\, width\, state}
+This routine decodes an Intel/DVI ADPCM coded fragment to a linear
+fragment. See the description of \code{lin2adpcm} for details on ADPCM
+coding. The routine returns a tuple
+\code{(\var{sample}, \var{newstate})}
+where the sample has the width specified in \var{width}.
+\end{funcdesc}
+
+\begin{funcdesc}{adpcm32lin}{adpcmfragment\, width\, state}
+This routine decodes an alternative 3-bit ADPCM code. See
+\code{lin2adpcm3} for details.
+\end{funcdesc}
+
+\begin{funcdesc}{avg}{fragment\, width}
+This function returns the average over all samples in the fragment.
+\end{funcdesc}
+
+\begin{funcdesc}{avgpp}{fragment\, width}
+This function returns the average peak-peak value over all samples in
+the fragment. No filtering is done, so the useability of this routine
+is questionable.
+\end{funcdesc}
+
+\begin{funcdesc}{bias}{fragment\, width\, bias}
+This function returns a fragment that is the original fragment with a
+bias added to each sample.
+\end{funcdesc}
+
+\begin{funcdesc}{cross}{fragment\, width}
+This function returns the number of zero crossings in the fragment
+passed as an argument.
+\end{funcdesc}
+
+\begin{funcdesc}{getsample}{fragment\, width\, index}
+This function returns the value of sample \var{index} from the fragment.
+\end{funcdesc}
+
+\begin{funcdesc}{lin2adpcm}{fragment\, width\, state}
+This function converts samples to 4 bit Intel/DVI ADPCM encoding.
+ADPCM coding is an adaptive coding scheme, whereby each 4 bit number
+is the difference between one sample and the next, divided by a
+(varying) step. The Intel/DVI ADPCM algorythm has been selected for
+use by the IMA, so may well become a standard.
+
+\code{State} is a tuple containing the state of the coder. The coder
+returns a tuple \code{(\var{adpcmfrag}, \var{newstate})}, and the
+\var{newstate} should be passed to the next call of lin2adpcm.  In the
+initial call \code{None} can be passed as the state. \var{adpcmfrag} is
+the ADPCM coded fragment packed 2 4-bit values per byte.
+\end{funcdesc}
+
+\begin{funcdesc}{lin2adpcm3}{fragment\, width\, state}
+This is an alternative ADPCM coder that uses only 3 bits per sample.
+It is not compatible with the Intel/DVI ADPCM coder and its output is
+not packed (due to laziness on the side of the author). Its use is
+discouraged.
+\end{funcdesc}
+
+\begin{funcdesc}{lin2ulaw}{fragment\, width}
+This function converts samples in the audio fragment to U-LAW encoding
+and returns this as a python string. U-LAW is an audio encoding format
+whereby you get a dynamic range of about 14 bits using only 8 bit
+samples. It is used by the Sun audio hardware, among others.
+\end{funcdesc}
+
+\begin{funcdesc}{max}{fragment\, width}
+Max returns the maximum of the absolute value of all samples in a fragment.
+\end{funcdesc}
+
+\begin{funcdesc}{maxpp}{fragment\, width}
+This function returns the maximum peak-peak value in the sound fragment.
+\end{funcdesc}
+
+\begin{funcdesc}{mul}{fragment\, width\, factor}
+Mul returns a fragment that has all samples in the original framgent
+multiplied by the floating-point value \var{factor}. Overflow is
+silently ignored.
+\end{funcdesc}
+
+\begin{funcdesc}{tomono}{fragment\, width\, lfactor\, rfactor} 
+This function converts a stereo fragment to a mono fragment. The left
+channel is multiplied by \var{lfactor} and the right channel by
+\var{rfactor} before adding the two channels to give a mono signal.
+\end{funcdesc}
+
+\begin{funcdesc}{tostereo}{fragment\, width\, lfactor\, rfactor}
+This function generates a stereo fragment from a mono fragment. Each
+pair of samples in the stereo fragment are computed from the mono
+sample, whereby left channel samples are multiplied by \var{lfactor}
+and right channel samples by \var{rfactor}.
+\end{funcdesc}
+
+\begin{funcdesc}{mul}{fragment\, width\, factor}
+Mul returns a fragment that has all samples in the original framgent
+multiplied by the floating-point value \var{factor}. Overflow is
+silently ignored.
+\end{funcdesc}
+
+\begin{funcdesc}{rms}{fragment\, width\, factor}
+Returns the root-mean-square of the fragment, i.e.
+\iftexi
+the square root of the quotient of the sum of all squared sample value,
+divided by the sumber of samples.
+\else
+% in eqn: sqrt { sum S sub i sup 2  over n }
+\begin{displaymath}
+\catcode`_=8
+\sqrt{\frac{\sum{{S_{i}}^{2}}}{n}}
+\end{displaymath}
+\fi
+This is a measure of the power in an audio signal.
+\end{funcdesc}
+
+\begin{funcdesc}{ulaw2lin}{fragment\, width}
+This function converts sound fragments in ULAW encoding to linearly
+encoded sound fragments. ULAW encoding always uses 8 bits samples, so
+\var{width} refers only to the sample width of the output fragment here.
+\end{funcdesc}
+
+Note that operations such as \code{mul} or \code{max} make no
+distinction between mono and stereo fragments, i.e. all samples are
+treated equal.  If this is a problem the stereo fragment should be split
+into two mono fragments first and recombined later.  Here is an example
+of how to do that:
+\bcode\begin{verbatim}
+def mul_stereo(sample, width, lfactor, rfactor):
+    lsample = audioop.tomono(sample, width, 1, 0)
+    rsample = audioop.tomono(sample, width, 0, 1)
+    lsample = audioop.mul(sample, width, lfactor)
+    rsample = audioop.mul(sample, width, rfactor)
+    lsample = audioop.tostereo(lsample, width, 1, 0)
+    rsample = audioop.tostereo(rsample, width, 0, 1)
+    return audioop.add(lsample, rsample, width)
+\end{verbatim}\ecode
+
+If you use the ADPCM coder to build network packets and you want your
+protocol to be stateless (i.e. to be able to tolerate packet loss)
+you should not only transmit the data but also the state. Note that
+you should send the \var{initial} state (the one you passed to
+lin2adpcm) along to the decoder, not the final state (as returned by
+the coder).
+
+The ADPCM coders have never been tried against other ADPCM coders,
+only against themselves. It could well be that I misinterpreted the
+standards in which case they will not be interoperable with the
+respective standards.
+
+\chapter{CRYPTOGRAPHIC EXTENSIONS}
+
+The modules described in this chapter support cryptographic algorithms
+such as RSA.  They are only available when explicitly configured
+(requiring the GNU MP library).
+
+\section{Built-in module \sectcode{mpz}}
+\stmodindex{mpz}
+
+This module implements the interface to part of the GNU MP library.
+This library contains arbitrary precision integer and rational number
+arithmetic routines. Only the interfaces to the \emph{integer}
+(\samp{mpz_{\rm \ldots}}) routines are provided. If not stated
+otherwise, the description in the GNU MP documentation can be applied.
+
+In general, \dfn{mpz}-numbers can be used just like other standard
+Python numbers, e.g. you can use the built-in operators like \code{+},
+\code{*}, etc., as well as the standard built-in functions like
+\code{abs}, \code{int}, \ldots, \code{divmod}, \code{pow}.
+\strong{Please note:} the {\it bitwise-xor} operation has been implemented as
+a bunch of {\it and}s, {\it invert}s and {\it or}s, because the library
+lacks an \code{mpz_xor} function, and I didn't need one.
+
+You create an mpz-number, by calling the function called \code{mpz} (see
+below for an excact description). An mpz-number is printed like this:
+\code{mpz(\var{value})}.
+
+\renewcommand{\indexsubitem}{(in module mpz)}
+\begin{funcdesc}{mpz}{value}
+  Create a new mpz-number. \var{value} can be an integer, a long,
+  another mpz-number, or even a string. If it is a string, it is
+  interpreted as an array of radix-256 digits, least significant digit
+  first, resulting in a positive number. See also the \code{binary}
+  method, described below.
+\end{funcdesc}
+
+A number of {\em extra} functions are defined in this module. Non
+mpz-arguments are converted to mpz-values first, and the functions
+return mpz-numbers.
+
+\begin{funcdesc}{powm}{base\, exponent\, modulus}
+  Return \code{pow(\var{base}, \var{exponent}) \%{} \var{modulus}}. If
+  \code{\var{exponent} == 0}, return \code{mpz(1)}. In contrast to the
+  \C-library function, this version can handle negative exponents.
+\end{funcdesc}
+
+\begin{funcdesc}{gcd}{op1\, op2}
+  Return the greatest common divisor of \var{op1} and \var{op2}.
+\end{funcdesc}
+
+\begin{funcdesc}{gcdext}{a\, b}
+  Return a tuple \code{(\var{g}, \var{s}, \var{t})}, such that
+  \code{\var{a}*\var{s} + \var{b}*\var{t} == \var{g} == gcd(\var{a}, \var{b})}.
+\end{funcdesc}
+
+\begin{funcdesc}{sqrt}{op}
+  Return the square root of \var{op}. The result is rounded towards zero.
+\end{funcdesc}
+
+\begin{funcdesc}{sqrtrem}{op}
+  Return a tuple \code{(\var{root}, \var{remainder})}, such that
+  \code{\var{root}*\var{root} + \var{remainder} == \var{op}}.
+\end{funcdesc}
+
+\begin{funcdesc}{divm}{numerator\, denominator\, modulus}
+  Returns a number \var{q}. such that
+  \code{\var{q} * \var{denominator} \%{} \var{modulus} == \var{numerator}}.
+  One could also implement this function in python, using \code{gcdext}.
+\end{funcdesc}
+
+An mpz-number has one method:
+
+\renewcommand{\indexsubitem}{(mpz method)}
+\begin{funcdesc}{binary}{}
+  Convert this mpz-number to a binary string, where the number has been
+  stored as an array of radix-256 digits, least significant digit first.
+
+  The mpz-number must have a value greater than- or equal to zero,
+  otherwise a \code{ValueError}-exception will be raised.
+\end{funcdesc}
+
+\section{Built-in module \sectcode{md5}}
+\stmodindex{md5}
+
+This module implements the interface to RSA's MD5 message digest
+algorithm (see also the file \file{md5.doc}). It's use is very
+straightforward: use the function \code{md5} to create an
+\dfn{md5}-object. You can now ``feed'' this object with arbitrary
+strings.
+
+At any time you can ask the ``final'' digest of the object. Internally,
+a temorary copy of the object is made and the digest is computed and
+returned. Because of the copy, the digest operation is not desctructive
+for the object. Before a more exact description of the use, a small
+example: to obtain the digest of the string \code{'abc'}, use \ldots
+
+\bcode\begin{verbatim}
+>>> from md5 import md5
+>>> m = md5()
+>>> m.update('abc')
+>>> m.digest()
+'\220\001P\230<\322O\260\326\226?}(\341\177r'
+\end{verbatim}\ecode
+
+More condensed:
+
+\bcode\begin{verbatim}
+>>> md5('abc').digest()
+'\220\001P\230<\322O\260\326\226?}(\341\177r'
+\end{verbatim}\ecode
+
+\renewcommand{\indexsubitem}{(in module md5)}
+\begin{funcdesc}{md5}{arg}
+  Create a new md5-object. \var{arg} is optional: if present, an initial
+  \code{update} method is called with \var{arg} as argument.
+\end{funcdesc}
+
+An md5-object has the following methods:
+
+\renewcommand{\indexsubitem}{(md5 method)}
+\begin{funcdesc}{update}{arg}
+  Update this md5-object with the string \var{arg}.
+\end{funcdesc}
+
+\begin{funcdesc}{digest}{}
+  Return the \dfn{digest} of this md5-object. Internally, a copy is made
+  and the \C-function \code{MD5Final} is called. Finally the digest is
+  returned.
+\end{funcdesc}
+
+\begin{funcdesc}{copy}{}
+  Return a separate copy of this md5-object.  An \code{update} to this
+  copy won't affect the original object.
+\end{funcdesc}

@@ -1,0 +1,204 @@
+.TH DL 3 Local
+.SH NAME
+dl \- Dynamic loader for Irix
+.SH SYNOPSIS
+.B #include "dl.h"
+.LP
+.B "typedef void dl_errortype(char *)
+.LP
+.B "typedef void (*dl_funcptr)()
+.LP
+.B "dl_funcptr dl_loadmod(char *binary, char *module, char *rtn)
+.LP
+.B "int dl_loadmod_mult(char *binary, char *module, struct nlist *nl)
+.LP
+.B "dl_setincr(char *binary)
+.LP
+.B "dl_seterror(dl_errortype *ertn)
+.LP
+.B "dl_setmessage(dl_errortype *mrtn)
+.SH DESCRIPTION
+The
+.I dl
+library contains a set of routines that allows you to dynamically load
+modules into running programs. The library is meant for use on SGI Irix.
+.LP
+The library contains both a simple interface meant for day-to-day use,
+and a set of more involved routines that can be used if better control
+is wanted. This man page describes the library as a whole and the
+simple interface, the man page
+.IR dlother (3)
+describes the other routines.
+.LP
+The standard routine to load a module is
+.I dl_loadmod .
+This routine loads an object file into the currently running process,
+and returns the new address of an external in that object file. The
+value returned can be cast to a pointer of the appropriate type
+(probably a pointer to a function) and used.
+.LP
+Dl_loadmod takes three arguments.
+.I Binary
+is the file name of the currently running binary. This is needed
+because the object file is incrementally linked with this binary to
+resolve unsatisfied references in the object (using the -A option of
+.IR ld (1)).
+The current binary
+should not be stripped and should be readable.
+If the binary name contains no slashes dl_loadmod attempts to find the
+full pathname of the binary by searching
+.I $PATH
+for it.
+.I Module
+is the name of the object file to load.
+.I Rtn
+is the name of the routine for which the address is required.
+.LP
+Dl_loadmod locates an area of free virtual memory, calls the linker to
+incrementally link the object at that address, loads the resulting
+binary and locates the given symbol to return its value.
+.LP
+If there is a file with the same name as the object file, but with
+extension
+.I .libs
+this file is assumed to contain command-line options to
+.IR ld (1).
+This feature can be used if the object needs to be linked with special
+libraries, for instance.
+.LP
+Because
+linking the object is a fairly time-consuming process the resulting
+binary is cached with extension
+.I .ld .
+The version stamp of the cached binary is set on a number computed
+from the time stamps of both the object file and the running executable.
+Before linking dl_loadmod checks whether a cached binary exists
+and whether the load address and version stamp match the required
+values. If so, it skips the link phase.
+.LP
+If there is no cached binary or if the version stamp and load address
+do not match dl_loadmod attempts to create the cached binary. If it cannot
+do this, due to lack of permission, for instance, it will
+create a temporary binary in
+.I /usr/tmp .
+.LP
+If more addresses should be obtained from the newly loaded module the
+.I dl_loadmod_mult
+interface can be used. Its actions are almost the same as for
+.I dl_loadmod
+but it takes an array of nlist structures (see
+.IR nlist (3))
+as third parameter. It fills the nlist structures with the addresses
+of the requested symbols. Dl_loadmod_mult returns the number of
+symbols found, and it does not print an error message if a symbol is
+not found.
+.LP
+It is also possible to do incremental loading, i.e. to make all the
+new symbols defined in a loaded module available to modules loaded
+after that. To do incremental loading you should first call
+.I dl_setincr
+giving the name of the original executable file, and pass a null
+pointer as executable name to subsequent
+.I dl_loadmod
+or
+.I dl_loadmod_multi
+calls.
+.LP
+.I Dl_seterror
+can be used to set a new error handling routine. The default error
+handler will print a message on standard output, but if something else
+is required
+.I dl_seterror
+can be called with a routine parameter. This routine will be called
+with a string argument on each error condition. The routine can simply
+return, resulting in
+.I dl_loadmod
+returning with a zero pointer.
+Calling
+.I dl_seterror
+with a null routine pointer re-instates the default error handler.
+.LP
+Because linking can take a long time dl will print a message if it has
+to relink an object file. By default, this message is printed to
+standard error. Because this is sometimes undesired the error printing
+routine can be set using the routine
+.I dl_setmessage,
+just like dl_seterror. A routine
+.I dl_nomessage
+is provided that can be passed as an argument to dl_setmessage and
+that will result in the message not being printed.
+.SH NOTES
+The object file (and all libraries used) should be compiled with the -G 0
+flag. The linker could probably check this but does not, unfortunately. Not
+compiling your subroutine with -G 0 or using a library that is not compiled
+with -G 0 will result in wondrous and deeply puzzling results from your
+program. SGI provides versions of all libraries compiled with -G 0, these
+have a
+.I _G0
+suffix, as in
+.i -lc_g0.
+Shared libraries are also safe.
+.LP
+Using a set of routines that uses global data (like
+.IR stdio )
+will work, whether the routines are used in the main executable or not.
+What will
+.I not
+work, however, is using something like stdio in more than one dynamically
+loaded module when it is not used in the main executable (because each
+dynamic module will have its own copy of the global data).
+.LP
+There may be other subtleties involved with shared libraries, global data
+structures or other features like
+.IR sproc (2)
+that I am not aware of.
+.LP
+Although the package has support for incremental loading this does not
+work currently, due to
+.IR ld (1)
+refusing to take the output of an incremental link as the input to
+another incremental link.
+.SH BUGS
+The algorithm used to locate unused virtual memory may fail if the
+program does
+.IR mmap (2)
+or
+.IR shmat (2)
+calls. See the routines dl_checkrange and dl_setrange in
+.IR dlother (3),
+however.
+.LP
+Temporary binaries created in
+.I /usr/tmp
+are only removed if the program exits normally (by calling
+.I exit
+(3).
+.LP
+Incremental loading is a bit of a hack: the loaded modules are patched
+to remove definitions of
+.I _end\c
+,
+.I _etext
+and
+.I _edata.
+This might affect some programs adversely since the value of those
+symbols will be different in different modules.
+.LP
+Error messages issued by the
+.IR ldfcn (3)
+library or by the linker always end up on stderr and are not affected by
+calling
+.IR dl_seterror .
+.SH DIAGNOSTICS
+In case of errors
+.I NULL
+is returned, and a message is printed on standard error (unless dl_seterror
+has been called to change the error behaviour).
+.SH FILES
+.nf
+.IR object .o
+.IR object .dl
+.IR object .libs
+.SH "SEE ALSO"
+dlother(3),
+ld(1)

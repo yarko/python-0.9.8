@@ -1,0 +1,23 @@
+This directory contains the Python distribution and related files.
+
+Python is a portable extensible interpreted object-oriented
+programming language with a friendly syntax.  Python is somewhat
+similar to Perl and Tcl, but has a nicer syntax, is object-oriented,
+and better suited for writing large programs.  For an introduction to
+the language, fetch the Postscript documentation and print the
+tutorial (the file tut.ps).
+
+An overview of the files found here:
+
+MacPython0.9.8.hqx		Macintosh executable (binhex'ed)
+arraymodule.c			New module to implement array datatype
+arraymodule.libs		Corresponding library definitions
+maclibunix.shar			Subroutines needed to compile on the Mac
+python-NEWS-0.9.8		News in the 0.9.8 release
+python-lib-info.tar		The library reference as Emacs info files (tar)
+python-lib-info.tar.Z		Ditto, newer version (compressed tar)
+python.exe.Z			MS-DOS executable (compressed)
+python0.9.8.tar.Z		Source distribution (compressed tar)
+pythondoc-ps0.9.8.tar.Z		Postscript of documentation (compressed tar)
+
+--Guido van Rossum, CWI, Amsterdam <Guido.van.Rossum@cwi.nl>

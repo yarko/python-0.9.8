@@ -1,0 +1,1092 @@
+%% Master: lib.tex
+\chapter{MOST OPERATING SYSTEMS}
+
+\section{Built-in Module \sectcode{posix}}
+
+\bimodindex{posix}
+
+This module provides access to operating system functionality that is
+standardized by the C Standard and the POSIX standard (a thinly diguised
+\UNIX{} interface).
+It is available in all Python versions except on the Macintosh;
+the MS-DOS version does not support certain functions.
+The descriptions below are very terse; refer to the
+corresponding \UNIX{} manual entry for more information.
+
+Errors are reported as exceptions; the usual exceptions are given
+for type errors, while errors reported by the system calls raise
+\code{posix.error}, described below.
+
+Module \code{posix} defines the following data items:
+
+\renewcommand{\indexsubitem}{(data in module posix)}
+\begin{datadesc}{environ}
+A dictionary representing the string environment at the time
+the interpreter was started.
+(Modifying this dictionary does not affect the string environment of the
+interpreter.)
+For example,
+\code{posix.environ['HOME']}
+is the pathname of your home directory, equivalent to
+\code{getenv("HOME")}
+in C.
+\end{datadesc}
+
+\renewcommand{\indexsubitem}{(exception in module posix)}
+\begin{excdesc}{error}
+This exception is raised when an POSIX function returns a
+POSIX-related error (e.g., not for illegal argument types).  Its
+string value is \code{'posix.error'}.  The accompanying value is a
+pair containing the numeric error code from \code{errno} and the
+corresponding string, as would be printed by the C function
+\code{perror()}.
+\end{excdesc}
+
+It defines the following functions:
+
+\renewcommand{\indexsubitem}{(in module posix)}
+\begin{funcdesc}{chdir}{path}
+Change the current working directory to \var{path}.
+\end{funcdesc}
+
+\begin{funcdesc}{chmod}{path\, mode}
+Change the mode of \var{path} to the numeric \var{mode}.
+\end{funcdesc}
+
+\begin{funcdesc}{_exit}{n}
+Exit to the system with status \var{n}, without calling cleanup
+handlers, flushing stdio buffers, etc.
+(Not on MS-DOS.)
+
+Note: the standard way to exit is \code{sys.exit(\var{n})}.
+\code{posix.exit()} should normally only be used in the child process
+after a \code{fork()}.
+\end{funcdesc}
+
+\begin{funcdesc}{exec}{path\, args}
+Execute the executable \var{path} with argument list \var{args},
+replacing the current process (i.e., the Python interpreter).
+The argument list may be a tuple or list of strings.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{fork}{}
+Fork a child process.  Return 0 in the child, the child's process id
+in the parent.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{getcwd}{}
+Return a string representing the current working directory.
+\end{funcdesc}
+
+\begin{funcdesc}{getegid}{}
+Return the current process's effective group id.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{geteuid}{}
+Return the current process's effective user id.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{getgid}{}
+Return the current process's group id.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{getpid}{}
+Return the current process id.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{getppid}{}
+Return the parent's process id.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{getuid}{}
+Return the current process's user id.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{kill}{pid\, sig}
+Kill the process \var{pid} with signal \var{sig}.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{link}{src\, dst}
+Create a hard link pointing to \var{src} named \var{dst}.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{listdir}{path}
+Return a list containing the names of the entries in the directory.
+The list is in arbitrary order.  It includes the special entries
+\code{'.'} and \code{'..'} if they are present in the directory.
+\end{funcdesc}
+
+\begin{funcdesc}{lstat}{path}
+Like \code{stat()}, but do not follow symbolic links.  (On systems
+without symbolic links, this is identical to \code{posix.stat}.)
+\end{funcdesc}
+
+\begin{funcdesc}{mkdir}{path\, mode}
+Create a directory named \var{path} with numeric mode \var{mode}.
+\end{funcdesc}
+
+\begin{funcdesc}{nice}{increment}
+Add \var{incr} to the process' ``niceness''.  Return the new niceness.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{popen}{command\, mode}
+Open a pipe to or from \var{command}.  The return value is an open
+file object connected to the pipe, which can be read or written
+depending on whether \var{mode} is \code{'r'} or \code{'w'}.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{readlink}{path}
+Return a string representing the path to which the symbolic link
+points.  (On systems without symbolic links, this always raises
+\code{posix.error}.)
+\end{funcdesc}
+
+\begin{funcdesc}{rename}{src\, dst}
+Rename the file or directory \var{src} to \var{dst}.
+\end{funcdesc}
+
+\begin{funcdesc}{rmdir}{path}
+Remove the directory \var{path}.
+\end{funcdesc}
+
+\begin{funcdesc}{stat}{path}
+Perform a {\em stat} system call on the given path.  The return value
+is a tuple of at least 10 integers giving the most important (and
+portable) members of the {\em stat} structure, in the order
+\code{st_mode},
+\code{st_ino},
+\code{st_dev},
+\code{st_nlink},
+\code{st_uid},
+\code{st_gid},
+\code{st_size},
+\code{st_atime},
+\code{st_mtime},
+\code{st_ctime}.
+More items may be added at the end by some implementations.
+(On MS-DOS, some items are filled with dummy values.)
+
+Note: The standard module \code{stat} defines functions and constants
+that are useful for extracting information from a stat structure.
+\end{funcdesc}
+
+\begin{funcdesc}{symlink}{src\, dst}
+Create a symbolic link pointing to \var{src} named \var{dst}.  (On
+systems without symbolic links, this always raises
+\code{posix.error}.)
+\end{funcdesc}
+
+\begin{funcdesc}{system}{command}
+Execute the command (a string) in a subshell.  This is implemented by
+calling the Standard C function \code{system()}, and has the same
+limitations.  Changes to \code{posix.environ}, \code{sys.stdin} etc. are
+not reflected in the environment of the executed command.  The return
+value is the exit status of the process as returned by Standard C
+\code{system()}.
+\end{funcdesc}
+
+\begin{funcdesc}{times}{}
+Return a 4-tuple of floating point numbers indicating accumulated CPU
+times, in seconds.  The items are: user time, system time, children's
+user time, and children's system time, in that order.  See the \UNIX{}
+manual page {\it times}(2).  (Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{umask}{mask}
+Set the current numeric umask and returns the previous umask.
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{uname}{}
+Return a 5-tuple containing information identifying the current
+operating system.  The tuple contains 5 strings:
+\code{(\var{sysname}, \var{nodename}, \var{release}, \var{version}, \var{machine})}.
+Some systems truncate the nodename to 8
+characters or to the leading component; an better way to get the
+hostname is \code{socket.gethostname()}.  (Not on MS-DOS, nor on older
+\UNIX{} systems.)
+\end{funcdesc}
+
+\begin{funcdesc}{unlink}{path}
+Unlink \var{path}.
+\end{funcdesc}
+
+\begin{funcdesc}{utime}{path\, \(atime\, mtime\)}
+Set the access and modified time of the file to the given values.
+(The second argument is a tuple of two items.)
+\end{funcdesc}
+
+\begin{funcdesc}{wait}{}
+Wait for completion of a child process, and return a tuple containing
+its pid and exit status indication (encoded as by \UNIX{}).
+(Not on MS-DOS.)
+\end{funcdesc}
+
+\begin{funcdesc}{waitpid}{pid\, options}
+Wait for completion of a child process given by proces id, and return
+a tuple containing its pid and exit status indication (encoded as by
+\UNIX{}).  The semantics of the call are affected by the value of
+the integer options, which should be 0 for normal operation.  (If the
+system does not support waitpid(), this always raises
+\code{posix.error}.  Not on MS-DOS.)
+\end{funcdesc}
+
+\section{Standard Module \sectcode{posixpath}}
+
+\stmodindex{posixpath}
+This module implements some useful functions on POSIX pathnames.
+
+\renewcommand{\indexsubitem}{(in module posixpath)}
+\begin{funcdesc}{basename}{p}
+Return the base name of pathname
+\var{p}.
+This is the second half of the pair returned by
+\code{posixpath.split(\var{p})}.
+\end{funcdesc}
+
+\begin{funcdesc}{commonprefix}{list}
+Return the longest string that is a prefix of all strings in
+\var{list}.
+If
+\var{list}
+is empty, return the empty string (\code{''}).
+\end{funcdesc}
+
+\begin{funcdesc}{exists}{p}
+Return true if
+\var{p}
+refers to an existing path.
+\end{funcdesc}
+
+\begin{funcdesc}{expanduser}{p}
+Return the argument with an initial component of \samp{\~} or
+\samp{\~\var{user}} replaced by that \var{user}'s home directory.  An
+initial \samp{\~{}} is replaced by the environment variable \code{\${}HOME};
+an initial \samp{\~\var{user}} is looked up in the password directory through
+the built-in module \code{pwd}.  If the expansion fails, or if the
+path does not begin with a tilde, the path is returned unchanged.
+\end{funcdesc}
+
+\begin{funcdesc}{isabs}{p}
+Return true if \var{p} is an absolute pathname (begins with a slash).
+\end{funcdesc}
+
+\begin{funcdesc}{isfile}{p}
+Return true if \var{p} is an existing regular file.  This follows
+symbolic links, so both islink() and isfile() can be true for the same
+path.
+\end{funcdesc}
+
+\begin{funcdesc}{isdir}{p}
+Return true if \var{p} is an existing directory.  This follows
+symbolic links, so both islink() and isdir() can be true for the same
+path.
+\end{funcdesc}
+
+\begin{funcdesc}{islink}{p}
+Return true if
+\var{p}
+refers to a directory entry that is a symbolic link.
+Always false if symbolic links are not supported.
+\end{funcdesc}
+
+\begin{funcdesc}{ismount}{p}
+Return true if \var{p} is a mount point.  (This currently checks whether
+\code{\var{p}/..} is on a different device as \var{p} or whether
+\code{\var{p}/..} and \var{p} point to the same i-node on the same
+device --- is this test correct for all \UNIX{} and POSIX variants?)
+\end{funcdesc}
+
+\begin{funcdesc}{join}{p\, q}
+Join the paths
+\var{p}
+and
+\var{q} intelligently:
+If
+\var{q}
+is an absolute path, the return value is
+\var{q}.
+Otherwise, the concatenation of
+\var{p}
+and
+\var{q}
+is returned, with a slash (\code{'/'}) inserted unless
+\var{p}
+is empty or ends in a slash.
+\end{funcdesc}
+
+\begin{funcdesc}{normcase}{p}
+Normalize the case of a pathname.  This returns the path unchanged;
+however, a similar function in \code{macpath} converts upper case to
+lower case.
+\end{funcdesc}
+
+\begin{funcdesc}{samefile}{p\, q}
+Return true if both pathname arguments refer to the same file or directory
+(as indicated by device number and i-node number).
+Raise an exception if a stat call on either pathname fails.
+\end{funcdesc}
+
+\begin{funcdesc}{split}{p}
+Split the pathname \var{p} in a pair \code{(\var{head}, \var{tail})}, where
+\var{tail} is the last pathname component and \var{head} is
+everything leading up to that.  If \var{p} ends in a slash (except if
+it is the root), the trailing slash is removed and the operation
+applied to the result; otherwise, \code{join(\var{head}, \var{tail})} equals
+\var{p}.  The \var{tail} part never contains a slash.  Some boundary
+cases: if \var{p} is the root, \var{head} equals \var{p} and
+\var{tail} is empty; if \var{p} is empty, both \var{head} and
+\var{tail} are empty; if \var{p} contains no slash, \var{head} is
+empty and \var{tail} equals \var{p}.
+\end{funcdesc}
+
+\begin{funcdesc}{splitext}{p}
+Split the pathname \var{p} in a pair \code{(\var{root}, \var{ext})}
+such that \code{\var{root} + \var{ext} == \var{p}},
+the last component of \var{root} contains no periods,
+and \var{ext} is empty or begins with a period.
+\end{funcdesc}
+
+\begin{funcdesc}{walk}{p\, visit\, arg}
+Calls the function \var{visit} with arguments
+\code{(\var{arg}, \var{dirname}, \var{names})} for each directory in the
+directory tree rooted at \var{p} (including \var{p} itself, if it is a
+directory).  The argument \var{dirname} specifies the visited directory,
+the argument \var{names} lists the files in the directory (gotten from
+\code{posix.listdir(\var{dirname})}).  The \var{visit} function may
+modify \var{names} to influence the set of directories visited below
+\var{dirname}, e.g., to avoid visiting certain parts of the tree.  (The
+object referred to by \var{names} must be modified in place, using
+\code{del} or slice assignment.)
+\end{funcdesc}
+
+\section{Standard Module \sectcode{getopt}}
+
+\stmodindex{getopt}
+This module helps scripts to parse the command line arguments in
+\code{sys.argv}.
+It uses the same conventions as the \UNIX{}
+\code{getopt()}
+function.
+It defines the function
+\code{getopt.getopt(args, options)}
+and the exception
+\code{getopt.error}.
+
+The first argument to
+\code{getopt()}
+is the argument list passed to the script with its first element
+chopped off (i.e.,
+\code{sys.argv[1:]}).
+The second argument is the string of option letters that the
+script wants to recognize, with options that require an argument
+followed by a colon (i.e., the same format that \UNIX{}
+\code{getopt()}
+uses).
+The return value consists of two elements: the first is a list of
+option-and-value pairs; the second is the list of program arguments
+left after the option list was stripped (this is a trailing slice of the
+first argument).
+Each option-and-value pair returned has the option as its first element,
+prefixed with a hyphen (e.g.,
+\code{'-x'}),
+and the option argument as its second element, or an empty string if the
+option has no argument.
+The options occur in the list in the same order in which they were
+found, thus allowing multiple occurrences.
+Example:
+
+\bcode\begin{verbatim}
+>>> import getopt, string
+>>> args = string.split('-a -b -cfoo -d bar a1 a2')
+>>> args
+['-a', '-b', '-cfoo', '-d', 'bar', 'a1', 'a2']
+>>> optlist, args = getopt.getopt(args, 'abc:d:')
+>>> optlist
+[('-a', ''), ('-b', ''), ('-c', 'foo'), ('-d', 'bar')]
+>>> args
+['a1', 'a2']
+>>> 
+\end{verbatim}\ecode
+
+The exception
+\code{getopt.error = 'getopt error'}
+is raised when an unrecognized option is found in the argument list or
+when an option requiring an argument is given none.
+The argument to the exception is a string indicating the cause of the
+error.
+
+\chapter{UNIX ONLY}
+
+\section{Built-in Module \sectcode{pwd}}
+
+\bimodindex{pwd}
+This module provides access to the \UNIX{} password database.
+It is available on all \UNIX{} versions.
+
+Password database entries are reported as 7-tuples containing the
+following items from the password database (see \file{<pwd.h>}), in order:
+\code{pw_name},
+\code{pw_passwd},
+\code{pw_uid},
+\code{pw_gid},
+\code{pw_gecos},
+\code{pw_dir},
+\code{pw_shell}.
+The uid and gid items are integers, all others are strings.
+An exception is raised if the entry asked for cannot be found.
+
+It defines the following items:
+
+\renewcommand{\indexsubitem}{(in module pwd)}
+\begin{funcdesc}{getpwuid}{uid}
+Return the password database entry for the given numeric user ID.
+\end{funcdesc}
+
+\begin{funcdesc}{getpwnam}{name}
+Return the password database entry for the given user name.
+\end{funcdesc}
+
+\begin{funcdesc}{getpwall}{}
+Return a list of all available password database entries, in arbitrary order.
+\end{funcdesc}
+
+\section{Built-in Module \sectcode{grp}}
+
+\bimodindex{grp}
+This module provides access to the \UNIX{} group database.
+It is available on all \UNIX{} versions.
+
+Group database entries are reported as 4-tuples containing the
+following items from the group database (see \file{<grp.h>}), in order:
+\code{gr_name},
+\code{gr_passwd},
+\code{gr_gid},
+\code{gr_mem}.
+The gid is an integer, name and password are strings, and the member
+list is a list of strings.
+(Note that most users are not explicitly listed as members of the
+group(s) they are in.)
+An exception is raised if the entry asked for cannot be found.
+
+It defines the following items:
+
+\renewcommand{\indexsubitem}{(in module grp)}
+\begin{funcdesc}{getgrgid}{gid}
+Return the group database entry for the given numeric group ID.
+\end{funcdesc}
+
+\begin{funcdesc}{getgrnam}{name}
+Return the group database entry for the given group name.
+\end{funcdesc}
+
+\begin{funcdesc}{getgrall}{}
+Return a list of all available group entries entries, in arbitrary order.
+\end{funcdesc}
+
+\section{Built-in Module \sectcode{socket}}
+
+\bimodindex{socket}
+This module provides access to the BSD {\em socket} interface.
+It is available on \UNIX{} systems that support this interface.
+
+For an introduction to socket programming (in C), see the following
+papers: \emph{An Introductory 4.3BSD Interprocess Communication
+Tutorial}, by Stuart Sechrest and \emph{An Advanced 4.3BSD Interprocess
+Communication Tutorial}, by Samuel J.  Leffler et al, both in the
+\UNIX{} Programmer's Manual, Supplementary Documents 1 (sections PS1:7
+and PS1:8).  The \UNIX{} manual pages for the various socket-related
+system calls also a valuable source of information on the details of
+socket semantics.
+
+The Python interface is a straightforward transliteration of the
+\UNIX{} system call and library interface for sockets to Python's
+object-oriented style: the \code{socket()} function returns a
+\dfn{socket object} whose methods implement the various socket system
+calls.  Parameter types are somewhat higer-level than in the C
+interface: as for \code{read()} and \code{write()} operations on Python
+files, buffer allocation on receive operations is automatic, and
+buffer length is implicit on send operations.
+
+Socket addresses are represented as a single string for the
+\code{AF_UNIX} address family and as a pair
+\code{(\var{host}, \var{port})} for the \code{AF_INET} address family,
+where \var{host} is a string representing
+either a hostname in Internet domain notation like
+\code{'daring.cwi.nl'} or an IP address like \code{'100.50.200.5'},
+and \var{port} is an integral port number.  Other address families are
+currently not supported.  The address format required by a particular
+socket object is automatically selected based on the address family
+specified when the socket object was created.
+
+All errors raise exceptions.  The normal exceptions for invalid
+argument types and out-of-memory conditions can be raised; errors
+related to socket or address semantics raise the error \code{socket.error}.
+
+Not all socket operations are currently implemented; there are no
+provisions for asynchronous or non-blocking I/O (but see
+\code{avail()}, and some of the lesser-used primitives such as
+\code{getpeername()} are not provided.
+
+The module \code{socket} exports the following constants and functions:
+
+\renewcommand{\indexsubitem}{(in module socket)}
+\begin{excdesc}{error}
+This exception is raised for socket- or address-related errors.
+The accompanying value is either a string telling what went wrong or a
+pair \code{(\var{errno}, \var{string})}
+representing an error returned by a system
+call, similar to the value accompanying \code{posix.error}.
+\end{excdesc}
+
+\begin{datadesc}{AF_UNIX}
+\dataline{AF_INET}
+These constants represent the address (and protocol) families,
+used for the first argument to \code{socket()}.
+\end{datadesc}
+
+\begin{datadesc}{SOCK_STREAM}
+\dataline{SOCK_DGRAM}
+These constants represent the socket types,
+used for the second argument to \code{socket()}.
+(There are other types, but only \code{SOCK_STREAM} and
+\code{SOCK_DGRAM} appear to be generally useful.)
+\end{datadesc}
+
+\begin{funcdesc}{gethostbyname}{hostname}
+Translate a host name to IP address format.  The IP address is
+returned as a string, e.g.,  \code{'100.50.200.5'}.  If the host name
+is an IP address itself it is returned unchanged.
+\end{funcdesc}
+
+\begin{funcdesc}{getservbyname}{servicename\, protocolname}
+Translate an Internet service name and protocol name to a port number
+for that service.  The protocol name should be \code{'tcp'} or
+\code{'udp'}.
+\end{funcdesc}
+
+\begin{funcdesc}{socket}{family\, type\, proto}
+Create a new socket using the given address family, socket type and
+protocol number.  The address family should be \code{AF_INET} or
+\code{AF_UNIX}.  The socket type should be \code{SOCK_STREAM},
+\code{SOCK_DGRAM} or perhaps one of the other \samp{SOCK_} constants.
+The protocol number is usually zero and may be omitted in that case.
+\end{funcdesc}
+
+\begin{funcdesc}{fromfd}{fd\, family\, type\, proto}
+Build a socket object from an existing file descriptor (an integer as
+returned by a file object's \code{fileno} method).  Address family,
+socket type and protocol number are as for the \code{socket} function
+above.  The file descriptor should refer to a socket, but this is not
+checked --- subsequent operations on the object may fail if the file
+descriptor is invalid.  This function is rarely needed, but can be
+used to get or set socket options on a socket passed to a program as
+standard input or output (e.g. a server started by the \UNIX{} inet
+daemon).
+\end{funcdesc}
+
+\subsection{Socket Object Methods}
+
+\noindent
+Socket objects have the following methods.  Except for
+\code{makefile()} these correspond to \UNIX{} system calls applicable to
+sockets.
+
+\renewcommand{\indexsubitem}{(socket method)}
+\begin{funcdesc}{accept}{}
+Accept a connection.
+The socket must be bound to an address and listening for connections.
+The return value is a pair \code{(\var{conn}, \var{address})}
+where \var{conn} is a \emph{new} socket object usable to send and
+receive data on the connection, and \var{address} is the address bound
+to the socket on the other end of the connection.
+\end{funcdesc}
+
+\begin{funcdesc}{avail}{}
+Return true (nonzero) if at least one byte of data can be received
+from the socket without blocking, false (zero) if not.  There is no
+indication of how many bytes are available.  (\strong{This function is
+obsolete --- see module \code{select} for a more general solution.})
+\end{funcdesc}
+
+\begin{funcdesc}{bind}{address}
+Bind the socket to an address.  The socket must not already be bound.
+\end{funcdesc}
+
+\begin{funcdesc}{close}{}
+Close the socket.  All future operations on the socket object will fail.
+The remote end will receive no more data (after queued data is flushed).
+Sockets are automatically closed when they are garbage-collected.
+\end{funcdesc}
+
+\begin{funcdesc}{connect}{address}
+Connect to a remote socket.
+\end{funcdesc}
+
+\begin{funcdesc}{fileno}{}
+Return the socket's file descriptor (a small integer).  This is useful
+with \code{select}.
+\end{funcdesc}
+
+\begin{funcdesc}{getpeername}{}
+Return the remote address to which the socket is connected.  This is
+useful to find out the port number of a remote IP socket, for instance.
+\end{funcdesc}
+
+\begin{funcdesc}{getsockname}{}
+Return the socket's own address.  This is useful to find out the port
+number of an IP socket, for instance.
+\end{funcdesc}
+
+\begin{funcdesc}{getsockopt}{level\, optname\, buflen}
+Return the value of the given socket option (see the \UNIX{} man page
+{\it getsockopt}(2)).  The needed symbolic constants are defined in module
+SOCKET.  If the optional third argument is absent, an integer option
+is assumed and its integer value is returned by the function.  If
+\var{buflen} is present, it specifies the maximum length of the buffer used
+to receive the option in, and this buffer is returned as a string.
+It's up to the caller to decode the contents of the buffer (see the
+optional built-in module \code{struct} for a way to decode C structures
+encoded as strings).
+\end{funcdesc}
+
+\begin{funcdesc}{listen}{backlog}
+Listen for connections made to the socket.
+The argument (in the range 0-5) specifies the maximum number of
+queued connections.
+\end{funcdesc}
+
+\begin{funcdesc}{makefile}{mode}
+Return a \dfn{file object} associated with the socket.
+(File objects were described earlier under Built-in Types.)
+The file object references a \code{dup}ped version of the socket file
+descriptor, so the file object and socket object may be closed or
+garbage-collected independently.
+\end{funcdesc}
+
+\begin{funcdesc}{recv}{bufsize\, flags}
+Receive data from the socket.  The return value is a string representing
+the data received.  The maximum amount of data to be received
+at once is specified by \var{bufsize}.  See the \UNIX{} manual page
+for the meaning of the optional argument \var{flags}; it defaults to
+zero.
+\end{funcdesc}
+
+\begin{funcdesc}{recvfrom}{bufsize}
+Receive data from the socket.  The return value is a pair
+\code{(\var{string}, \var{address})} where \var{string} is a string
+representing the data received and \var{address} is the address of the
+socket sending the data.
+\end{funcdesc}
+
+\begin{funcdesc}{send}{string}
+Send data to the socket.  The socket must be connected to a remote
+socket.
+\end{funcdesc}
+
+\begin{funcdesc}{sendto}{string\, address}
+Send data to the socket.  The socket should not be connected to a
+remote socket, since the destination socket is specified by
+\code{address}.
+\end{funcdesc}
+
+\begin{funcdesc}{setsockopt}{level\, optname\, value}
+Set the value of the given socket option (see the \UNIX{} man page
+{\it setsockopt}(2)).  The needed symbolic constants are defined in module
+\code{SOCKET}.  The value can be an integer or a string representing a
+buffer.  In the latter case it is up to the caller to ensure that the
+string contains the proper bits (see the optional built-in module
+\code{struct} for a way to encode C structures as strings).
+\end{funcdesc}
+
+\begin{funcdesc}{shutdown}{how}
+Shut down one or both halves of the connection.  If \var{how} is \code{0},
+further receives are disallowed.  If \var{how} is \code{1}, further sends are
+disallowed.  If \var{how} is \code{2}, further sends and receives are
+disallowed.
+\end{funcdesc}
+
+Note that there are no methods \code{read()} or \code{write()}; use
+\code{recv()} and \code{send()} without \var{flags} argument instead.
+
+\subsection{Example}
+\nodename{Socket Example}
+
+Here are two minimal example programs using the TCP/IP protocol: a
+server that echoes all data that it receives back (servicing only one
+client), and a client using it.  Note that a server must perform the
+sequence \code{socket}, \code{bind}, \code{listen}, \code{accept}
+(possibly repeating the \code{accept} to service more than one client),
+while a client only needs the sequence \code{socket}, \code{connect}.
+Also note that the server does not \code{send}/\code{receive} on the
+socket it is listening on but on the new socket returned by
+\code{accept}.
+
+\bcode\begin{verbatim}
+# Echo server program
+from socket import *
+HOST = ''                 # Symbolic name meaning the local host
+PORT = 50007              # Arbitrary non-privileged server
+s = socket(AF_INET, SOCK_STREAM)
+s.bind(HOST, PORT)
+s.listen(0)
+conn, addr = s.accept()
+print 'Connected by', addr
+while 1:
+    data = conn.recv(1024)
+    if not data: break
+    conn.send(data)
+conn.close()
+\end{verbatim}\ecode
+
+\bcode\begin{verbatim}
+# Echo client program
+from socket import *
+HOST = 'daring.cwi.nl'    # The remote host
+PORT = 50007              # The same port as used by the server
+s = socket(AF_INET, SOCK_STREAM)
+s.connect(HOST, PORT)
+s.send('Hello, world')
+data = s.recv(1024)
+s.close()
+print 'Received', `data`
+\end{verbatim}\ecode
+
+\section{Built-in module \sectcode{select}}
+
+This module provides access to the function \code{select} available in
+most \UNIX{} versions.  It defines the following:
+
+\renewcommand{\indexsubitem}{(in module select)}
+\begin{excdesc}{error}
+The exception raised when an error occurs.  The accompanying value is
+a pair containing the numeric error code from \code{errno} and the
+corresponding string, as would be printed by the C function
+\code{perror()}.
+\end{excdesc}
+
+\begin{funcdesc}{select}{iwtd\, owtd\, ewtd\, timeout}
+This is a straightforward interface to the \UNIX{} \code{select()}
+system call.  The first three arguments are lists of `waitable
+objects': either integers representing \UNIX{} file descriptors or
+objects with a parameterless method named \code{fileno()} returning
+such an integer.  The three lists of waitable objects are for input,
+output and `exceptional conditions', respectively.  Empty lists are
+allowed.  The optional last argument is a time-out specified as a
+floating point number in seconds.  When the \var{timeout} argument
+is omitted the function blocks until at least one file descriptor is
+ready.  A time-out value of zero specifies a poll and never blocks.
+
+The return value is a triple of lists of objects that are ready:
+subsets of the first three arguments.  When the time-out is reached
+without a file descriptor becoming ready, three empty lists are
+returned.
+
+Amongst the acceptable object types in the lists are Python file
+objects (e.g. \code{sys.stdin}, or objects returned by \code{open()}
+or \code{posix.popen()}), socket objects returned by
+\code{socket.socket()}, and the module \code{stdwin} which happens to
+define a function \code{fileno()} for just this purpose.  You may
+also define a \dfn{wrapper} class yourself, as long as it has an
+appropriate \code{fileno()} method (that really returns a \UNIX{} file
+descriptor, not just a random integer).
+\end{funcdesc}
+\bimodindex{socket}
+\bimodindex{stdwin}
+
+\section{Built-in Module \sectcode{dbm}}
+
+Dbm provides python programs with an interface to the unix \code{ndbm}
+database library. Dbm objects are of the mapping type, so they can be
+handled just like objects of the built-in \dfn{dictionary} type. Keys
+are always strings, like with dictionary objects, but in contrast to
+dictionaries the values stored in a dbm object should also all be of
+string type. The only other difference with dictionaries is that dbm
+objects cannot be printed, for obvious reasons.
+
+The module defines the following constant and functions:
+
+\renewcommand{\indexsubitem}{(in module dbm)}
+\begin{excdesc}{error}
+Raised on dbm-specific errors, such as I/O errors. \code{KeyError} is
+raised for general mapping errors like specifying an incorrect key.
+\end{excdesc}
+
+\begin{funcdesc}{open}{filename\, rwmode\, filemode}
+Open a dbm database and return a mapping object.  \var{filename} is
+the name of the database file (without the \file{.dir} or \file{.pag}
+extensions), \var{rwmode} is \code{'r'}, \code{'w'} or \code{'rw'} as for
+\code{open}, and \var{filemode} is the unix mode of the file, used only
+when the database has to be created.
+\end{funcdesc}
+
+\section{Built-in Module \sectcode{thread}}
+
+This module provides low-level primitives for working with multiple
+threads (a.k.a. \dfn{light-weight processes} or \dfn{tasks}) --- multiple
+threads of control sharing their global data space.  For
+synchronization, simple locks (a.k.a. \dfn{mutexes} or \dfn{binary
+semaphores}) are provided.
+
+The module is optional and supported on SGI and Sun Sparc systems only.
+
+It defines the following constant and functions:
+
+\renewcommand{\indexsubitem}{(in module thread)}
+\begin{excdesc}{error}
+Raised on thread-specific errors.
+\end{excdesc}
+
+\begin{funcdesc}{start_new_thread}{func\, arg}
+Start a new thread.  The thread executes the function \var{func}
+with the argument list \var{arg} (which must be a tuple).  When the
+function returns, the thread silently exits.  When the function raises
+terminates with an unhandled exception, a stack trace is printed and
+then the thread exits (but other threads continue to run).
+\end{funcdesc}
+
+\begin{funcdesc}{exit_thread}{}
+Exit the current thread silently.  Other threads continue to run.
+\strong{Caveat:} code in pending \code{finally} clauses is not executed.
+\end{funcdesc}
+
+\begin{funcdesc}{exit_prog}{status}
+Exit all threads and report the value of the integer argument
+\var{status} as the exit status of the entire program.
+\strong{Caveat:} code in pending \code{finally} clauses, in this thread
+or in other threads, is not executed.
+\end{funcdesc}
+
+\begin{funcdesc}{allocate_lock}{}
+Return a new lock object.  Methods of locks are described below.  The
+lock is initially unlocked.
+\end{funcdesc}
+
+Lock objects have the following methods:
+
+\renewcommand{\indexsubitem}{(lock method)}
+\begin{funcdesc}{acquire}{waitflag}
+Without the optional argument, this method acquires the lock
+unconditionally, if necessary waiting until it is released by another
+thread (only one thread at a time can acquire a lock --- that's their
+reason for existence), and returns \code{None}.  If the integer
+\var{waitflag} argument is present, the action depends on its value:
+if it is zero, the lock is only acquired if it can be acquired
+immediately without waiting, while if it is nonzero, the lock is
+acquired unconditionally as before.  If an argument is present, the
+return value is 1 if the lock is acquired successfully, 0 if not.
+\end{funcdesc}
+
+\begin{funcdesc}{release}{}
+Releases the lock.  The lock must have been acquired earlier, but not
+necessarily by the same thread.
+\end{funcdesc}
+
+\begin{funcdesc}{locked}{}
+Return the status of the lock: 1 if it has been acquired by some
+thread, 0 if not.
+\end{funcdesc}
+
+{\bf Caveats:}
+
+\begin{itemize}
+\item
+Threads interact strangely with interrupts: the
+\code{KeyboardInterrupt} exception will be received by an arbitrary
+thread.
+
+\item
+Calling \code{sys.exit(\var{status})} or executing
+\code{raise SystemExit, \var{status}} is almost equivalent to calling
+\code{thread.exit_prog(\var{status})}, except that the former ways of
+exiting the entire program do honor \code{finally} clauses in the
+current thread (but not in other threads).
+
+\item
+Not all built-in functions that may block waiting for I/O allow other
+threads to run, although the most popular ones (\code{sleep},
+\code{read}, \code{select}) work as expected.
+
+\end{itemize}
+
+\chapter{AMOEBA ONLY}
+
+\section{Built-in Module \sectcode{amoeba}}
+
+\bimodindex{amoeba}
+This module provides some object types and operations useful for
+Amoeba applications.  It is only available on systems that support
+Amoeba operations.  RPC errors and other Amoeba errors are reported as
+the exception \code{amoeba.error = 'amoeba.error'}.
+
+The module \code{amoeba} defines the following items:
+
+\renewcommand{\indexsubitem}{(in module amoeba)}
+\begin{funcdesc}{name_append}{path\, cap}
+Stores a capability in the Amoeba directory tree.
+Arguments are the pathname (a string) and the capability (a capability
+object as returned by
+\code{name_lookup()}).
+\end{funcdesc}
+
+\begin{funcdesc}{name_delete}{path}
+Deletes a capability from the Amoeba directory tree.
+Argument is the pathname.
+\end{funcdesc}
+
+\begin{funcdesc}{name_lookup}{path}
+Looks up a capability.
+Argument is the pathname.
+Returns a
+\dfn{capability}
+object, to which various interesting operations apply, described below.
+\end{funcdesc}
+
+\begin{funcdesc}{name_replace}{path\, cap}
+Replaces a capability in the Amoeba directory tree.
+Arguments are the pathname and the new capability.
+(This differs from
+\code{name_append()}
+in the behavior when the pathname already exists:
+\code{name_append()}
+finds this an error while
+\code{name_replace()}
+allows it, as its name suggests.)
+\end{funcdesc}
+
+\begin{datadesc}{capv}
+A table representing the capability environment at the time the
+interpreter was started.
+(Alas, modifying this table does not affect the capability environment
+of the interpreter.)
+For example,
+\code{amoeba.capv['ROOT']}
+is the capability of your root directory, similar to
+\code{getcap("ROOT")}
+in C.
+\end{datadesc}
+
+\begin{excdesc}{error}
+The exception raised when an Amoeba function returns an error.
+The value accompanying this exception is a pair containing the numeric
+error code and the corresponding string, as returned by the C function
+\code{err_why()}.
+\end{excdesc}
+
+\begin{funcdesc}{timeout}{msecs}
+Sets the transaction timeout, in milliseconds.
+Returns the previous timeout.
+Initially, the timeout is set to 2 seconds by the Python interpreter.
+\end{funcdesc}
+
+\subsection{Capability Operations}
+
+Capabilities are written in a convenient ASCII format, also used by the
+Amoeba utilities
+{\it c2a}(U)
+and
+{\it a2c}(U).
+For example:
+
+\bcode\begin{verbatim}
+>>> amoeba.name_lookup('/profile/cap')
+aa:1c:95:52:6a:fa/14(ff)/8e:ba:5b:8:11:1a
+>>> 
+\end{verbatim}\ecode
+
+The following methods are defined for capability objects.
+
+\renewcommand{\indexsubitem}{(capability method)}
+\begin{funcdesc}{dir_list}{}
+Returns a list of the names of the entries in an Amoeba directory.
+\end{funcdesc}
+
+\begin{funcdesc}{b_read}{offset\, maxsize}
+Reads (at most)
+\var{maxsize}
+bytes from a bullet file at offset
+\var{offset.}
+The data is returned as a string.
+EOF is reported as an empty string.
+\end{funcdesc}
+
+\begin{funcdesc}{b_size}{}
+Returns the size of a bullet file.
+\end{funcdesc}
+
+\begin{funcdesc}{dir_append}{}
+\funcline{dir_delete}{}\ 
+\funcline{dir_lookup}{}\ 
+\funcline{dir_replace}{}
+Like the corresponding
+\samp{name_}*
+functions, but with a path relative to the capability.
+(For paths beginning with a slash the capability is ignored, since this
+is the defined semantics for Amoeba.)
+\end{funcdesc}
+
+\begin{funcdesc}{std_info}{}
+Returns the standard info string of the object.
+\end{funcdesc}
+
+\begin{funcdesc}{tod_gettime}{}
+Returns the time (in seconds since the Epoch, in UCT, as for POSIX) from
+a time server.
+\end{funcdesc}
+
+\begin{funcdesc}{tod_settime}{t}
+Sets the time kept by a time server.
+\end{funcdesc}
+
+\chapter{MACINTOSH ONLY}
+
+The following modules are available on the Apple Macintosh only.
+
+\section{Built-in module \sectcode{mac}}
+
+\bimodindex{mac}
+This module provides a subset of the operating system dependent
+functionality provided by the optional built-in module \code{posix}.
+It is best accessed through the more portable standard module
+\code{os}.
+
+The following functions are available in this module:
+\code{chdir},
+\code{getcwd},
+\code{listdir},
+\code{mkdir},
+\code{rename},
+\code{rmdir},
+\code{stat},
+\code{sync},
+\code{unlink},
+as well as the exception \code{error}.
+
+\section{Standard module \sectcode{macpath}}
+
+\stmodindex{macpath}
+This module provides a subset of the pathname manipulation functions
+available from the optional standard module \code{posixpath}.  It is
+best accessed through the more portable standard module \code{os}, as
+\code{os.path}.
+
+The following functions are available in this module:
+\code{normcase},
+\code{isabs},
+\code{join},
+\code{split},
+\code{isdir},
+\code{isfile},
+\code{exists}.

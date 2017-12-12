@@ -1,0 +1,564 @@
+Sat Jan  9 18:14:47 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* fileobject.c: repr(file) now includes the object's address for
+  uniqueness.
+
+* Makefile: use cp -r to install the library
+
+* ceval.c: use #ifdef COMPAT_HACKS instead of #if 0
+
+Thu Jan  7 10:12:50 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile: fix to make clmodule.c compile;
+  make config.o dependent on libpython.a (so date is always correct)
+
+* Changes by Sjoerd to thread.c, threadmodule.c, ceval.c (changes
+  needed for CMIF) and clmodule.c (new) Makefile (svmodule is no
+  longer generated).
+
+Wed Jan  6 00:13:44 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* timemodule.c: now sleep() also takes a float argument.
+
+Tue Jan  5 23:51:30 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* posixmodule.c: added nice().
+
+Mon Jan  4 10:09:04 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Configure.py: use #!/usr/local/bin/python
+
+Sat Jan  2 11:35:29 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* posixmodule.c: move extern function declarations to top
+
+* listobject.c: cmp() arguments must be void* if __STDC__
+
+* Makefile, allobjects.h, panelmodule.c, modsupport.c: get rid of
+  strdup() -- it is a portability risk
+
+* Makefile: enclosed ranlib command in parentheses for Sequent Make
+  which aborts if the command is not found even if '-' is present
+
+Fri Jan  1 17:26:51 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* timemodule.c: time() returns a floating point number, in microsecond
+  precision if BSD_TIME is defined.
+
+Tue Dec 22 15:00:21 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* imageopmodule.c: added 2 and 4 bits grey formats (Jack)
+
+* Fix nasty bug in fileobject.filegetline: v == expr instead of v = expr...
+
+* Makefile: configure strop by default; fix lint flags for mpz/md5
+
+Mon Dec 14 14:17:31 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* mymalloc.h: always allocate one extra byte, since some malloc's
+  return NULL for malloc(0) or realloc(p, 0).  (This should be done
+  differently than wasting one byte, but alas...)
+
+Fri Dec 11 13:47:39 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Moved "add'l libraries" option in Makefile to an earlier place.
+
+* Remove argument compatibility hacks (b) and (c).
+
+* Add grey2mono, dither2mono and mono2grey to imageop.
+
+Tue Dec  8 13:36:25 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Dup the fd in socket.fromfd().
+
+* Added new modules mpz, md5 (by JH, requiring GNU MP 1.2).  Affects
+  Makefile and config.c.
+
+* socketmodule.c: added socket.fromfd(fd, family, type, [proto]),
+  converted socket() to use of getargs().
+
+Thu Nov 26 11:27:13 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* classobject.c: in instance_lenth, test result of call_object
+  for exception before using it.  Fixed a few other places where the
+  outcome of calling sq_length wasn't tested for exceptions
+  (bltinmodule.c, ceval.c).
+
+Wed Nov 25 16:50:27 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* config.c: Added audioop to lists.
+
+* Makefile: change default source directory
+
+* socketmodule.c: added getsockname and getpeername
+
+Wed Nov 18 14:00:27 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* bltinmodule.c: corrected typo in type() error message
+
+Sun Nov 15 16:20:58 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added small optimization to strop.joinfields(): if there's only one
+  item, don't copy it.
+
+Sat Nov 14 02:14:02 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added new built-in functions str() and repr(): repr(x) == `x`;
+  str(x) == x if x is a string, otherwise str(x) == repr(x).
+
+Thu Nov 12 11:30:15 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added joinfields to stropmodule.c (string.join calls joinfields now)
+
+Sun Oct 18 19:45:50 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* bltinmodule.c: added built-in function cmp(a, b)
+
+* flmodule.c: added {do,check}_only_forms to fl's list of functions;
+  and don't print a message when an unknown object is returned.
+
+* pythonrun.c: catch SIGHUP and SIGTERM to do essential cleanup.
+
+Sat Sep 26 16:30:00 1992  Guido van Rossum  (guido@roos.cwi.nl)
+
+* Made jpegmodule.c smaller by using getargs() and mkvalue() consistently.
+
+* Increased parser stack size to 500 in parser.h.
+
+* Implemented custom allocation of stack frames to frameobject.c and
+  added dynamic stack overflow checks (value stack only) to ceval.c.
+  (There seems to be a bug left: sometimes stack traces don't make sense.)
+
+Fri Sep 25 23:59:00 1992  Guido van Rossum  (guido@roos.cwi.nl)
+
+* Changed most I/O to use sys.std{in,out,err} and to accept any object
+  with readline() or write() methods (true fileobjects are still done
+  specially for speed).
+
+* Added Addmodule.sh shell script to add a new optional module: edit
+  Makefile and config.c.  Added markers to these files to help the
+  script.  Added most known modules in this way.
+
+Thu Sep 17 19:50:43 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile: added IMGFILE; moved some stuff around.
+
+* flmodule.c: added some missing functions; changed readonly flags of
+  some data members based upon FORMS documentation.
+
+* listobject.c: fixed int/long arg lint bug (bites PC compilers).
+
+* several: removed redundant print methods (repr is good enough).
+
+* posixmodule.c: added (still experimental) process group functions.
+
+Wed Sep 16 16:28:58 1992  Guido van Rossum  (guido@roos.cwi.nl)
+
+* svmodule.c.proto: Now use the bitvector of svBurstCapture.  The
+  bitvector is returned as a tuple of 0's and 1's.  A 0 indicates an
+  even field, a 1 indicates an odd field.
+
+Tue Sep 15 18:14:52 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Fix PC bug in listindex() (newintobject((int))
+
+Sun Sep 13 22:05:32 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* posix: added setpgrp(), and, if sgi,
+  setsid(), setpgid(pid, pgid), tcgetpgrp(fd), and tcsetpgrp(fd, pgid)
+
+Sat Sep 12 01:51:14 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Made builtins int(), long(), float(), oct() and hex() more generic.
+
+Fri Sep 11 23:59:59 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* thread.[ch] use fewer signals and have more sophisticated debug output.
+
+* Makefile changed to use $> for lint, tags and other targets.
+
+* cgen and svgen support filename argument.
+
+* added lower, upper and swapcase to strop.
+
+Tue Sep  8 11:03:25 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile, config.c: made struct a standard built-in module
+
+Mon Sep  7 23:37:30 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* socketmodule.c: added string arguments to {set,get}sockoption
+
+* cstubs: added gversion()
+
+Thu Sep  3 16:16:58 1992  Guido van Rossum  (guido@roos.cwi.nl)
+
+* new svmodule.c.proto for new video library (Sjoerd)
+
+Wed Sep  2 14:46:42 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile: fixed depend target so it works when used with VPATH
+
+Sat Aug 29 18:38:32 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* regexmodule.c: check for offset in range in reg_match().
+
+Fri Aug 28 13:32:47 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* flmodule.c: replace getishortarg calls by getargs calls; fix lay-out.
+
+* imgfilemodule.c: always close image file; return errno errors.
+
+Thu Aug 27 09:40:25 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* imgfilemodule.c: forget about caching (it never worked anyway) and
+  get rid of some global variables.
+
+* pythonmain.c: added execution of $PYTHONSTARTUP in interactive sessions
+
+* pythonrun.c: in goaway(), call sys.exitfunc if it exists
+
+* modsupport.c: suppress unnecessary error message if too many
+  arguments are passed
+
+Wed Aug 26 15:56:41 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+Various changes to make debugging easier:
+
+* stringobject.c: stringrepr() contained bogus NEWREF and type/size assignment!
+
+* flmodule.c: print FORMS forms and objects nicer.
+
+* printobject() now calls reprobject() if tp_repr is defined
+  and tp_print isn't
+
+* compile.c: code objects print somewhat nicer
+
+* ceval.c: make debugging easier #ifdef DEBUG:
+  always set f->f_lineno, save filename as local variable of type char*.
+
+Sun Aug 23 14:36:36 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* flmodule.c: change management of "list of all generic objects":
+  if the object is not in a form, it is not in the list; and when
+  removing an object from the list, its callback is removed.
+
+* config.c: made *all* modules optional, added a set of USE_XXX at the top
+
+* object.h: if DEBUG is defined, don't define NDEBUG
+
+* pythonrun.c, parser.c: small changes to make debugging code compile
+
+* sysmodule.c: added mdebug(flag) to set mallopt(M_DEBUG, flag)
+
+* dictobject.c: give the dummy key a non-empty value (for debugging)
+
+Wed Aug 19 18:34:25 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* listobject.c: check for overflow of the size of the object,
+  so things like range(0x7fffffff) will raise MemoryError instead
+  of calling malloc() with -4 (and then crashing -- malloc's fault)
+
+* renamed malloc.h mymalloc.h, and added MALLARG as the type of the
+  argument to malloc() (size_t or unsigned int)
+
+* ceval.c: fix *serious* (new) bug in testbool: by default objects
+  should test true, not false!!!
+
+* bltinmodule.c: fix *serious* (new) bug in evalfile: forgot to
+  initialize s!!!
+
+* almodule.c: added getname, getdefault and getminmax functions
+
+* cgen.py: don't call gl.foreground and create a new window after all
+  (seems to break window positions in .Xdefaults)
+
+* config.c: rearranged modules alphabetically
+
+* structmodule.c: unpack() now returns a tuple, not a list
+
+* svmodule.c.proto: GetCaptureData now returns timestamp as float
+
+Fri Aug 14 13:50:37 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* bltinmodule.c: use getargs() in more cases
+
+* modsupport.c: check for embedded \0 in strings for z and s formats
+
+* longobject.c, bltinmodule.c (oct): oct(0) should return '0', not '00'
+
+* macmodule.c: include allobjects.h, not .c
+
+* timemodule.c: the mac has no unistd.h
+
+* classobject.c: fixed several cases of return NULL that should be
+  return -1 !!!
+
+* xxobject.c: added tp_as_number, tp_as_sequence, tp_as_mapping to
+  the type object.
+
+* malloc.h: sparcs have stdlib.h (and their free() is declared int).
+
+* classobject.[ch], {float,long,int}object.c, bltinmodule.c:
+  coercion is now completely generic.
+
+* ceval.c: for instances, don't coerce for + and *; * reverses
+  arguments if left one is non-instance numeric and right one sequence.
+
+Wed Aug 12 17:12:22 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added new optional nismodule.c by Fred Gansevles of U.Twente.
+
+* The Makefile is now hpux-aware.
+
+* Don't put ../lib in $(DEFPATH), insterad fix the two python calls in
+  the Makefile and add it explicitly to Configure.py.
+
+* Made regexmodule.c optional.
+
+* Made DO_TIMES for posixmodule.c a Makefile choice.
+
+* The save_* functions in ceval.[ch] now use object*, not void*.
+
+* Added CASE_TOO_BIG hack to ceval.c, just in case.
+
+Tue Aug 11 23:59:59 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added support for user classes defining numeric types as well.
+
+* Added new built-in function coerce().
+
+* ceval.c: if an object is both a sequence and a mapping, use the
+  mapping's implementation of len() and x[k]
+
+* ceval.c, bltinmodule.c: computing an object's length may raise an
+  error
+
+* classobject.c: classes can now define their own representation and
+  comparison functions, and emulate sequences or mappings
+
+Sun Aug  9 14:08:40 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* fixed Makefile to use ##if[yes|no] instead of ##ask
+
+* Made waitpid() a separate function
+
+Sat Aug  8 17:50:38 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Configure.py: added ##[el]if[yes|no] directives (more powerful than ##ask)
+
+Fri Aug  7 15:52:17 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Configure.py: change ##file to ##edit{file,dir}; and minor changes.
+
+* Makefile: fixed comments to work nicely with Configure.py; fixed
+  ##file references.
+
+Thu Aug  6 18:52:22 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added Configure.py and made the Makefile use it.
+
+Wed Aug  5 21:41:41 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile: cosmetics
+
+* socketmodule.c: get rid of makepair(); fix makesocketaddr to fix
+  broken recvfrom()
+
+* socketmodule: get rid of getStrarg()
+
+* ceval.h: move eval_code() to new file eval.h, so compile.h is no
+  longer needed.
+
+* ceval.c: move thread comments to ceval.h; always make save/restore
+  thread functions available (for dynloaded modules)
+
+* cdmodule.c, listobject.c: don't include compile.h
+
+* flmodule.c: include ceval.h
+
+* import.c: include eval.h instead of ceval.h
+
+* cgen.py: add forground(); noport(); winopen(""); to initgl().
+
+* bltinmodule.c, socketmodule.c, fileobject.c, posixmodule.c,
+  selectmodule.c:
+  adapt to threads (add BGN/END SAVE macros)
+
+* stdwinmodule.c: adapt to threads and use a special stdwin lock.
+
+* pythonmain.c: don't include getpythonpath().
+
+* pythonrun.c: use BGN/END SAVE instead of direct calls; also more
+  BGN/END SAVE calls etc.
+
+* thread.c: bigger stack size for sun; change exit() to _exit()
+
+* threadmodule.c: use BGN/END SAVE macros where possible
+
+* timemodule.c: adapt better to threads; use BGN/END SAVE; add
+  longsleep internal function if BSD_TIME; cosmetics
+
+Tue Aug  4 11:04:08 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile adapted to changes below.
+
+* split pythonmain.c in two: most stuff goes to pythonrun.c, in the library.
+
+* new optional built-in threadmodule.c, build upon Sjoerd's thread.{c,h}.
+
+* new module from Sjoerd: sv (svgen.py, svmodule.c.proto).
+
+* new files thread.{c,h} (from Sjoerd).
+
+* new xxmodule.c (example only).
+
+* myselect.h: bzero -> memset
+
+* select.c: bzero -> memset; removed global variable
+
+Mon Aug  3 21:05:02 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* cdmodule.c: 2 minor changes by Sjoerd.
+
+* listobject.c: added optional cmp function to list.sort().
+
+Fri Jul 31 14:35:48 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* fileobject.c: fix fatal bug in getline() (forgot to initialize fp now)
+
+Mon Jul  6 16:17:35 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* audioopmodule.c: Added conversions to/from ADPCM(-4); renamed adpcm
+  to adpcm3 (what it really was).
+
+* fileobject.c: report more meaningful error for I/O on closed files;
+  user getargs() everywhere.
+
+Fri Jul  3 10:17:37 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile: added install rules and $(*DEST*) defines
+
+Tue Jun 30 14:40:35 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* stdwinevent.c: added proper detail format for WE_KEY events: "(ii)".
+
+* dbmmodule.c: new module by Jack, interfaces to ndbm.
+
+* cstubs: added stub for qgetfd().
+
+Tue Jun 23 11:00:27 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* selectmodule.c: use "myselect.h" as intended.
+
+* audioopmodule.c: Added  adpcm2lin and lin2adpcm.
+
+* myselect.h: new header accumulates hacks for select system call.
+
+* timemodule.c, socketmodule.c: include new "myselect.h".
+
+* Makefile: added selectmodule.[co] to standard src/obj.
+
+* config.c: added select as standard built-in module.
+
+Mon Jun 22 16:13:33 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* stdwinmodule.c: added stdwin.connectionnumber() interface and alias
+  stwin.fileno() for it.
+
+* selectmodule.c: added (tentatively) -- code by Jack.
+
+Fri Jun 19 16:12:11 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* sockemodule.c, fileobject.c: added x.fileno() method to files and
+  sockets.
+
+Sun Jun 14 14:11:10 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* calling sys.settrace() or sys.setprofile() without arguments crashed
+  in INCREF() calls which should be XINCREF() calls.
+
+Fri Jun 12 10:32:13 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* timemodule.c: fix for SEQUENT port (sys/select, struct timezone) by
+Jaap Vermeulen
+
+* socketmodule.c: some versions of UNIX want the exact size of the
+address structure (patch by Jaap Vermeulen)
+
+Fri Jun  5 14:14:10 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* socketmodule.c: added getsockopt and setsockopt methods.
+
+* audioopmodule.c: fix bug in ulaw2lin for 4-byte ints.
+
+Wed Jun  3 15:09:44 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* imgfilemodule.c: added readscaled() function.
+
+* config.c: append the default path to $PYTHONPATH; ignore empty $PYTHONPATH.
+
+* newmodule sunaudiodevmodule.c (by Jack) added.
+
+Tue Jun  2 15:52:38 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* structmember.[ch]: added BYTE, CHAR and unsigned variants
+
+* flmodule.c: fixed bugs in generic_setattr (returned NULL instead of
+  -1 for errors)
+
+Mon Jun  2 16:01:00 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* new module audioopmodule.c (by Jack) added
+
+Wed May 20 10:27:00 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* new module pcmodule.c (by Mark Anacker) added
+
+Fri May 15 13:02:37 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Makefile: fixed DL (added DL_LIBS to def'n of LIBS!) and added
+  similar DLD option (also with DL_ prefix!)
+
+Sat May  9 17:51:11 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* modsupport.c: do_mkvalue was missing argument declarations
+
+* Added get[e]uid() and get[e]gid() to module posix.
+
+Mon Apr 13 15:51:13 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Incorporated Sjoerd's CD module
+
+* Fixed Makefile to incorporate DL and CD options
+
+* merged modsupport with Steve Miale's version
+
+Sun Apr 12 16:57:39 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* modsupport.[ch]: added mkvalue() -- counterpart of getargs()
+  to construct return values
+
+* stdwinmodule.c: used mkvalue() where possible
+
+Thu Apr  9 09:18:52 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Bumped patchlevel to 7
+
+* Check for NULL value returned by err_get in call_exc_trace
+  (thanks to Patrick Dussud for finding this so quickly!)
+
+* Separate STRTOL and STRTOD config options, since our strtod.c
+  dumps core on a sparc
+
+Wed Apr  8 11:29:21 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* flmodule.c: in form_dealloc, only hide the form if it's visible.
+
+* config.c: change the date to say >= 6 Apr 1992.
+
+# ceval.c: reverse sense of test for CHECKEXC.
+
+-------------------------------------------------------------------------------
+^^^ Log entries after release of 0.9.6 ^^^
+-------------------------------------------------------------------------------

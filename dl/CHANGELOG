@@ -1,0 +1,62 @@
+Differences between 1.6 and 1.5:
+- There is a new interface dl_getrange() that allows you to get the
+  address of a free memory range (to pass to usinit, for instance).
+- dl has no way of knowing how big text- and data-segments will be
+  before ld is run. Occasionally, this will cause the resultant .ld
+  file not to fit in the allocated space. This still happens, but at
+  least now there's a routine dl_setsegsizeguess() that you can use to
+  increase the guess used.
+- dl_checkrange now has begin,end parameters (like dl_setrange).
+
+Differences between 1.5 and 1.4:
+- dl now skips comment sections, which sometimes appear in 4.0.5F
+  binaries.
+  WARNING: there is a bug in the 3.10 loader which effectively stops
+  'ld -A' from working. This dl can work together with a patched
+  version of ld 3.10 that is available thru SGI to work around the bug.
+- You can pass the name of a #! script as binary name and dl_loadmod
+  will find the name of the real binary.
+- The .ld file is created under a temporary name and moved to the right
+  place later (so multiple processes loading the same object don't
+  bite each other so much) (10-Dec-92)
+- Fixed a bug wrt. the #! script finding (18-Dec-92)
+
+Differences between 1.4 and 1.3:
+- The main change is that there is a new interface, dl_loadmod_mult()
+  which allows you to obtain more than one address from the newly loaded
+  module.
+- Dl has also been adapted to work with the new libmld library which
+  missed some features of older libmld implementations. Dl has been
+  tested under 4.0.2 and 4.0.5, but I have no reason to believe that it
+  won't work with older releases.
+- A workaround for incremental loading has been hacked in. The idea was
+  provided by Casper Dik: if we are in incremental mode (when the user
+  has called dl_setincr() and calls dl_loadmod() with a null filename)
+  we make a pass over the string table and remove occurrences of _end,
+  _etext and _edata. Gross, but it works.
+- Finally, dl now uses atexit() to attempt to remove temporary
+  executables when the program exits.
+
+Differences between 1.3 and 1.2:
+- A few bugs have been fixed, the main one being that object files with
+  an empty bss segment didn't load correctly.
+- Since linking can take a long time a message is now printed to stderr
+  while linking the object. There is a routine dl_setmessage() to set
+  the message printing routine, and a routine dl_nomessage() is also
+  provided that doesn't print anything.
+- Support for incremental loading has been added. It doesn't work,
+  unfortunately, because SGI ld refuses to take an incrementally linked
+  file (one created with an 'ld -A ...' run) as the input to another
+  incremental link (i.e. as argument to the '-A'). It complains about
+  '-A file defines loader-defined symbol _etext'. Careful examination of
+  symbol tables didn't point me at the problem, so I remain open to
+  suggestions.
+
+Differences between 1.2 and 1.0:
+- The only significant change with respect to version 1.0 is that the
+  load addresses for the file are now computed as a hash function from
+  the file name, and that memory management is done using a bitmap. The
+  effect of this is that if you often load modules in random order the
+  caching will still work. A minor (but annoying) change is that
+  dl_ldzfilep has gotten a second parameter, which is needed due to some
+  ununderstood weirdness in the ldfcn library.

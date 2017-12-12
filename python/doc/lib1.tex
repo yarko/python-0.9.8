@@ -1,0 +1,1087 @@
+%% Master: lib.tex
+\chapter{Introduction}
+
+The Python library consists of three parts, with different levels of
+integration with the interpreter.
+Closest to the interpreter are built-in types, exceptions and functions.
+Next are built-in modules, which are written in \C{} and linked statically
+with the interpreter.
+Finally there are standard modules that are implemented entirely in
+Python, but are always available.
+For efficiency, some standard modules may become built-in modules in
+future versions of the interpreter.
+\indexii{built-in}{types}
+\indexii{built-in}{exceptions}
+\indexii{built-in}{functions}
+\indexii{built-in}{modules}
+\indexii{standard}{modules}
+\indexii{\C{}}{language}
+
+\chapter{Built-in Types, Exceptions and Functions}
+\nodename{Built-in Objects}
+
+Names for built-in exceptions and functions are found in a separate
+symbol table.  This table is searched last, so local and global
+user-defined names can override built-in names.  Built-in types have
+no names but are created easily by constructing an object of the
+desired type (e.g., using a literal) and applying the built-in
+function \code{type()} to it.  They are described together here for
+easy reference.%
+\footnote{Some descriptions sorely lack explanations of the exceptions
+	that may be raised --- this will be fixed in a future version of
+	this document.}
+\indexii{built-in}{types}
+\indexii{built-in}{exceptions}
+\indexii{built-in}{functions}
+\index{symbol table}
+\bifuncindex{type}
+
+\section{Built-in Types}
+
+The following sections describe the standard types that are built into
+the interpreter.  These are the numeric types, sequence types, and
+several others, including types themselves.  There is no explicit
+Boolean type; use integers instead.
+\indexii{built-in}{types}
+\indexii{Boolean}{type}
+
+Some operations are supported by several object types; in particular,
+all objects can be compared, tested for truth value, and converted to
+a string (with the \code{`{\rm \ldots}`} notation).  The latter conversion is
+implicitly used when an object is written by the \code{print} statement.
+\stindex{print}
+
+\subsection{Truth Value Testing}
+
+Any object can be tested for truth value, for use in an \code{if} or
+\code{while} condition or as operand of the Boolean operations below.
+The following values are false:
+\stindex{if}
+\stindex{while}
+\indexii{truth}{value}
+\indexii{Boolean}{operations}
+\index{false}
+
+\begin{itemize}
+\renewcommand{\indexsubitem}{(Built-in object)}
+
+\item	\code{None}
+	\ttindex{None}
+
+\item	zero of any numeric type, e.g., \code{0}, \code{0L}, \code{0.0}.
+
+\item	any empty sequence, e.g., \code{''}, \code{()}, \code{[]}.
+
+\item	any empty mapping, e.g., \code{\{\}}.
+
+\end{itemize}
+
+\emph{All} other values are true --- so objects of many types are
+always true.
+\index{true}
+
+\subsection{Boolean Operations}
+
+These are the Boolean operations:
+\indexii{Boolean}{operations}
+
+\begin{tableiii}{|c|l|c|}{code}{Operation}{Result}{Notes}
+  \lineiii{\var{x} or \var{y}}{if \var{x} is false, then \var{y}, else \var{x}}{(1)}
+  \lineiii{\var{x} and \var{y}}{if \var{x} is false, then \var{x}, else \var{y}}{(1)}
+  \lineiii{not \var{x}}{if \var{x} is false, then \code{1}, else \code{0}}{}
+\end{tableiii}
+\opindex{and}
+\opindex{or}
+\opindex{not}
+
+\noindent
+Notes:
+
+\begin{description}
+
+\item[(1)]
+These only evaluate their second argument if needed for their outcome.
+
+\end{description}
+
+\subsection{Comparisons}
+
+Comparison operations are supported by all objects:
+
+\begin{tableiii}{|c|l|c|}{code}{Operation}{Meaning}{Notes}
+  \lineiii{<}{strictly less than}{}
+  \lineiii{<=}{less than or equal}{}
+  \lineiii{>}{strictly greater than}{}
+  \lineiii{>=}{greater than or equal}{}
+  \lineiii{==}{equal}{}
+  \lineiii{<>}{not equal}{(1)}
+  \lineiii{!=}{not equal}{(1)}
+  \lineiii{is}{object identity}{}
+  \lineiii{is not}{negated object identity}{}
+\end{tableiii}
+\indexii{operator}{comparison}
+\opindex{==} % XXX *All* others have funny characters < ! >
+\opindex{is}
+\opindex{is not}
+
+\noindent
+Notes:
+
+\begin{description}
+
+\item[(1)]
+\code{<>} and \code{!=} are alternate spellings for the same operator.
+(I couldn't choose between \ABC{} and \C{}! :-)
+\indexii{\ABC{}}{language}
+\indexii{\C{}}{language}
+
+\end{description}
+
+Objects of different types, except different numeric types, never
+compare equal; such objects are ordered consistently but arbitrarily
+(so that sorting a heterogeneous array yields a consistent result).
+Furthermore, some types (e.g., windows) support only a degenerate
+notion of comparison where any two objects of that type are unequal.
+Again, such objects are ordered arbitrarily but consistently.
+\indexii{types}{numeric}
+\indexii{objects}{comparing}
+
+(Implementation note: objects of different types except numbers are
+ordered by their type names; objects of the same types that don't
+support proper comparison are ordered by their address.)
+
+Two more operations with the same syntactic priority, \code{in} and
+\code{not in}, are supported only by sequence types (below).
+\opindex{in}
+\opindex{not in}
+
+\subsection{Numeric Types}
+
+There are three numeric types: \dfn{plain integers}, \dfn{long integers}, and
+\dfn{floating point numbers}.  Plain integers (also just called \dfn{integers})
+are implemented using \code{long} in \C{}, which gives them at least 32
+bits of precision.  Long integers have unlimited precision.  Floating
+point numbers are implemented using \code{double} in \C{}.  All bets on
+their precision are off unless you happen to know the machine you are
+working with.
+\indexii{numeric}{types}
+\indexii{integer}{types}
+\indexii{integer}{type}
+\indexiii{long}{integer}{type}
+\indexii{floating point}{type}
+\indexii{\C{}}{language}
+
+Numbers are created by numeric literals or as the result of built-in
+functions and operators.  Unadorned integer literals (including hex
+and octal numbers) yield plain integers.  Integer literals with an \samp{L}
+or \samp{l} suffix yield long integers
+(\samp{L} is preferred because \code{1l} looks too much like eleven!).
+Numeric literals containing a decimal point or an exponent sign yield
+floating point numbers.
+\indexii{numeric}{literals}
+\indexii{integer}{literals}
+\indexiii{long}{integer}{literals}
+\indexii{floating point}{literals}
+\indexii{hexadecimal}{literals}
+\indexii{octal}{literals}
+
+Python fully supports mixed arithmetic: when an binary arithmetic
+operator has operands of different numeric types, the operand with the
+``smaller'' type is converted to that of the other, where plain
+integer is smaller than long integer is smaller than floating point.
+Comparisons between numbers of mixed type use the same rule.%
+\footnote{As a consequence, the list \code{[1, 2]} is considered equal
+	to \code{[1.0, 2.0]}, and similar for tuples.}
+The functions \code{int()}, \code{long()} and \code{float()} can be used
+to coerce numbers to a specific type.
+\index{arithmetic}
+\bifuncindex{int}
+\bifuncindex{long}
+\bifuncindex{float}
+
+All numeric types support the following operations:
+
+\begin{tableiii}{|c|l|c|}{code}{Operation}{Result}{Notes}
+  \lineiii{abs(\var{x})}{absolute value of \var{x}}{}
+  \lineiii{int(\var{x})}{\var{x} converted to integer}{(1)}
+  \lineiii{long(\var{x})}{\var{x} converted to long integer}{(1)}
+  \lineiii{float(\var{x})}{\var{x} converted to floating point}{}
+  \lineiii{-\var{x}}{\var{x} negated}{}
+  \lineiii{+\var{x}}{\var{x} unchanged}{}
+  \lineiii{\var{x} + \var{y}}{sum of \var{x} and \var{y}}{}
+  \lineiii{\var{x} - \var{y}}{difference of \var{x} and \var{y}}{}
+  \lineiii{\var{x} * \var{y}}{product of \var{x} and \var{y}}{}
+  \lineiii{\var{x} / \var{y}}{quotient of \var{x} and \var{y}}{(2)}
+  \lineiii{\var{x} \%{} \var{y}}{remainder of \code{\var{x} / \var{y}}}{}
+  \lineiii{divmod(\var{x}, \var{y})}{the pair \code{(\var{x} / \var{y}, \var{x} \%{} \var{y})}}{(3)}
+  \lineiii{pow(\var{x}, \var{y})}{\var{x} to the power \var{y}}{}
+\end{tableiii}
+\indexiii{operations on}{numeric}{types}
+
+\noindent
+Notes:
+\begin{description}
+\item[(1)]
+Conversion from floating point to (long or plain) integer may round or
+% XXXJH xref here
+truncate as in \C{}; see functions \code{floor} and \code{ceil} in module
+\code{math} for well-defined conversions.
+\indexii{numeric}{conversions}
+\bimodindex{math}
+\indexii{\C{}}{language}
+
+\item[(2)]
+For (plain or long) integer division, the result is an integer; it
+always truncates towards zero.
+% XXXJH integer division is better defined nowadays
+\indexii{integer}{division}
+\indexiii{long}{integer}{division}
+
+\item[(3)]
+See the section on built-in functions for an exact definition.
+
+\end{description}
+% XXXJH exceptions: overflow (when? what operations?) zerodivision
+
+\subsubsection{Bit-string Operations on Integer Types.}
+
+Plain and long integer types support additional operations that make
+sense only for bit-strings.  Negative numbers are treated as their 2's
+complement value:
+
+\begin{tableiii}{|c|l|c|}{code}{Operation}{Result}{Notes}
+  \lineiii{\~\var{x}}{the bits of \var{x} inverted}{}
+  \lineiii{\var{x} \^{} \var{y}}{bitwise \dfn{exclusive or} of \var{x} and \var{y}}{}
+  \lineiii{\var{x} \&{} \var{y}}{bitwise \dfn{and} of \var{x} and \var{y}}{}
+  \lineiii{\var{x} | \var{y}}{bitwise \dfn{or} of \var{x} and \var{y}}{}
+  \lineiii{\var{x} << \var{n}}{\var{x} shifted left by \var{n} bits}{}
+  \lineiii{\var{x} >> \var{n}}{\var{x} shifted right by \var{n} bits}{}
+\end{tableiii}
+% XXXJH what's `left'? `right'? maybe better use lsb or msb or something
+\indexiii{operations on}{integer}{types}
+\indexii{bit-string}{operations}
+\indexii{shifting}{operations}
+\indexii{masking}{operations}
+
+\subsection{Sequence Types}
+
+There are three sequence types: strings, lists and tuples.
+Strings literals are written in single quotes: \code{'xyzzy'}.
+Lists are constructed with square brackets,
+separating items with commas:
+\code{[a, b, c]}.
+Tuples are constructed by the comma operator
+(not within square brackets), with or without enclosing parentheses,
+but an empty tuple must have the enclosing parentheses, e.g.,
+\code{a, b, c} or \code{()}.  A single item tuple must have a trailing comma,
+e.g., \code{(d,)}.
+\indexii{sequence}{types}
+\indexii{string}{type}
+\indexii{tuple}{type}
+\indexii{list}{type}
+
+Sequence types support the following operations (\var{s} and \var{t} are
+sequences of the same type; \var{n}, \var{i} and \var{j} are integers):
+
+\begin{tableiii}{|c|l|c|}{code}{Operation}{Result}{Notes}
+  \lineiii{len(\var{s})}{length of \var{s}}{}
+  \lineiii{min(\var{s})}{smallest item of \var{s}}{}
+  \lineiii{max(\var{s})}{largest item of \var{s}}{}
+  \lineiii{\var{x} in \var{s}}{\code{1} if an item of \var{s} is equal to \var{x}, else \code{0}}{}
+  \lineiii{\var{x} not in \var{s}}{\code{0} if an item of \var{s} is equal to \var{x}, else \code{1}}{}
+  \lineiii{\var{s} + \var{t}}{the concatenation of \var{s} and \var{t}}{}
+  \lineiii{\var{s} * \var{n}{\rm ,} \var{n} * \var{s}}{\var{n} copies of \var{s} concatenated}{}
+  \lineiii{\var{s}[\var{i}]}{\var{i}'th item of \var{s}, origin 0}{(1)}
+  \lineiii{\var{s}[\var{i}:\var{j}]}{slice of \var{s} from \var{i} to \var{j}}{(1), (2)}
+\end{tableiii}
+\indexiii{operations on}{sequence}{types}
+\bifuncindex{len}
+\bifuncindex{min}
+\bifuncindex{max}
+\indexii{concatenation}{operation}
+\indexii{repetition}{operation}
+\indexii{subscript}{operation}
+\indexii{slice}{operation}
+\opindex{in}
+\opindex{not in}
+
+\noindent
+Notes:
+
+% XXXJH all TeX-math expressions replaced by python-syntax expressions
+\begin{description}
+  
+\item[(1)] If \var{i} or \var{j} is negative, the index is relative to
+  the end of the string, i.e., \code{len(\var{s}) + \var{i}} or
+  \code{len(\var{s}) + \var{j}} is substituted.  But note that \code{-0} is
+  still \code{0}.
+  
+\item[(2)] The slice of \var{s} from \var{i} to \var{j} is defined as
+  the sequence of items with index \var{k} such that \code{\var{i} <=
+  \var{k} < \var{j}}.  If \var{i} or \var{j} is greater than
+  \code{len(\var{s})}, use \code{len(\var{s})}.  If \var{i} is omitted,
+  use \code{0}.  If \var{j} is omitted, use \code{len(\var{s})}.  If
+  \var{i} is greater than or equal to \var{j}, the slice is empty.
+
+\end{description}
+
+\subsubsection{Mutable Sequence Types.}
+
+List objects support additional operations that allow in-place
+modification of the object.
+These operations would be supported by other mutable sequence types
+(when added to the language) as well.
+Strings and tuples are immutable sequence types and such objects cannot
+be modified once created.
+The following operations are defined on mutable sequence types (where
+\var{x} is an arbitrary object):
+\indexiii{mutable}{sequence}{types}
+\indexii{list}{type}
+
+\begin{tableiii}{|c|l|c|}{code}{Operation}{Result}{Notes}
+  \lineiii{\var{s}[\var{i}] = \var{x}}
+	{item \var{i} of \var{s} is replaced by \var{x}}{}
+  \lineiii{\var{s}[\var{i}:\var{j}] = \var{t}}
+  	{slice of \var{s} from \var{i} to \var{j} is replaced by \var{t}}{}
+  \lineiii{del \var{s}[\var{i}:\var{j}]}
+	{same as \code{\var{s}[\var{i}:\var{j}] = []}}{}
+  \lineiii{\var{s}.append(\var{x})}
+	{same as \code{\var{s}[len(\var{x}):len(\var{x})] = [\var{x}]}}{}
+  \lineiii{\var{s}.count(\var{x})}
+	{return number of \var{i}'s for which \code{\var{s}[\var{i}] == \var{x}}}{}
+  \lineiii{\var{s}.index(\var{x})}
+	{return smallest \var{i} such that \code{\var{s}[\var{i}] == \var{x}}}{(1)}
+  \lineiii{\var{s}.insert(\var{i}, \var{x})}
+	{same as \code{\var{s}[\var{i}:\var{i}] = [\var{x}]}}{}
+  \lineiii{\var{s}.remove(\var{x})}
+	{same as \code{del \var{s}[\var{s}.index(\var{x})]}}{(1)}
+  \lineiii{\var{s}.reverse()}
+	{reverses the items of \var{s} in place}{}
+  \lineiii{\var{s}.sort()}
+	{permutes the items of \var{s} to satisfy
+        \code{\var{s}[\var{i}] <= \var{s}[\var{j}]},
+        for \code{\var{i} < \var{j}}}{(2)}
+\end{tableiii}
+\indexiv{operations on}{mutable}{sequence}{types}
+\indexiii{operations on}{sequence}{types}
+\indexiii{operations on}{list}{type}
+\indexii{subscript}{assignment}
+\indexii{slice}{assignment}
+\stindex{del}
+\renewcommand{\indexsubitem}{(list method)}
+\ttindex{append}
+\ttindex{count}
+\ttindex{index}
+\ttindex{insert}
+\ttindex{remove}
+\ttindex{reverse}
+\ttindex{sort}
+
+\noindent
+Notes:
+\begin{description}
+\item[(1)] Raises an exception when \var{x} is not found in \var{s}.
+  
+\item[(2)] The \code{sort()} method takes an optional argument
+  specifying a comparison function of two arguments (list items) which
+  should return \code{-1}, \code{0} or \code{1} depending on whether the
+  first argument is considered smaller than, equal to, or larger than the
+  second argument.  Note that this slows the sorting process down
+  considerably; e.g. to sort an array in reverse order it is much faster
+  to use calls to \code{sort()} and \code{reverse()} than to use
+  \code{sort()} with a comparison function that reverses the ordering of
+  the elements.
+\end{description}
+
+\subsection{Mapping Types}
+
+A \dfn{mapping} object maps values of one type (the key type) to
+arbitrary objects.  Mappings are mutable objects.  There is currently
+only one mapping type, the \dfn{dictionary}.  A dictionary's keys are
+strings.
+\indexii{mapping}{types}
+\indexii{dictionary}{type}
+
+Dictionaries are created by placing a comma-separated list of
+\code{\var{key}: \var{value}} pairs within braces, for example:
+\code{\{'jack': 4098, 'sape': 4127\}}.
+
+The following operations are defined on mappings (where \var{a} is a
+mapping, \var{k} is a key and \var{x} is an arbitrary object):
+
+\begin{tableiii}{|c|l|c|}{code}{Operation}{Result}{Notes}
+  \lineiii{len(\var{a})}{the number of items in \var{a}}{}
+  \lineiii{\var{a}[\var{k}]}{the item of \var{a} with key \var{k}}{(1)}
+  \lineiii{\var{a}[\var{k}] = \var{x}}{set \code{\var{a}[\var{k}]} to \var{x}}{}
+  \lineiii{del \var{a}[\var{k}]}{remove \code{\var{a}[\var{k}]} from \var{a}}{(1)}
+  \lineiii{\var{a}.keys()}{a copy of \var{a}'s list of keys}{(2)}
+  \lineiii{\var{a}.has_key(\var{k})}{true if \var{a} has a key \var{k}}{}
+\end{tableiii}
+\indexiii{operations on}{mapping}{types}
+\indexiii{operations on}{dictionary}{type}
+\stindex{del}
+\bifuncindex{len}
+\renewcommand{\indexsubitem}{(dictionary method)}
+\ttindex{keys}
+\ttindex{has_key}
+
+% XXXJH some lines above, you talk about `true', elsewhere you
+% explicitely states \code{0} or \code{1}.
+\noindent
+Notes:
+\begin{description}
+\item[(1)] Raises an exception if \var{k} is not in the map.
+
+\item[(2)] Keys are listed in random order.
+\end{description}
+
+\subsection{Other Built-in Types}
+
+The interpreter supports several other kinds of objects.
+Most of these support only one or two operations.
+
+\subsubsection{Modules.}
+
+The only special operation on a module is attribute access:
+\code{\var{m}.\var{name}}, where \var{m} is a module and \var{name} accesses
+a name defined in \var{m}'s symbol table.  Module attributes can be
+assigned to.  (Note that the \code{import} statement is not, strictly
+spoken, an operation on a module object; \code{import \var{foo}} does not
+require a module object named \var{foo} to exist, rather it requires
+an (external) \emph{definition} for a module named \var{foo}
+somewhere.)
+
+A special member of every module is \code{__dict__}.
+This is the dictionary containing the module's symbol table.
+Modifying this dictionary will actually change the module's symbol
+table, but direct assignment to the \code{__dict__} attribute is not
+possible (i.e., you can write \code{\var{m}.__dict__['a'] = 1}, which
+defines \code{\var{m}.a} to be \code{1}, but you can't write \code{\var{m}.__dict__ = \{\}}.
+
+Modules are written like this: \code{<module 'sys'>}.
+
+\subsubsection{Classes and Class Instances.}
+% XXXJH cross ref here
+(See the Python Reference Manual for these.)
+
+\subsubsection{Functions.}
+
+Function objects are created by function definitions.  The only
+operation on a function object is to call it:
+\code{\var{func}(\var{argument-list})}.
+
+There are really two flavors of function objects: built-in functions
+and user-defined functions.  Both support the same operation (to call
+the function), but the implementation is different, hence the
+different object types.
+
+The implementation adds two special read-only attributes:
+\code{\var{f}.func_code} is a function's \dfn{code object} (see below) and
+\code{\var{f}.func_globals} is the dictionary used as the function's
+global name space (this is the same as \code{\var{m}.__dict__} where
+\var{m} is the module in which the function \var{f} was defined).
+
+\subsubsection{Methods.}
+
+Methods are functions that are called using the attribute notation.
+There are two flavors: built-in methods (such as \code{append()} on
+lists) and class instance methods.  Built-in methods are described
+with the types that support them.
+
+The implementation adds two special read-only attributes to class
+instance methods: \code{\var{m}.im_self} is the object whose method this
+is, and \code{\var{m}.im_func} is the function implementing the method.
+Calling \code{\var{m}(\var{arg-1}, \var{arg-2}, {\rm \ldots},
+\var{arg-n})} is completely equivalent to calling
+\code{\var{m}.im_func(\var{m}.im_self, \var{arg-1}, \var{arg-2}, {\rm
+\ldots}, \var{arg-n})}.
+
+(See the Python Reference Manual for more info.)
+
+\subsubsection{Type Objects.}
+
+Type objects represent the various object types.  An object's type is
+% XXXJH xref here
+accessed by the built-in function \code{type()}.  There are no special
+operations on types.
+
+Types are written like this: \code{<type 'int'>}.
+
+\subsubsection{The Null Object.}
+
+This object is returned by functions that don't explicitly return a
+value.  It supports no special operations.  There is exactly one null
+object, named \code{None} (a built-in name).
+
+It is written as \code{None}.
+
+\subsubsection{File Objects.}
+
+File objects are implemented using \C{}'s \code{stdio} package and can be
+% XXXJH xref here
+created with the built-in function \code{open()} described under
+Built-in Functions below.
+
+When a file operation fails for an I/O-related reason, the exception
+\code{IOError} is raised.  This includes situations where the
+operation is not defined for some reason, like \code{seek()} on a tty
+device or writing a file opened for reading.
+
+Files have the following methods:
+
+
+\renewcommand{\indexsubitem}{(file method)}
+
+\begin{funcdesc}{close}{}
+  Close the file.  A closed file cannot be read or written anymore.
+\end{funcdesc}
+
+\begin{funcdesc}{flush}{}
+  Flush the internal buffer, like \code{stdio}'s \code{fflush()}.
+\end{funcdesc}
+
+\begin{funcdesc}{isatty}{}
+  Return \code{1} if the file is connected to a tty(-like) device, else
+  \code{0}.
+\end{funcdesc}
+
+\begin{funcdesc}{read}{size}
+  Read at most \var{size} bytes from the file (less if the read hits
+  \EOF{} or no more data is immediately available on a pipe, tty or
+  similar device).  If the \var{size} argument is omitted, read all
+  data until \EOF{} is reached.  The bytes are returned as a string
+  object.  An empty string is returned when \EOF{} is encountered
+  immediately.  (For certain files, like ttys, it makes sense to
+  continue reading after an \EOF{} is hit.)
+\end{funcdesc}
+
+\begin{funcdesc}{readline}{}
+  Read one entire line from the file.  A trailing newline character is
+  kept in the string (but may be absent when a file ends with an
+  incomplete line).  An empty string is returned when \EOF{} is hit
+  immediately.  Note: unlike \code{stdio}'s \code{fgets()}, the returned
+  string contains null characters (\code{'\e 0'}) if they occurred in the
+  input.
+\end{funcdesc}
+
+\begin{funcdesc}{readlines}{}
+  Read until \EOF{} using \code{readline()} and return a list containing
+  the lines thus read.
+\end{funcdesc}
+
+\begin{funcdesc}{seek}{offset\, whence}
+  Set the file's current position, like \code{stdio}'s \code{fseek()}.
+  The \var{whence} argument is optional and defaults to \code{0}
+  (absolute file positioning); other values are \code{1} (seek
+  relative to the current position) and \code{2} (seek relative to the
+  file's end).  There is no return value.
+\end{funcdesc}
+
+\begin{funcdesc}{tell}{}
+  Return the file's current position, like \code{stdio}'s \code{ftell()}.
+\end{funcdesc}
+
+\begin{funcdesc}{write}{str}
+  Write a string to the file.  There is no return value.
+\end{funcdesc}
+
+\subsubsection{Internal Objects.}
+
+(See the Python Reference Manual for these.)
+
+\subsection{Special Attributes}
+
+The implementation adds a few special read-only attributes to several
+object types, where they are relevant:
+
+\begin{itemize}
+
+\item
+\code{\var{x}.__dict__} is a dictionary of some sort used to store an
+object's (writable) attributes;
+
+\item
+\code{\var{x}.__methods__} lists the methods of many built-in object types,
+e.g., \code{[].__methods__} is
+% XXXJH results in?, yields?, written down as an example
+\code{['append', 'count', 'index', 'insert', 'remove', 'reverse', 'sort']};
+
+\item
+\code{\var{x}.__members__} lists data attributes;
+
+\item
+\code{\var{x}.__class__} is the class to which a class instance belongs;
+
+\item
+\code{\var{x}.__bases__} is the tuple of base classes of a class object.
+
+\end{itemize}
+
+\section{Built-in Exceptions}
+
+Exceptions are string objects.  Two distinct string objects with the
+same value are different exceptions.  This is done to force programmers
+to use exception names rather than their string value when specifying
+exception handlers.  The string value of all built-in exceptions is
+their name, but this is not a requirement for user-defined exceptions
+or exceptions defined by library modules.
+
+The following exceptions can be generated by the interpreter or
+built-in functions.  Except where mentioned, they have an `associated
+value' indicating the detailed cause of the error.  This may be a
+string or a tuple containing several items of information (e.g., an
+error code and a string explaining the code).
+
+User code can raise built-in exceptions.  This can be used to test an
+exception handler or to report an error condition `just like' the
+situation in which the interpreter raises the same exception; but
+beware that there is nothing to prevent user code from raising an
+inappropriate error.
+
+\renewcommand{\indexsubitem}{(built-in exception)}
+
+\begin{excdesc}{AttributeError}
+% xref to attribute reference?
+  Raised when an attribute reference or assignment fails.  (When an
+  object does not support attributes references or attribute assignments
+  at all, \code{TypeError} is raised.)
+\end{excdesc}
+
+\begin{excdesc}{EOFError}
+% XXXJH xrefs here
+  Raised when one of the built-in functions (\code{input()} or
+  \code{raw_input()}) hits an end-of-file condition (\EOF{}) without
+  reading any data.
+% XXXJH xrefs here
+  (N.B.: the \code{read()} and \code{readline()} methods of file
+  objects return an empty string when they hit \EOF{}.)  No associated value.
+\end{excdesc}
+
+\begin{excdesc}{IOError}
+% XXXJH xrefs here
+  Raised when an I/O operation (such as a \code{print} statement, the
+  built-in \code{open()} function or a method of a file object) fails
+  for an I/O-related reason, e.g., `file not found', `disk full'.
+\end{excdesc}
+
+\begin{excdesc}{ImportError}
+% XXXJH xref to import statement?
+  Raised when an \code{import} statement fails to find the module
+  definition or when a \code{from {\rm \ldots} import} fails to find a
+  name that is to be imported.
+\end{excdesc}
+
+\begin{excdesc}{IndexError}
+% XXXJH xref to sequences
+  Raised when a sequence subscript is out of range.  (Slice indices are
+  silently truncated to fall in the allowed range; if an index is not a
+  plain integer, \code{TypeError} is raised.)
+\end{excdesc}
+
+\begin{excdesc}{KeyError}
+% XXXJH xref to mapping objects?
+  Raised when a mapping (dictionary) key is not found in the set of
+  existing keys.
+\end{excdesc}
+
+\begin{excdesc}{KeyboardInterrupt}
+  Raised when the user hits the interrupt key (normally
+  \kbd{Control-C} or
+\key{DEL}).  During execution, a check for interrupts is made regularly.
+% XXXJH xrefs here
+  Interrupts typed when a built-in function \code{input()} or
+  \code{raw_input()}) is waiting for input also raise this exception.  No
+  associated value.
+\end{excdesc}
+
+\begin{excdesc}{MemoryError}
+  Raised when an operation runs out of memory but the situation may
+  still be rescued (by deleting some objects).  The associated value is
+  a string indicating what kind of (internal) operation ran out of memory.
+  Note that because of the underlying memory management architecture
+  (\C{}'s \code{malloc()} function), the interpreter may not always be able
+  to completely recover from this situation; it nevertheless raises an
+  exception so that a stack traceback can be printed, in case a run-away
+  program was the cause.
+\end{excdesc}
+
+\begin{excdesc}{NameError}
+  Raised when a local or global name is not found.  This applies only
+  to unqualified names.  The associated value is the name that could
+  not be found.
+\end{excdesc}
+
+\begin{excdesc}{OverflowError}
+% XXXJH reference to long's and/or int's?
+  Raised when the result of an arithmetic operation is too large to be
+  represented.  This cannot occur for long integers (which would rather
+  raise \code{MemoryError} than give up).  Because of the lack of
+  standardization of floating point exception handling in \C{}, most
+  floating point operations also aren't checked.  For plain integers,
+  all operations that can overflow are checked except left shift, where
+  typical applications prefer to drop bits than raise an exception.
+\end{excdesc}
+
+\begin{excdesc}{RuntimeError}
+  Raised when an error is detected that doesn't fall in any of the
+  other categories.  The associated value is a string indicating what
+  precisely went wrong.  (This exception is a relic from a previous
+  version of the interpreter; it is not used any more except by some
+  extension modules that haven't been converted to define their own
+  exceptions yet.)
+\end{excdesc}
+
+\begin{excdesc}{SyntaxError}
+% XXXJH xref to these functions?
+  Raised when the parser encounters a syntax error.  This may occur in
+  an \code{import} statement, in a call to the built-in functions
+  \code{eval()}, \code{exec()}, \code{execfile()} or \code{input()}, or
+  when reading the initial script or standard input (also
+  interactively).
+\end{excdesc}
+
+\begin{excdesc}{SystemError}
+  Raised when the interpreter finds an internal error, but the
+  situation does not look so serious to cause it to abandon all hope.
+  The associated value is a string indicating what went wrong (in
+  low-level terms).
+  
+  You should report this to the author or maintainer of your Python
+  interpreter.  Be sure to report the version string of the Python
+  interpreter (\code{sys.version}; it is also printed at the start of an
+  interactive Python session), the exact error message (the exception's
+  associated value) and if possible the source of the program that
+  triggered the error.
+\end{excdesc}
+
+\begin{excdesc}{SystemExit}
+% XXXJH xref to module sys?
+  This exception is raised by the \code{sys.exit()} function.  When it
+  is not handled, the Python interpreter exits; no stack traceback is
+  printed.  If the associated value is a plain integer, it specifies the
+  system exit status (passed to \C{}'s \code{exit()} function); if it is
+  \code{None}, the exit status is zero; if it has another type (such as
+  a string), the object's value is printed and the exit status is one.
+  
+  A call to \code{sys.exit} is translated into an exception so that
+  clean-up handlers (\code{finally} clauses of \code{try} statements)
+  can be executed, and so that a debugger can execute a script without
+  running the risk of losing control.  The \code{posix._exit()} function
+  can be used if it is absolutely positively necessary to exit
+  immediately (e.g., after a \code{fork()} in the child process).
+\end{excdesc}
+
+\begin{excdesc}{TypeError}
+  Raised when a built-in operation or function is applied to an object
+  of inappropriate type.  The associated value is a string giving
+  details about the type mismatch.
+\end{excdesc}
+
+\begin{excdesc}{ValueError}
+  Raised when a built-in operation or function receives an argument
+  that has the right type but an inappropriate value, and the
+  situation is not described by a more precise exception such as
+  \code{IndexError}.
+\end{excdesc}
+
+\begin{excdesc}{ZeroDivisionError}
+  Raised when the second argument of a division or modulo operation is
+  zero.  The associated value is a string indicating the type of the
+  operands and the operation.
+\end{excdesc}
+
+\section{Built-in Functions}
+
+The Python interpreter has a number of functions built into it that
+are always available.  They are listed here in alphabetical order.
+
+
+\renewcommand{\indexsubitem}{(built-in function)}
+\begin{funcdesc}{abs}{x}
+  Return the absolute value of a number.  The argument may be a plain
+  or long integer or a floating point number.
+\end{funcdesc}
+
+\begin{funcdesc}{apply}{func\, args}
+% XXXJH better: \var{func} must be.... and: the second --> \var{args}
+  The first argument must be a callable object (a user-defined or
+  built-in function or method, or a class object).  The second argument
+  must be a tuple, possibly empty or a singleton.  The function is
+  called with the tuple as argument list; the number of arguments is the
+  same as the length of the tuple.  (This is different from just calling
+  \code{\var{func}(\var{args})}, since in that case there is always
+  exactly one argument.)
+\end{funcdesc}
+
+\begin{funcdesc}{chr}{i}
+  Return a string of one character whose \ASCII{} code is the integer
+  \var{i}, e.g., \code{chr(97)} returns the string \code{'a'}.  This is the
+  inverse of \code{ord()}.  The argument must be in the range [0..255],
+  inclusive.
+\end{funcdesc}
+
+\begin{funcdesc}{cmp}{x\, y}
+  Compare the two objects \var{x} and \var{y} and return an integer
+  according to the outcome.  The return value is negative if \code{\var{x}
+  < \var{y}}, zero if \code{\var{x} == \var{y}} and strictly positive if
+  \code{\var{x} > \var{y}}.
+\end{funcdesc}
+
+\begin{funcdesc}{coerce}{x\, y}
+  Return a tuple consisting of the two numeric arguments converted to
+  a common type, using the same rules as used by arithmetic
+  operations.
+\end{funcdesc}
+
+\begin{funcdesc}{dir}{}
+  Without arguments, return the list of names in the current local
+  symbol table.  With a module, class or class instance object as
+  argument (or anything else that has a \code{__dict__} attribute),
+  returns the list of names in that object's attribute dictionary.
+  The resulting list is sorted.  For example:
+
+\bcode\begin{verbatim}
+>>> import sys
+>>> dir()
+['sys']
+>>> dir(sys)
+['argv', 'exit', 'modules', 'path', 'stderr', 'stdin', 'stdout']
+>>> 
+\end{verbatim}\ecode
+\end{funcdesc}
+
+\begin{funcdesc}{divmod}{a\, b}
+  Take two numbers as arguments and return a pair of integers
+  consisting of their integer quotient and remainder.  With mixed
+  operand types, the rules for binary arithmetic operators apply.  For
+  plain and long integers, the result is the same as
+  \code{(\var{a} / \var{b}, \var{a} \%{} \var{b})}.
+  For floating point numbers the result is the same as
+  \code{(math.floor(\var{a} / \var{b}), \var{a} \%{} \var{b})}.
+\end{funcdesc}
+
+\begin{funcdesc}{eval}{s\, globals\, locals}
+  The arguments are a string and two optional dictionaries.  The
+  string argument is parsed and evaluated as a Python expression
+  (technically speaking, a condition list) using the dictionaries as
+  global and local name space.  The string must not begin with
+  whitespace, nor must it contain null bytes.  The return value is the
+  result of the expression.  If the third argument is omitted it
+  defaults to the second.  If both dictionaries are omitted, the
+  expression is executed in the environment where \code{eval} is
+  called.  Syntax errors are reported as exceptions.  Example:
+
+\bcode\begin{verbatim}
+>>> x = 1
+>>> print eval('x+1')
+2
+>>> 
+\end{verbatim}\ecode
+\end{funcdesc}
+
+\begin{funcdesc}{exec}{s\, globals\, locals}
+  Similar to \code{eval}, but parses and executes the string as a
+  sequence of statements.  The return value is \code{None}.  The string
+  must not begin with whitespace and must end with a newline
+  (\code{'\e n'}).
+  Multiple lines separated by newlines are accepted; the
+  normal indentation rules must be obeyed.  Syntax errors are reported
+  as exceptions.  Example:
+
+\bcode\begin{verbatim}
+>>> x = 1
+>>> exec('x = x+1\n')
+>>> print x
+2
+>>> 
+\end{verbatim}\ecode
+\end{funcdesc}
+
+\begin{funcdesc}{execfile}{filename\, globals\, locals}
+  Similar to \code{exec}, but opens and parses a file instead of
+  taking
+  its input from a string.
+\end{funcdesc}
+
+\begin{funcdesc}{float}{x}
+  Convert a number to floating point.  The argument may be a plain or
+  long integer or a floating point number.
+\end{funcdesc}
+
+\begin{funcdesc}{getattr}{object\, name}
+  The arguments are an object and a string.  The string must be the
+  name
+  of one of the object's attributes.  The result is the value of that
+  attribute.  For example, \code{getattr(\var{x}, '\var{foobar}')} is equivalent to
+  \code{\var{x}.\var{foobar}}.
+\end{funcdesc}
+
+\begin{funcdesc}{hex}{x}
+  Convert a number to a hexadecimal string.  The result is a valid
+  Python expression.
+\end{funcdesc}
+
+\begin{funcdesc}{input}{prompt}
+  Almost equivalent to \code{eval(raw_input(\var{prompt}))}.  As for
+  \code{raw_input()}, the prompt argument is optional.  The difference is
+  that a long input expression may be broken over multiple lines using the
+  backslash convention.
+\end{funcdesc}
+
+\begin{funcdesc}{int}{x}
+  Convert a number to a plain integer.  The argument may be a plain or
+  long integer or a floating point number.
+\end{funcdesc}
+
+\begin{funcdesc}{len}{s}
+  Return the length (the number of items) of an object.  The argument
+% XXXJH xrefs to sequence and/or mapping?
+  may be a sequence (string, tuple or list) or a mapping (dictionary).
+\end{funcdesc}
+
+\begin{funcdesc}{long}{x}
+  Convert a number to a long integer.  The argument may be a plain or
+  long integer or a floating point number.
+\end{funcdesc}
+
+\begin{funcdesc}{max}{s}
+  Return the largest item of a non-empty sequence (string, tuple or
+  list).
+\end{funcdesc}
+
+\begin{funcdesc}{min}{s}
+  Return the smallest item of a non-empty sequence (string, tuple or
+  list).
+\end{funcdesc}
+
+\begin{funcdesc}{oct}{x}
+  Convert a number to an octal string.  The result is a valid Python
+  expression.
+\end{funcdesc}
+
+\begin{funcdesc}{open}{filename\, mode}
+  % XXXJH xrefs here to Built-in types?
+  Return a new file object (described earlier under Built-in Types).
+  The string arguments are the same as for \code{stdio}'s
+  \code{fopen()}: \var{filename} is the file name to be opened,
+  \var{mode} indicates how the file is to be opened: \code{'r'} for
+  reading, \code{'w'} for writing (truncating an existing file), and
+  \code{'a'} opens it for appending.  Modes \code{'r+'}, \code{'w+'} and
+  \code{'a+'} open the file for updating, provided the underlying
+  \code{stdio} library understands this.  On systems that differentiate
+  between binary and text files, \code{'b'} appended to the mode opens
+  the file in binary mode.  If the file cannot be opened, \code{IOError}
+  is raised.
+\end{funcdesc}
+
+\begin{funcdesc}{ord}{c}
+  Return the \ASCII{} value of a string of one character.  E.g.,
+  \code{ord('a')} returns the integer \code{97}.  This is the inverse of
+  \code{chr()}.
+\end{funcdesc}
+
+\begin{funcdesc}{pow}{x\, y}
+  Return \var{x} to the power \var{y}.  The arguments must have
+  numeric types.  With mixed operand types, the rules for binary
+  arithmetic operators apply.  The effective operand type is also the
+  type of the result; if the result is not expressible in this type, the
+  function raises an exception; e.g., \code{pow(2, -1)} is not allowed.
+\end{funcdesc}
+
+\begin{funcdesc}{range}{start\, end\, step}
+  This is a versatile function to create lists containing arithmetic
+  progressions.  It is most often used in \code{for} loops.  The
+  arguments must be plain integers.  If the \var{step} argument is
+  omitted, it defaults to \code{1}.  If the \var{start} argument is
+  omitted, it defaults to \code{0}.  The full form returns a list of
+  plain integers \code{[\var{start}, \var{start} + \var{step},
+  \var{start} + 2 * \var{step}, \ldots]}.  If \var{step} is positive,
+  the last element is the largest \code{\var{start} + \var{i} *
+  \var{step}} less than \var{end}; if \var{step} is negative, the last
+  element is the largest \code{\var{start} + \var{i} * \var{step}}
+  greater than \var{end}.  \var{step} must not be zero.  Example:
+
+\bcode\begin{verbatim}
+>>> range(10)
+[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+>>> range(1, 11)
+[1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+>>> range(0, 30, 5)
+[0, 5, 10, 15, 20, 25]
+>>> range(0, 10, 3)
+[0, 3, 6, 9]
+>>> range(0, -10, -1)
+[0, -1, -2, -3, -4, -5, -6, -7, -8, -9]
+>>> range(0)
+[]
+>>> range(1, 0)
+[]
+>>> 
+\end{verbatim}\ecode
+\end{funcdesc}
+
+\begin{funcdesc}{raw_input}{prompt}
+  The string argument is optional; if present, it is written to
+  standard
+  output without a trailing newline.  The function then reads a line
+  from input, converts it to a string (stripping a trailing newline),
+  and returns that.  When \EOF{} is read, \code{EOFError} is raised.
+  Example:
+
+\bcode\begin{verbatim}
+>>> s = raw_input('--> ')
+--> Monty Python's Flying Circus
+>>> s
+'Monty Python\'s Flying Circus'
+>>> 
+\end{verbatim}\ecode
+\end{funcdesc}
+
+\begin{funcdesc}{reload}{module}
+  Re-parse and re-initialize an already imported \var{module}.  The
+  argument must be a module object, so it must have been successfully
+  imported before.  This is useful if you have edited the module source
+  file using an external editor and want to try out the new version
+  without leaving the Python interpreter.  Note that if a module is
+  syntactically correct but its initialization fails, the first
+  \code{import} statement for it does not import the name, but does
+  create a (partially initialized) module object; to reload the module
+  you must first \code{import} it again (this will just make the
+  partially initialized module object available) before you can
+  \code{reload()} it.
+\end{funcdesc}
+
+\begin{funcdesc}{repr}{object}
+  This function returns exactly the same value as \code{`\var{object}`}.
+  It is sometimes useful to be able to access this operation as an
+  ordinary function.
+\end{funcdesc}
+
+\begin{funcdesc}{setattr}{object\, name\, value}
+  This is the counterpart of \code{getattr}.  The arguments are an
+  object, a string and an arbitrary value.  The string must be the name
+  of one of the object's attributes.  The function assigns the value to
+  the attribute, provided the object allows it.  For example,
+  \code{setattr(\var{x}, '\var{foobar}', 123)} is equivalent to
+  \code{\var{x}.\var{foobar} = 123}.
+\end{funcdesc}
+
+\begin{funcdesc}{str}{object}
+  This function returns \code{repr(\var{object})} unless \var{object}
+  is a string, in which case it returns \var{object} unchanged.
+  It is sometimes useful to make sure that a value is a string without
+  surrounding it with string quotes like \code{repr(\var{object})}
+  does if its argument is a string.
+\end{funcdesc}
+
+\begin{funcdesc}{type}{object}
+% XXXJH xref to buil-in objects here?
+  Return the type of an \var{object}.  The return value is a type
+  object.  There is not much you can do with type objects except compare
+  them to other type objects; e.g., the following checks if a variable
+  is a string:
+
+\bcode\begin{verbatim}
+>>> if type(x) == type(''): print 'It is a string'
+\end{verbatim}\ecode
+\end{funcdesc}

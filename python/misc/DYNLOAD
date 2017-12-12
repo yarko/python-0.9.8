@@ -1,0 +1,133 @@
+Dynamic Loading
+===============
+
+On some systems (e.g., SunOS, SGI Irix) it is possible to configure
+Python to support dynamic loading of modules implemented in C.  Once
+configured and installed it's trivial to use: if Python program
+executes "import foo", the search for modules tries to find a file
+"foomodule.o" in the module search path, and if one is found, it is
+linked with the executing binary and executed.  Once linked, the
+module acts just like a built-in module.
+
+The advantages of dynamic loading are twofold: the "core" Python
+binary gets smaller, and users can extend Python with their own
+modules implemented in C without having to build and maintain their
+own copy of the Python interpreter.  There are also disadvantages:
+dynamic loading isn't available on all systems (this just means that
+on some systems you have to use static loading), and dynamically
+loading a module that was compiled for a different version of Python
+(e.g., with a different representation of objects) may dump core.
+Also, under SunOS, you lose the ability to use shared libraries.
+
+
+Configuring and building the interpreter
+----------------------------------------
+
+Dynamic loading is a little complicated to configure, since its
+implementation is extremely system dependent, and there are no
+really standard libraries or interfaces for it.  I'm using an
+extremely simple interface, which basically needs only one function:
+
+	funcptr = dl_loadmod(binary, object, function)
+
+where 'binary' is the pathname of the currently executing program (not
+just argv[0]!), 'object' is the name of the .o file to be dynamically
+loaded, and 'function' is the name of a function in the module.  If
+the dynamic loading succeeds, dl_loadmod returns a pointer to the
+named function; if not, it returns NULL.
+
+I provide two implementations of dl_loadmod(): one for SGI machines
+running Irix 4.0 (written by my colleague Jack Jansen), and one that
+is a thin interface layer for Wilson Ho's (GNU) dynamic loading
+package "dld" (version 3.2.3).  Dld implements a much more powerful
+version of dynamic loading than needed (including unlinking), but it
+does not support System V's COFF object file format.  It currently
+supports only VAX (Ultrix), Sun 3 (SunOS 3.4 and 4.0), SPARCstation
+(SunOS 4.0), Sequent Symmetry (Dynix), and Atari ST (from the dld
+3.2.3 README file).  Because of the GNU copyleft I won't distribute
+dld with Python, but many ftp archive sites carry dld these days, so
+it won't be hard to get hold of it if you need it.
+
+(If you don't know where to get dld, try anonymous ftp to
+wuarchive.wustl.edu:/mirrors2/gnu/dld-3.2.3.tar.Z.  Jack's dld can be
+found at ftp.cwi.nl:/pub/dl.tar.Z.)
+
+To build a Python interpreter capable of dynamic loading, you need to
+edit the Makefile.  Basically you must uncomment the lines starting
+with #DL_, but you must also edit some of the lines to choose which
+version of dl_loadmod to use, and fill in the pathname of the dld
+library if you use it.  And, of course, you must first build
+dl_loadmod and dld, if used.
+
+IMPORTANT NOTE: when using dld under SonOS, the Python binary must be
+linked with -Bstatic unless you are using gcc -- this is to turn off
+shared libraries, which dld doesn't understand.  Yes, this is the
+price you have to pay for dynamic loading.
+
+
+Building a dynamically loadable module
+--------------------------------------
+
+Building an object file usable by dynamic loading is easy, if you
+follow these rules (substitute your module name for "foo" everywhere):
+
+- The source filename must be "foomodule.c", so the object name os
+"foomodule.o".
+
+- The module must be written as a (statically linked) Python extension
+module (see the documentation file "misc/EXTENDING") except that no
+line for it must be added to config.c and it mustn't be linked with
+the main Python interpreter.
+
+- The module's initialization function must be called "initfoo"; it
+must install the module in sys.modules as explained in "EXTENDING"
+(using initmodule).
+
+- The module must be compiled with "-c".  The resulting .o file must
+not be stripped.
+
+- Since the module must include many standard Python include files, it
+must be compiled with a "-I" option pointing to the Python source
+directory (unless it resides there itself).
+
+- On SGI Irix, the compiler flag "-G0" (or "-G 0") must be passed.
+IF THIS IS NOT DONE THE RESULTING CODE WILL NOT WORK.
+
+
+Using libraries
+---------------
+
+If your dynamically loadable module needs to be linked with one or
+more libraries that aren't linked with Python (or if it needs a
+routine that isn't used by Python from one of the libraries with which
+Python is linked), you must specify a list of libraries to search
+after loading the module in a file with extension ".libs" (and
+otherwise the same as your ".o" file).  This file should contain a
+single line containing whitespace-separated absolute library
+pathnames.  When using the dl interface, "-l..." flags may also be
+used (it is in fact passed as an option list to the system linker
+ld(1)), but the dl-dld interface requires absolute pathnames.
+I believe it is possible to specify shared libraries here.
+
+
+Caveats
+-------
+
+When using dl, the overlay is first converted into an "overlay" for
+the current process by the system linker ld(1).  The overlay is saved
+as a file with extension ".ld", either in the directory where the ".o"
+file lives or (if that can't be written) in a temporary directory.  An
+existing ".ld" file resulting from a previous run (not from a
+temporary directory) is used, bypassing the (costly) linking phase,
+provided its version matches the ".o" file and the current binary.
+(See the dl man page for more details.)
+
+
+Dynamic loading requires that main's argv[0] contains the pathname or
+at least filename of the Python interpreter.  Unfortunately, when
+executing a directly executable Python script (an executable file with
+#!... on the first line), the kernel overwrites argv[0] with the name
+of the script.  There is no easy way around this, so executable Python
+scripts cannot use dynamically loaded modules.  (You can always write
+a simple shell script that calls the Python interpreter with the
+script as its input.)

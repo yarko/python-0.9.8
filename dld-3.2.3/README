@@ -1,0 +1,17 @@
+This is dld version 3.2.3.  It currently supports VAX (Ultrix), Sun 3
+(SunOS 3.4 and 4.0), SPARCstation (SunOS 4.0), Sequent Symmetry
+(Dynix), and Atari ST.
+
+To compile,  type "make".
+To compile the test programs, cd to "test" and then type "make".
+
+Changes from 3.2.1 to 3.2.3 is minimal.  Mainly contains the port to
+Atari and Symmetry.  I've received quite a number of suggestions for
+improvements, new features, and debugging support.  I'll incorporate
+them in release 3.3--whenever I have time to work on it!
+
+Wilson Ho (how@cs.ucdavis.edu)
+Wed May 29 22:21:31 PDT 1991
+
+P.S.  Port for Atari is contributed by Edgar Roeder.  See ChangeLog.
+

@@ -1,0 +1,2 @@
+#! /usr/local/bin/esh
+sed -n 's/.* connection from //p' ${1-@log} | sort -u

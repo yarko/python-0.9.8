@@ -1,0 +1,158 @@
+.TH DLOTHER 3 Local
+.SH NAME
+dl - Dynamic loader for Irix, low-level and administrative routines.
+.SH SYNPOSIS
+.B "#include "dl.h"
+.LP
+.B "char *dl_findlibs(char *object);
+.LP
+.B "int dl_findcache(char *object, int vstamp, char **cached);
+.LP
+.B "int dl_gettime(char *exec);
+.LP
+.B "char *dl_getbinaryname(char *argv0);
+.LP
+.B "int dl_ldnfilep(LDFILE *ld);
+.LP
+.B "int dl_ldzfilep(LDFILE *ld, char *fname);
+.LP
+.B "int dl_ldfile(char *exec);
+.LP
+.B "int dl_linkfile(char *nexec, char *obj, char *oexec, char *libs, int taddr, int daddr, int vstamp);
+.LP
+.B "int dl_checkrange(long begin, long end);
+.LP
+.B "int dl_setrange(long begin, long end);
+.LP
+.B "void *dl_getrange(long len);
+.LP
+.B "void dl_setsegsizeguess(long size)
+.SH DESCRIPTION
+This manual page describes the low-level interface to the dynamic
+loader library for Irix. Normally the routines described here are not
+imporant for the user, but in some cases (e.g. if you use other
+packages that use
+.IR mmap (2)
+to allocate virtual memory, like the arena library) you might have to
+use these routines to facilitate communication on  virtual address
+usage. See
+.IR dl (3)
+for the simple interface and a general description.
+.LP
+.I Dl_findlibs
+looks for a
+.I .libs
+file belonging to the given objects. It returns either the contents of
+that file (with the terminating newline stripped) or an empty string.
+.LP
+.I Dl_findcache
+looks for a cached executable of object file
+.I object ,
+with version stamp
+.I vstamp .
+It returns 1 if a cached entry is found, 0 if not. In both cases,
+.I cached
+is set pointing to a string where the executable can either be found
+or where it should be created.
+.LP
+.I Dl_gettime
+returns the time-stamp of a given executable. This is not the mtime
+but the timestamp as present in the executable file header.
+Zero is returned on failure.
+.LP
+.I Dl_getbinaryname
+tries to turn an
+.I argv[0]
+style command name into a full pathname. If the argument contains
+slashes it is returned as-is, and if it does not the routine searches
+over the
+.I $PATH
+environment to locate the command. On failure it will return the
+original commandname.
+.LP
+.I Dl_ldnfilep
+loads an executable
+.I NMAGIC
+or
+.I ZMAGIC
+file into a running program. The executable is loaded into memory
+allocated with
+.I shmat (2).
+The file should already have been opened with
+.IR ldopen (3),
+see
+.IR ldfcn (3)
+for details.
+.LP
+.I Dl_ldzfilep
+also loads an executable, but it can only load
+.I ZMAGIC
+files. The file is loaded into memory allocated with
+.IR mmap (2),
+and will thus be demand-paged from the executable.
+.LP
+There are some quirks in the way mmap works, so dl_ldzfilep will only
+work on binaries in which all the segments are in the standard order
+(first the data sections, in ascending addresses, and the the bss sections).
+Unexpected things may happen with binaries for which this condition
+isn't true.
+.LP
+.I Dl_ldfile
+loads the executable given by name into core. It determines the file
+type and calls either
+.I dl_ldzfilep
+or
+.I dl_ldnfilep
+to do the actual loading.
+.LP
+.I Dl_linkfile
+calls the linker,
+.IR ld (1),
+to create an incremental executable.
+.I Nexec
+is the name the new executable should get;
+.I obj
+is the object file to link;
+.I oexec
+is the name of the old executable that is used in the incremental link;
+.I libs
+is a string containing extra options for the linker, library
+specifications for instance;
+.I taddr
+is the address where the new text segment should be linked;
+.I daddr
+is the address where the new data segment should be linked and
+.I vstamp
+is the version stamp that will be set on the new executable.
+.LP
+.I Dl_checkrange
+returns true if the given range of virtual addresses  is currently
+unused and false otherwise. It keeps track of all loaded modules and
+of the baseline program, but it cannot keep track of virtual addresses
+allocated with
+.IR mmap (3)
+or
+.IR shmat (3)
+calls. It also sets aside a 16Mb area immedeately following the
+baseline programs data space for malloc's, etc.
+.LP
+.I Dl_setrange
+marks the specified address range as begin in-use. It can be used by
+the program before it calls mmap or shmat.
+.LP
+.I Dl_getrange
+is an alternative interface with the same functionality. You provide a
+length and \fIdl_getrange\fP will return the address where you can map a
+segment. An implicit \fIdl_setrange\fP is done.
+.LP
+.I Dl_setsegsizeguess
+can be used to increase the guessed size of segments before loading.
+If the application knows a dynamically loaded module will contain big
+(>1Mb) text- or data-segments it is prudent to call this routine.
+.SH "SEE ALSO"
+dl(3),
+ldfcn(3),
+nlist(3),
+ld(1),
+a.out(5)
+

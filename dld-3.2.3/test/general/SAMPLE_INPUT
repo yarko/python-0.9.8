@@ -1,0 +1,37 @@
+dld hello.o
+hello
+dld print_arg.o
+print_arg 1 2 arg3 blah blah blah
+ul hello.o
+hello
+dld list-undefined.o
+list_undefined
+dld ../../libdld.a
+list_undefined
+uls list_undefined
+dld list-undefined.o
+list_undefinded
+dld ../../libdld.a
+list_undefined
+dld need.o ../../libdld.a
+need random
+random
+list_undefined
+dld /lib/libc.a
+random
+random
+uls random
+random
+dld get-sym.o ../../libdld.a
+get_symbol dld_undefined_sym_count
+dld read-a.out.o
+get_symbol dld_undefined_sym_count
+list_undefined
+dld /lib/libc.a
+read_a_out hello.o
+dld test-define.o ../../libdld.a
+test_define
+print_global
+dld remove.o ../../libdld.a
+test_remove global_int
+print_global

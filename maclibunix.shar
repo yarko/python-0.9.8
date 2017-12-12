@@ -1,0 +1,1529 @@
+#! /bin/sh
+# This is a shell archive.  Remove anything before this line, then unpack
+# it by saving it into a file and typing "sh file".  To overwrite existing
+# files, type "sh file -c".  You can also feed this as standard input via
+# unshar, or by typing "sh <file", e.g..  If this archive is complete, you
+# will see the following message at the end:
+#		"End of archive 1 (of 1)."
+# Contents:  MANIFEST Makefile README abort.c access.c chdir.c ctime.c
+#   del.c dir.h getbootvol.c getwd.c intercept.h localtime.c ls.c
+#   macdefs.h mkdir.c mov.c opendir.c perror.c pwd.c rename.c rmdir.c
+#   set_open_hook.c stat.c stat.h sync.c time.c time.h
+# Wrapped by guido@dahlia.cwi.nl on Thu Jan 21 16:49:41 1993
+PATH=/bin:/usr/bin:/usr/ucb ; export PATH
+if test -f 'MANIFEST' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'MANIFEST'\"
+else
+echo shar: Extracting \"'MANIFEST'\" \(982 characters\)
+sed "s/^X//" >'MANIFEST' <<'END_OF_FILE'
+X   File Name		Archive #	Description
+X-----------------------------------------------------------
+X MANIFEST                   1	This shipping list
+X Makefile                   1	
+X README                     1	
+X abort.c                    1	
+X access.c                   1	
+X chdir.c                    1	
+X ctime.c                    1	
+X del.c                      1	
+X dir.h                      1	
+X getbootvol.c               1	
+X getwd.c                    1	
+X intercept.h                1	
+X localtime.c                1	
+X ls.c                       1	
+X macdefs.h                  1	
+X mkdir.c                    1	
+X mov.c                      1	
+X opendir.c                  1	
+X perror.c                   1	
+X pwd.c                      1	
+X rename.c                   1	
+X rmdir.c                    1	
+X set_open_hook.c            1	
+X stat.c                     1	
+X stat.h                     1	
+X sync.c                     1	
+X time.c                     1	
+X time.h                     1	
+END_OF_FILE
+if test 982 -ne `wc -c <'MANIFEST'`; then
+    echo shar: \"'MANIFEST'\" unpacked with wrong size!
+fi
+# end of 'MANIFEST'
+fi
+if test -f 'Makefile' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'Makefile'\"
+else
+echo shar: Extracting \"'Makefile'\" \(790 characters\)
+sed "s/^X//" >'Makefile' <<'END_OF_FILE'
+XCOptions=	-g
+X
+Xall=	abort.c.o ¶
+X	access.c.o ¶
+X	chdir.c.o ¶
+X	ctime.c.o ¶
+X	getbootvol.c.o ¶
+X	getwd.c.o ¶
+X	localtime.c.o ¶
+X	mkdir.c.o ¶
+X	opendir.c.o ¶
+X	perror.c.o ¶
+X	rename.c.o ¶
+X	rmdir.c.o ¶
+X	set_open_hook.c.o ¶
+X	stat.c.o ¶
+X	sync.c.o ¶
+X	time.c.o
+X	
+X
+Xlib.o Ä {all}
+X	lib -o lib.o -sn Main=unixemu {all}
+X
+Xlibes=	{CLibraries}CInterface.o ¶
+X	{CLibraries}CRuntime.o ¶
+X	{CLibraries}CSANELib.o ¶
+X	{CLibraries}StdCLib.o
+X
+Xpobjs=	pwd.c.o lib.o
+Xpwd	Ä {pobjs}
+X	link -ot MPST -oc 'MPS ' -p -o pwd {pobjs} {libes}
+X
+Xlobjs=	ls.c.o dir.c.o stat.c.o
+Xls	Ä {lobjs}
+X	link -ot MPST -oc 'MPS ' -o ls {lobjs} {libes}
+X
+Xmobjs=	mov.c.o rename.c.o perror.c.o
+Xmov	Ä {mobjs}
+X	link -ot MPST -oc 'MPS ' -o mov {mobjs} {libes}
+X
+Xdobjs=	del.c.o rename.c.o perror.c.o
+Xdel	Ä {dobjs}
+X	link -ot MPST -oc 'MPS ' -o del {dobjs} {libes}
+END_OF_FILE
+echo shar: 23 control characters may be missing from \"'Makefile'\"
+if test 790 -ne `wc -c <'Makefile'`; then
+    echo shar: \"'Makefile'\" unpacked with wrong size!
+fi
+# end of 'Makefile'
+fi
+if test -f 'README' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'README'\"
+else
+echo shar: Extracting \"'README'\" \(1959 characters\)
+sed "s/^X//" >'README' <<'END_OF_FILE'
+XHere's source code for a library of routines for users of MPW C and
+XTHINK C (and possibly other C compilers) that makes it somewhat easier
+Xto port Unix programs, or at least to write Unix programs that are
+Xeasily portable to the Macintosh.
+X
+XMore-or-less Unix-compatible routines currently provided by this package:
+X	abort()
+X	access()
+X	chdir()
+X	ctime()
+X	getwd()
+X	mkdir()
+X	opendir(), readdir(), closedir()
+X	perror()
+X	rmdir()
+X	stat()
+X	sync()
+X	time(), localtime()
+X	
+XNote: I've last used this with MPW version 2.0; MPW version 3.x may
+Xinclude most of these in its own library.  THINK C 5.0 includes
+Xseveral, but these are still needed: chdir(), getwd(), mkdir(),
+Xopendir() and friends, rmdir(), stat(), sync().  The same is true for
+XTHINK C 4.0 (you may have to tweak the source in minor ways to get it
+Xto compile there).
+X
+XI've also included a routine to get the name of the boot volume, and a
+Xway to set a hook in MPW's open routine, which can be used to set the
+Xtype of all files created to `TEXT'.  This was also last tested in MPW
+X2.0.
+X
+XFinally, there are two simple example programs (a columnizing `ls' and
+X`pwd', both to be run as MPW tools) and a Makefile.  Note that the
+XMakefile contains non-ASCII characters and thus may be mangled by
+Xmailers; it should however be easy enough to reconstruct it if you know
+Xwhat an MPW Makefile should look like.
+X
+XAll routines work on MFS and HFS (but don't know about MFS folders); no
+Xguarantees for Mac SE and Mac II although I don't expect problems (most
+Xthings I do are just file system calls).
+X
+XI hope that the files are sufficiently commented, and moust routines are
+Xsufficiently well-known, that no additional documentation is necessary.
+X
+XBeing sick and tired of copyright wars I hereby place this code in the
+Xpublic domain, although it would still be nice if my name remained in
+Xredistributed or changed copies of the source.
+X
+XGuido van Rossum
+XCWI, dept. AA
+XKruislaan 413
+X1098 SJ  Amsterdam
+X
+XE-mail: guido@cwi.nl
+END_OF_FILE
+if test 1959 -ne `wc -c <'README'`; then
+    echo shar: \"'README'\" unpacked with wrong size!
+fi
+# end of 'README'
+fi
+if test -f 'abort.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'abort.c'\"
+else
+echo shar: Extracting \"'abort.c'\" \(146 characters\)
+sed "s/^X//" >'abort.c' <<'END_OF_FILE'
+X/* Abort emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+X#include "macdefs.h"
+X
+Xabort()
+X{
+X	Debugger();
+X	exit(2);
+X}
+END_OF_FILE
+if test 146 -ne `wc -c <'abort.c'`; then
+    echo shar: \"'abort.c'\" unpacked with wrong size!
+fi
+# end of 'abort.c'
+fi
+if test -f 'access.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'access.c'\"
+else
+echo shar: Extracting \"'access.c'\" \(953 characters\)
+sed "s/^X//" >'access.c' <<'END_OF_FILE'
+X/* Macintosh emulation of Unix 'access()' system call.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X
+X   This version ignores the mode flags; it assumes files can always
+X   be read or written when they exist.  This is more or less true,
+X   except on write-protected volumes and maybe in a shared file system
+X   situation.  Note that the Finder's 'locked' bit is ignored by
+X   the file system so you can still write such files from within
+X   an application.
+X   Execute permission might check the file type and return Yes
+X   if this is APPL, but I have no use for it right now anyway,
+X   so why bother. */
+X
+X#include "macdefs.h"
+X
+Xint
+Xaccess(path, mode)
+X	char *path;
+X	int mode;
+X{
+X	FileParam pb;
+X	char name[MAXPATH];
+X	
+X	strncpy(name, path, sizeof name);
+X	pb.ioNamePtr= (StringPtr) c2pstr(name);
+X	pb.ioVRefNum= 0;
+X	pb.ioFVersNum= 0;
+X	pb.ioFDirIndex= 0;
+X	if (PBGetFInfo(&pb, FALSE) != noErr) {
+X		errno= ENOENT;
+X		return -1;
+X	}
+X	return 0;
+X}
+END_OF_FILE
+if test 953 -ne `wc -c <'access.c'`; then
+    echo shar: \"'access.c'\" unpacked with wrong size!
+fi
+# end of 'access.c'
+fi
+if test -f 'chdir.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'chdir.c'\"
+else
+echo shar: Extracting \"'chdir.c'\" \(505 characters\)
+sed "s/^X//" >'chdir.c' <<'END_OF_FILE'
+X/* Chdir for the Macintosh.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X   Pathnames must be Macintosh paths, with colons as separators. */
+X
+X#include "macdefs.h"
+X
+X/* Change current directory. */
+X
+Xint
+Xchdir(path)
+X	char *path;
+X{
+X	WDPBRec pb;
+X	char name[MAXPATH];
+X	
+X	strncpy(name, path, sizeof name);
+X	name[MAXPATH-1]= EOS;
+X	pb.ioNamePtr= (StringPtr) c2pstr(name);
+X	pb.ioVRefNum= 0;
+X	pb.ioWDDirID= 0;
+X	if (PBHSetVol(&pb, FALSE) != noErr) {
+X		errno= ENOENT;
+X		return -1;
+X	}
+X	return 0;
+X}
+END_OF_FILE
+if test 505 -ne `wc -c <'chdir.c'`; then
+    echo shar: \"'chdir.c'\" unpacked with wrong size!
+fi
+# end of 'chdir.c'
+fi
+if test -f 'ctime.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'ctime.c'\"
+else
+echo shar: Extracting \"'ctime.c'\" \(550 characters\)
+sed "s/^X//" >'ctime.c' <<'END_OF_FILE'
+X/* Ctime emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include "macdefs.h"
+X
+Xstatic char dayname[]= "SunMonTueWedThuFriSat";
+Xstatic char monthname[]= "JanFebMarAprMayJunJulAugSepOctNovDec";
+X
+Xchar *
+Xctime(secs)
+X	long *secs;
+X{
+X	DateTimeRec date;
+X	static char buffer[26];
+X	
+X	Secs2Date(*secs + TIMEDIFF, &date);
+X	sprintf(buffer, "%.3s %.3s %2d %02d:%02d:%02d %4d\n",
+X		dayname + 3*(date.dayOfWeek-1),
+X		monthname + 3*(date.month-1),
+X		date.day,
+X		date.hour,
+X		date.minute,
+X		date.second,
+X		date.year);
+X	return buffer;
+X}
+END_OF_FILE
+if test 550 -ne `wc -c <'ctime.c'`; then
+    echo shar: \"'ctime.c'\" unpacked with wrong size!
+fi
+# end of 'ctime.c'
+fi
+if test -f 'del.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'del.c'\"
+else
+echo shar: Extracting \"'del.c'\" \(289 characters\)
+sed "s/^X//" >'del.c' <<'END_OF_FILE'
+X/* MPW tool to delete a file.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+Xmain(argc, argv)
+X	int argc;
+X	char **argv;
+X{
+X	if (argc != 2) {
+X		printf("usage: %s file\n", argv[0]);
+X		exit(2);
+X	}
+X	if (unlink(argv[1]) != 0) {
+X		perror(argv[1]);
+X		exit(1);
+X	}
+X	exit(0);
+X}
+END_OF_FILE
+if test 289 -ne `wc -c <'del.c'`; then
+    echo shar: \"'del.c'\" unpacked with wrong size!
+fi
+# end of 'del.c'
+fi
+if test -f 'dir.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'dir.h'\"
+else
+echo shar: Extracting \"'dir.h'\" \(357 characters\)
+sed "s/^X//" >'dir.h' <<'END_OF_FILE'
+X/*
+X * "Dir.h" for the Macintosh.
+X * Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X */
+X
+X#define MAXNAMLEN 31
+X#define MAXPATH 256
+X
+X#define DIR  struct _dir
+X
+Xstruct _dir {
+X	long dirid;
+X	int nextfile;
+X};
+X
+Xstruct direct {
+X	char d_name[MAXPATH];
+X};
+X
+Xextern DIR *opendir(char *);
+Xextern struct direct *readdir(DIR *);
+Xextern void closedir(DIR *);
+END_OF_FILE
+if test 357 -ne `wc -c <'dir.h'`; then
+    echo shar: \"'dir.h'\" unpacked with wrong size!
+fi
+# end of 'dir.h'
+fi
+if test -f 'getbootvol.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'getbootvol.c'\"
+else
+echo shar: Extracting \"'getbootvol.c'\" \(336 characters\)
+sed "s/^X//" >'getbootvol.c' <<'END_OF_FILE'
+X/* Return the name of the boot volume (not the current directory).
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include "macdefs.h"
+X
+Xchar *
+Xgetbootvol()
+X{
+X	short vrefnum;
+X	static char name[32];
+X	
+X	(void) GetVol(name, &vrefnum);
+X		/* Shouldn't fail; return ":" if it does */
+X	strcat(name, ":");
+X	return name;
+X}
+END_OF_FILE
+if test 336 -ne `wc -c <'getbootvol.c'`; then
+    echo shar: \"'getbootvol.c'\" unpacked with wrong size!
+fi
+# end of 'getbootvol.c'
+fi
+if test -f 'getwd.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'getwd.c'\"
+else
+echo shar: Extracting \"'getwd.c'\" \(3404 characters\)
+sed "s/^X//" >'getwd.c' <<'END_OF_FILE'
+X/* Get full pathname of current working directory.  The pathname is
+X   copied to the parameter array 'cwd', and a pointer to this array
+X   is also returned as function result.  If an error occurred, however,
+X   the return value is NULL but 'cwd' is filled with an error message.
+X   
+X   BUG: expect spectacular crashes when called from a directory whose
+X   path would be over MAXPATH bytes long (files in such directories are
+X   not reachable by full pathname).
+X   
+X   Starting with the dir ID returned by PBHGetVol, we do successive
+X   PBGetCatInfo's to get a component of the path until we reach the
+X   root (recognized by a dir ID of 2).  We move up along the path
+X   using the dir ID of the parent directory returned by PBGetCatInfo.
+X   
+X   Then we catenate the components found in reverse order with the volume
+X   name (already gotten from PBHGetVol), with intervening and trailing
+X   colons
+X   
+X   The code works correctly on MFS disks (where it always returns the
+X   volume name) by simply skipping the PBGetCatinfo calls in that case.
+X   There is a 'bug' in PBGetCatInfo when called for an MFS disk (with
+X   HFS running): it then seems to call PBHGetVInfo, which returns a
+X   larger parameter block.  But we won't run into this problem because
+X   we never call PBGetCatInfo for the root (assuming that PBHGetVol
+X   still sets the root ID in this case).
+X
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include "macdefs.h"
+X
+X#define ROOTID 2 /* Root directory ID */
+X
+Xchar *
+Xgetwd(cwd)
+X	char *cwd;
+X{
+X	/* Universal parameter block. */
+X	union {
+X#ifdef THINK_C
+X		HFileInfo f;
+X		DirInfo d;
+X		WDPBRec w;
+X#else /* MPW */
+X		struct HFileInfo f;
+X		struct DirInfo d;
+X		struct WDPBRec w;
+X#endif
+X	} pb;
+X	char buf[MAXPATH]; /* Buffer to store the name components */
+X	char *ecwd, *ebuf; /* Pointers to end of used part of cwd and buf */
+X	int err; /* Error code of last I/O call */
+X	
+X	/* First, get the default volume name and working directory ID. */
+X	
+X	pb.w.ioNamePtr= (unsigned char *)cwd;
+X	err= PBHGetVol(&pb.w, FALSE);
+X	if (err != noErr) {
+X		sprintf(cwd, "I/O error %d in PBHGetVol", err);
+X		return NULL;
+X	}
+X	ecwd= strchr(p2cstr((unsigned char*)cwd), EOS);
+X	ebuf= buf;
+X	*ebuf = EOS;
+X	
+X	/* Next, if at least we're running HFS, walk up the path. */
+X	
+X	if (hfsrunning()) {
+X		long dirid= pb.w.ioWDDirID;
+X		pb.d.ioVRefNum= pb.w.ioWDVRefNum;
+X		while (dirid != ROOTID) {
+X			pb.d.ioNamePtr= (unsigned char *) ++ebuf;
+X			pb.d.ioFDirIndex= -1;
+X			pb.d.ioDrDirID= dirid;
+X			err= PBGetCatInfo((CInfoPBPtr)&pb.d, FALSE);
+X			if (err != noErr) {
+X				sprintf(cwd, "I/O error %d in PBGetCatInfo", err);
+X				return NULL;
+X			}
+X			dirid= pb.d.ioDrParID;
+X			ebuf += strlen(p2cstr((unsigned char *)ebuf));
+X			/* Should check for buf overflow */
+X		}
+X	}
+X	
+X	/* Finally, reverse the list of components and append it to cwd.
+X	   Ebuf points at the EOS after last component,
+X	   and there is an EOS before the first component.
+X	   If there are no components, ebuf equals buf (but there
+X	   is still an EOS where it points).
+X	   Ecwd points at the EOS after the path built up so far,
+X	   initially the volume name.
+X	   We break out of the loop in the middle, thus
+X	   appending a colon at the end in all cases. */
+X	
+X	for (;;) {
+X		*ecwd++ = ':';
+X		if (ebuf == buf)
+X			break;
+X		do { } while (*--ebuf != EOS); /* Find component start */
+X		strcpy(ecwd, ebuf+1);
+X		ecwd= strchr(ecwd, EOS);
+X	}
+X	*ecwd= EOS;
+X	return cwd;
+X}
+END_OF_FILE
+if test 3404 -ne `wc -c <'getwd.c'`; then
+    echo shar: \"'getwd.c'\" unpacked with wrong size!
+fi
+# end of 'getwd.c'
+fi
+if test -f 'intercept.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'intercept.h'\"
+else
+echo shar: Extracting \"'intercept.h'\" \(1322 characters\)
+sed "s/^X//" >'intercept.h' <<'END_OF_FILE'
+X/* The structure of the 'device switch' used by the standard I/O library.
+X   It is possible to install your own versions of selected routines
+X   by storing function pointers into this table.  The structure of
+X   the control block for the dev_write function is also given.
+X
+X   Careful! this information was gathered by disassembling parts
+X   of the library.  There are no guarantees that the same code will
+X   work in future versions of MPW.
+X   Part of it has been tested with versions 1.0B1 trough 2.01.
+X   
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+Xtypedef int (*funcptr)();	/* Pointer to integer function */
+X
+Xstruct device {
+X	long	dev_name;	/* 'FSYS', 'CONS' or 'SYST' */
+X	funcptr	dev_faccess;
+X	funcptr dev_close;
+X	funcptr dev_read;
+X	funcptr dev_write;
+X	funcptr dev_ioctl;
+X};
+X
+Xextern struct device _StdDevs[];
+X
+X#define DEV_FSYS 0
+X#define DEV_CONS 1
+X#define DEV_SYST 2
+X
+X/* Control block for dev_write (arg 1 is a pointer to this).
+X   You might guess that dev_read is similar. */
+X
+Xstruct controlblock {
+X	long io_filler1;	/* Flags? */
+X	long io_filler2;	/* Some pointer */
+X	long io_filler3;	/* Zero */
+X	long io_nbytes;		/* Number of bytes to write */
+X				/* (Reset this to zero after writing) */
+X	char *io_data;		/* Start of data buffer */
+X};
+X
+X#define IO_OK 0			/* Return value from dev_write */
+END_OF_FILE
+if test 1322 -ne `wc -c <'intercept.h'`; then
+    echo shar: \"'intercept.h'\" unpacked with wrong size!
+fi
+# end of 'intercept.h'
+fi
+if test -f 'localtime.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'localtime.c'\"
+else
+echo shar: Extracting \"'localtime.c'\" \(454 characters\)
+sed "s/^X//" >'localtime.c' <<'END_OF_FILE'
+X/* Localtime emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include "macdefs.h"
+X#include "time.h"
+X
+Xstruct tm *
+Xlocaltime(clock)
+X	long *clock;
+X{
+X	DateTimeRec date;
+X	static struct tm t;
+X	
+X	Secs2Date(*clock + TIMEDIFF, &date);
+X	t.tm_sec= date.second;
+X	t.tm_min= date.minute;
+X	t.tm_hour= date.hour;
+X	t.tm_mday= date.day;
+X	t.tm_mon= date.month - 1;
+X	t.tm_wday= date.dayOfWeek - 1;
+X	t.tm_year= date.year - 1900;
+X	return &t;
+X}
+END_OF_FILE
+if test 454 -ne `wc -c <'localtime.c'`; then
+    echo shar: \"'localtime.c'\" unpacked with wrong size!
+fi
+# end of 'localtime.c'
+fi
+if test -f 'ls.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'ls.c'\"
+else
+echo shar: Extracting \"'ls.c'\" \(3872 characters\)
+sed "s/^X//" >'ls.c' <<'END_OF_FILE'
+X/* An ls-like program for use as an MPW tool.
+X   Main improvement over the MPW built-in command Files is columnar
+X   output.  Main disadvantage is the absence of a "-l" flag.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include <stdio.h>
+X#include "dir.h"
+X#include "stat.h"
+X
+X#include "macdefs.h"
+X
+Xchar *strcpy();
+X
+Xint
+Xmain(argc, argv)
+X	int argc;
+X	char **argv;
+X{
+X	setvbuf(stdout, (char*) NULL, _IOLBF, BUFSIZ);
+X	if (argc > 1)
+X		lslist(argc-1, argv+1);
+X	else
+X		lsdir(":");
+X	return 0;
+X}
+X
+Xstruct item {
+X	char *name;
+X	long flags;
+X};
+X
+X#define ISDIR 1		/* flag set for directory */
+X
+Xint
+Xcompare(a, b)
+X	struct item *a, *b;
+X{
+X	return IUMagString(a->name, b->name,
+X		strlen(a->name), strlen(b->name));
+X}
+X
+Xoutsortedlist(listc, listv)
+X	int listc;
+X	struct item *listv;
+X{
+X	qsort(listv, listc, sizeof(struct item), compare);
+X	outlist(listc, listv, 0, 0);
+X}
+X
+Xoutlist(listc, listv, colwidth, screenwidth)
+X	int listc;
+X	struct item *listv;
+X	int colwidth;
+X	int screenwidth;
+X{
+X	int i, j, ncols, nrows;
+X	char *p;
+X	
+X	if (colwidth <= 1) colwidth= 16;
+X	if (screenwidth <= 1) screenwidth= 72;
+X	ncols= screenwidth/colwidth;
+X	nrows= (listc+ncols-1) / ncols;
+X	
+X	for (i= 0; i < nrows; ++i) {
+X		for (j= i; j < listc; j += nrows) {
+X			if (listv[j].flags & ISDIR) {
+X				char buf[40];
+X				sprintf(buf, ":%s:", listv[j].name);
+X				p= buf;
+X			}
+X			else
+X				p= listv[j].name;
+X			if (j+nrows < listc)
+X				printf("%-*.*s ", colwidth, colwidth, p);
+X			else
+X				printf("%s\n", p);
+X		}
+X	}
+X}
+X
+Xlslist(argc, argv)
+X	int argc;
+X	char **argv;
+X{
+X	struct item *files= NULL;
+X	struct item *dirs= NULL;
+X	int nfiles= 0;
+X	int ndirs= 0;
+X	struct stat buf;
+X	int i;
+X	
+X	for (i= 0; i < argc; ++i) {
+X		if (isdir(argv[i]))
+X			addtolist(argv[i], &dirs, &ndirs, ISDIR);
+X		else if (stat(argv[i], &buf) >= 0)
+X			addtolist(argv[i], &files, &nfiles, 0);
+X		else
+X			fprintf(stderr, "Can't stat %s\n", argv[i]);
+X	}
+X	outsortedlist(nfiles, files);
+X	qsort(dirs, ndirs, sizeof(struct item), compare);
+X	for (i= 0; i < ndirs; ++i) {
+X		printf("\n%s\n", dirs[i]);
+X		lsdir(dirs[i]);
+X	}
+X}
+X
+X/* "Intelligent" filename concatenation.  Buf becomes path:name, but:
+X   insert a SEP only if path doesn't end in SEP and name doesn't
+X   begin with SEP; remove a SEP if path ends in SEP and name begins
+X   with SEP. Returns buf. */
+X
+Xchar *
+Xmkpath(buf, path, name)
+X	char *buf;
+X	char *path;
+X	char *name;
+X{
+X	char *p;
+X	
+X	strcpy(buf, path);
+X	p= buf + strlen(buf);
+X	if (p > buf) {
+X		if (p[-1] != SEP) {
+X			if (name[0] != SEP)
+X				*p++= SEP;
+X		}
+X		else if (name[0] == SEP)
+X			++name;
+X	}
+X	strcpy(p, name);
+X	return buf;
+X}
+X
+Xlsdir(dir)
+X	char *dir;
+X{
+X	DIR *dirp= opendir(dir);
+X	struct direct *dp;
+X	struct item *listv= NULL;
+X	int listc= 0;
+X	char buf[256];
+X	
+X	if (dirp == NULL) {
+X		fprintf("can't open directory %s\n", dir);
+X		return -1;
+X	}
+X	while ((dp= readdir(dirp)) != NULL)
+X		addtolist(dp->d_name, &listv, &listc,
+X			isdir(mkpath(buf, dir, dp->d_name)) ? ISDIR : 0);
+X	closedir(dirp);
+X	if (listc > 0) {
+X		outsortedlist(listc, listv);
+X		while (--listc >= 0)
+X			freemem(listv[listc]);
+X		freemem((char*) listv);
+X	}
+X}
+X
+Xchar *malloc();
+Xchar **realloc();
+X
+Xchar *
+Xgetmem(n)
+X	int n;
+X{
+X	char *p= malloc((unsigned) n);
+X	
+X	if (p == 0)
+X		memexh();
+X	return p;
+X}
+X
+Xregetmem(ps, n)
+X	char **ps;
+X	int n;
+X{
+X	if (*ps == NULL)
+X		*ps= getmem(n);
+X	else {
+X		*ps= realloc(*ps, (unsigned) n);
+X		if (*ps == NULL)
+X			memexh();
+X	}
+X}
+X
+Xfreemem(p)
+X	char *p;
+X{
+X	free(p);
+X}
+X
+Xmemexh()
+X{
+X	fprintf(stderr, "out of memory\n");
+X	exit(3);
+X}
+X
+Xchar *
+Xstrdup(s)
+X	char *s;
+X{
+X	char *p= getmem(strlen(s)+1);
+X	
+X	return strcpy(p, s);
+X}
+X
+Xaddtolist(s, plistv, plistc, flags)
+X	char *s;
+X	struct item **plistv;
+X	int *plistc;
+X	int flags;
+X{
+X	regetmem(& (char *) *plistv, (*plistc+1) * sizeof(**plistv));
+X
+X	(*plistv)[*plistc].name= strdup(s);
+X	(*plistv)[*plistc].flags= flags;
+X	++*plistc;
+X}
+X
+Xisdir(path)
+X	char *path;
+X{
+X	struct stat buf;
+X	
+X	return stat(path, &buf) == 0 && (buf.st_mode&S_IFMT) == S_IFDIR;
+X}
+END_OF_FILE
+if test 3872 -ne `wc -c <'ls.c'`; then
+    echo shar: \"'ls.c'\" unpacked with wrong size!
+fi
+# end of 'ls.c'
+fi
+if test -f 'macdefs.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'macdefs.h'\"
+else
+echo shar: Extracting \"'macdefs.h'\" \(824 characters\)
+sed "s/^X//" >'macdefs.h' <<'END_OF_FILE'
+X/* Useful #includes and #defines for programming a set of Unix
+X   look-alike file system access functions on the Macintosh.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include <Types.h>
+X#include <Files.h>
+X#include <OSUtils.h>
+X
+X#include <pascal.h>
+X
+X#include <errno.h>
+X#include <string.h>
+X
+X/* Difference in origin between Mac and Unix clocks: */
+X#define TIMEDIFF ((unsigned long) \
+X	(((1970-1904)*365 + (1970-1904)/4) * 24 * 3600))
+X
+X/* Macro to find out whether we can do HFS-only calls: */
+X#define FSFCBLen (* (short *) 0x3f6)
+X#define hfsrunning() (FSFCBLen > 0)
+X
+X/* Universal constants: */
+X#define MAXPATH 256
+X#define TRUE 1
+X#define FALSE 0
+X#ifndef NULL
+X#define NULL 0
+X#endif
+X#define EOS '\0'
+X#define SEP ':'
+X
+X#if 0 // doesn't work
+X/* Call Macsbug: */
+Xpascal void Debugger() extern 0xA9FF;
+X#endif
+END_OF_FILE
+if test 824 -ne `wc -c <'macdefs.h'`; then
+    echo shar: \"'macdefs.h'\" unpacked with wrong size!
+fi
+# end of 'macdefs.h'
+fi
+if test -f 'mkdir.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'mkdir.c'\"
+else
+echo shar: Extracting \"'mkdir.c'\" \(579 characters\)
+sed "s/^X//" >'mkdir.c' <<'END_OF_FILE'
+X/* Mkdir for the Macintosh.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X   Pathnames must be Macintosh paths, with colons as separators. */
+X
+X#include "macdefs.h"
+X
+X/* Create a directory. */
+X
+Xint
+Xmkdir(path, mode)
+X	char *path;
+X	int mode; /* Ignored */
+X{
+X	HFileParam pb;
+X	char name[MAXPATH];
+X		
+X	if (!hfsrunning()) {
+X		errno= ENODEV;
+X		return -1;
+X	}
+X	strncpy(name, path, sizeof name);
+X	pb.ioNamePtr= (StringPtr) c2pstr(name);
+X	pb.ioVRefNum= 0;
+X	pb.ioDirID= 0;
+X	if (PBDirCreate((HParmBlkPtr)&pb, FALSE) != noErr) {
+X		errno= EACCES;
+X		return -1;
+X	}
+X	return 0;
+X}
+END_OF_FILE
+if test 579 -ne `wc -c <'mkdir.c'`; then
+    echo shar: \"'mkdir.c'\" unpacked with wrong size!
+fi
+# end of 'mkdir.c'
+fi
+if test -f 'mov.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'mov.c'\"
+else
+echo shar: Extracting \"'mov.c'\" \(307 characters\)
+sed "s/^X//" >'mov.c' <<'END_OF_FILE'
+X/* MPW tool to move a file.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+Xmain(argc, argv)
+X	int argc;
+X	char **argv;
+X{
+X	if (argc != 3) {
+X		printf("usage: %s oldname newname\n", argv[0]);
+X		exit(2);
+X	}
+X	if (rename(argv[1], argv[2]) != 0) {
+X		perror(argv[1]);
+X		exit(1);
+X	}
+X	exit(0);
+X}
+END_OF_FILE
+if test 307 -ne `wc -c <'mov.c'`; then
+    echo shar: \"'mov.c'\" unpacked with wrong size!
+fi
+# end of 'mov.c'
+fi
+if test -f 'opendir.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'opendir.c'\"
+else
+echo shar: Extracting \"'opendir.c'\" \(1864 characters\)
+sed "s/^X//" >'opendir.c' <<'END_OF_FILE'
+X/*
+X * Macintosh version of UNIX directory access package
+X * (opendir, readdir, closedir).
+X * Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X */
+X
+X#include "dir.h"
+X#include "macdefs.h"
+X
+Xstatic DIR opened;
+X
+X/*
+X * Open a directory.  This means calling PBOpenWD.
+X * The value returned is always the address of opened, or NULL.
+X * (I have as yet no use for multiple open directories; this could
+X * be implemented by allocating memory dynamically.)
+X */
+X
+XDIR *
+Xopendir(path)
+X	char *path;
+X{
+X	union {
+X		WDPBRec d;
+X		VolumeParam v;
+X	} pb;
+X	char ppath[MAXPATH];
+X	short err;
+X	
+X	if (opened.nextfile != 0) {
+X		errno = EBUSY;
+X		return NULL; /* A directory is already open. */
+X	}
+X	strncpy(ppath+1, path, ppath[0]= strlen(path));
+X	pb.d.ioNamePtr= (unsigned char *)ppath;
+X	pb.d.ioVRefNum= 0;
+X	if (hfsrunning()) {
+X		pb.d.ioWDProcID= 0;
+X		pb.d.ioWDDirID= 0;
+X		err= PBOpenWD((WDPBPtr)&pb, FALSE);
+X	}
+X	else {
+X		pb.v.ioVolIndex= 0;
+X		err= PBGetVInfo((ParmBlkPtr)&pb, FALSE);
+X	}
+X	if (err != noErr) {
+X		errno = ENOENT;
+X		return NULL;
+X	}
+X	opened.dirid= pb.d.ioVRefNum;
+X	opened.nextfile= 1;
+X	return &opened;
+X}
+X
+X/*
+X * Close a directory.
+X */
+X
+Xvoid
+Xclosedir(dirp)
+X	DIR *dirp;
+X{
+X	if (hfsrunning()) {
+X		WDPBRec pb;
+X		
+X		pb.ioVRefNum= dirp->dirid;
+X		(void) PBCloseWD(&pb, FALSE);
+X	}
+X	dirp->dirid= 0;
+X	dirp->nextfile= 0;
+X}
+X
+X/*
+X * Read the next directory entry.
+X */
+X
+Xstruct direct *
+Xreaddir(dp)
+X	DIR *dp;
+X{
+X	union {
+X		DirInfo d;
+X		FileParam f;
+X		HFileInfo hf;
+X	} pb;
+X	short err;
+X	static struct direct dir;
+X	
+X	dir.d_name[0]= 0;
+X	pb.d.ioNamePtr= (unsigned char *)dir.d_name;
+X	pb.d.ioVRefNum= dp->dirid;
+X	pb.d.ioFDirIndex= dp->nextfile++;
+X	pb.d.ioDrDirID= 0;
+X	if (hfsrunning())
+X		err= PBGetCatInfo((CInfoPBPtr)&pb, FALSE);
+X	else
+X		err= PBGetFInfo((ParmBlkPtr)&pb, FALSE);
+X	if (err != noErr) {
+X		errno = EIO;
+X		return NULL;
+X	}
+X	(void) p2cstr((unsigned char *)dir.d_name);
+X	return &dir;
+X}
+END_OF_FILE
+if test 1864 -ne `wc -c <'opendir.c'`; then
+    echo shar: \"'opendir.c'\" unpacked with wrong size!
+fi
+# end of 'opendir.c'
+fi
+if test -f 'perror.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'perror.c'\"
+else
+echo shar: Extracting \"'perror.c'\" \(246 characters\)
+sed "s/^X//" >'perror.c' <<'END_OF_FILE'
+X/* Perror emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+X#include <stdio.h>
+X#include <errno.h>
+X
+Xperror(str)
+X	char *str;
+X{
+X	if (str != NULL)
+X		fprintf(stderr, "%s: ", str);
+X	fprintf(stderr, "Error %d\n", errno);
+X}
+END_OF_FILE
+if test 246 -ne `wc -c <'perror.c'`; then
+    echo shar: \"'perror.c'\" unpacked with wrong size!
+fi
+# end of 'perror.c'
+fi
+if test -f 'pwd.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'pwd.c'\"
+else
+echo shar: Extracting \"'pwd.c'\" \(271 characters\)
+sed "s/^X//" >'pwd.c' <<'END_OF_FILE'
+X/* PWD tool to print working directory.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+X#include <stdio.h>
+X
+Xmain()
+X{
+X	char buffer[256];
+X	
+X	if (getwd(buffer) == NULL) {
+X		fprintf(stderr, "pwd: %s\n", buffer);
+X		exit(1);
+X	}
+X	puts(buffer);
+X	exit(0);
+X}
+END_OF_FILE
+if test 271 -ne `wc -c <'pwd.c'`; then
+    echo shar: \"'pwd.c'\" unpacked with wrong size!
+fi
+# end of 'pwd.c'
+fi
+if test -f 'rename.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'rename.c'\"
+else
+echo shar: Extracting \"'rename.c'\" \(229 characters\)
+sed "s/^X//" >'rename.c' <<'END_OF_FILE'
+X/* Rename emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+X#include "macdefs.h"
+X
+Xint
+Xrename(old, new)
+X	char *old, *new;
+X{
+X	if (Rename(old, 0, new) == noErr)
+X		return 0;
+X	errno= EPERM;
+X	return -1;
+X}
+END_OF_FILE
+if test 229 -ne `wc -c <'rename.c'`; then
+    echo shar: \"'rename.c'\" unpacked with wrong size!
+fi
+# end of 'rename.c'
+fi
+if test -f 'rmdir.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'rmdir.c'\"
+else
+echo shar: Extracting \"'rmdir.c'\" \(442 characters\)
+sed "s/^X//" >'rmdir.c' <<'END_OF_FILE'
+X/* Rmdir for the Macintosh.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X   Pathnames must be Macintosh paths, with colons as separators. */
+X
+X#include "macdefs.h"
+X
+Xint
+Xrmdir(path)
+X	char *path;
+X{
+X	IOParam pb;
+X	char name[MAXPATH];
+X	
+X	strncpy(name, path, sizeof name);
+X	pb.ioNamePtr= (StringPtr) c2pstr(name);
+X	pb.ioVRefNum= 0;
+X	if (PBDelete((ParmBlkPtr)&pb, FALSE) != noErr) {
+X		errno= EACCES;
+X		return -1;
+X	}
+X	return 0;
+X}
+END_OF_FILE
+if test 442 -ne `wc -c <'rmdir.c'`; then
+    echo shar: \"'rmdir.c'\" unpacked with wrong size!
+fi
+# end of 'rmdir.c'
+fi
+if test -f 'set_open_hook.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'set_open_hook.c'\"
+else
+echo shar: Extracting \"'set_open_hook.c'\" \(3381 characters\)
+sed "s/^X//" >'set_open_hook.c' <<'END_OF_FILE'
+X/* A procedure to install a hook in the MPW C 'open' library function.
+X   This is useful because you may want to create files automatically
+X   with type 'TEXT' without having to change all the 'open' or 'fopen'
+X   calls in a large C program you are trying to port.  A standard hook
+X   procedure for this purpose is also provided.   
+X
+X   Call:
+X   	set_open_hook(proc);
+X   This installs the hook proc, or restores the default situation if
+X   proc is NULL.
+X   The hook procedure will be called immediately *after* a successful
+X   open call, with the following parameters:
+X   	proc(filename, oflag, fd)
+X		char *filename;		The file name
+X		int oflag;		Mode passed to open
+X		int fd;			Return value from open
+X
+X   Note: this only works when the program is linked as an application
+X   (type APPL); for tools (type MPST) the device switch is located
+X   in the Shell's memory.
+X   
+X   Careful! this information was gathered by disassembling parts
+X   of the library.
+X   There are no guarantees that the same code will work in future
+X   versions of MPW.  It has been tested with versions 1.0B2 through 2.01.
+X   
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include "macdefs.h"
+X#include <fcntl.h>
+X#include "intercept.h"
+X
+X#define ERRFLAG 0x40000000
+X
+Xstatic ProcPtr open_hook;
+X
+X/* The hook for faccess, installed in the device switch.
+X   This will be called with cmd == F_OPEN from 'open',
+X   but also from 'faccess', with other values for cmd.
+X   The open_hook is only called if cmd == F_OPEN.
+X   It is not necessary to check whether open_hook is NULL,
+X   since we are only installed after open_hook is set non-NULL. */
+X
+Xstatic long
+Xmy_faccess(file, cmd, arg)
+X	char *file;
+X	int cmd;
+X	short *arg;
+X{
+X	long res= _fsFAccess(file, cmd, arg);
+X	
+X	if (cmd == F_OPEN && !(res&ERRFLAG)) {
+X		(void) (*open_hook)(file, *arg, (int)res);
+X	}
+X	return res;
+X}
+X
+X/* Standard open hook, to set type and creator of created files.
+X   It will not change existing non-zero type or creator fields.
+X   It returns an error code even though this is ignored by the
+X   calling routine; you might want to call it yourself in a more
+X   fancyful hook, and test the error code.
+X   This routine can be customized by changing 'std_type' or
+X   'std_creator'. */
+X
+XOSType std_type=	'TEXT';
+XOSType std_creator=	'MPS ';
+X
+Xint
+Xstd_open_hook(file, mode, fd)
+X	char *file;
+X	int mode;
+X	int fd;
+X{
+X	FInfo info;
+X	int err= noErr;
+X	
+X	switch (mode & 03) {
+X	
+X	case O_RDWR:
+X	case O_WRONLY:
+X		err= GetFInfo(file, 0, &info);
+X		if (err != noErr)
+X			return err;
+X		if (info.fdType == 0) {
+X			info.fdType= std_type;
+X			++err; /* Use 'err' as a flag to call SetFInfo */
+X		}
+X		if (info.fdCreator == 0) {
+X			info.fdCreator= std_creator;
+X			++err;
+X		}
+X		if (err != noErr)
+X			err= SetFInfo(file, 0, &info);
+X	
+X	}
+X	return err;
+X}
+X
+X/* The procedure to install the hook.
+X   Note: this assumes nobody else is also installing hooks
+X   for faccess, otherwise we would have to save and restore
+X   the old function, instead of blindly assuming _fsFAccess. */
+X
+Xset_open_hook(hook)
+X	ProcPtr hook;
+X{
+X	if (hook == NULL)
+X		_StdDevs[DEV_FSYS].dev_faccess= _fsFAccess;
+X	else {
+X		open_hook= hook;
+X		_StdDevs[DEV_FSYS].dev_faccess= my_faccess;
+X	}
+X}
+X
+X/* A trivial test program will be included if you #define MAIN: */
+X
+X#ifdef MAIN
+X
+X#include <stdio.h>
+X
+Xextern int std_open_hook();
+X
+Xmain()
+X{
+X	set_open_hook(std_open_hook);
+X	fclose(fopen("ABC", "a"));
+X}
+X
+X#endif
+END_OF_FILE
+if test 3381 -ne `wc -c <'set_open_hook.c'`; then
+    echo shar: \"'set_open_hook.c'\" unpacked with wrong size!
+fi
+# end of 'set_open_hook.c'
+fi
+if test -f 'stat.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'stat.c'\"
+else
+echo shar: Extracting \"'stat.c'\" \(1246 characters\)
+sed "s/^X//" >'stat.c' <<'END_OF_FILE'
+X/* Minimal 'stat' emulation: tells directories from files and
+X   gives length and mtime.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X*/
+X
+X#include "stat.h"
+X#include "macdefs.h"
+X
+X/* Bits in ioFlAttrib: */
+X#define LOCKBIT	(1<<0)		/* File locked */
+X#define DIRBIT	(1<<4)		/* It's a directory */
+X
+Xint
+Xstat(path, buf)
+X	char *path;
+X	struct stat *buf;
+X{
+X	union {
+X		DirInfo d;
+X		FileParam f;
+X		HFileInfo hf;
+X	} pb;
+X	char name[256];
+X	short err;
+X	
+X	pb.d.ioNamePtr= (unsigned char *)c2pstr(strcpy(name, path));
+X	pb.d.ioVRefNum= 0;
+X	pb.d.ioFDirIndex= 0;
+X	pb.d.ioDrDirID= 0;
+X	pb.f.ioFVersNum= 0; /* Fix found by Timo! See Tech Note 102 */
+X	if (hfsrunning())
+X		err= PBGetCatInfo((CInfoPBPtr)&pb, FALSE);
+X	else
+X		err= PBGetFInfo((ParmBlkPtr)&pb, FALSE);
+X	if (err != noErr) {
+X		errno = ENOENT;
+X		return -1;
+X	}
+X	if (pb.d.ioFlAttrib & LOCKBIT)
+X		buf->st_mode= 0444;
+X	else
+X		buf->st_mode= 0666;
+X	if (pb.d.ioFlAttrib & DIRBIT) {
+X		buf->st_mode |= 0111 | S_IFDIR;
+X		buf->st_size= pb.d.ioDrNmFls;
+X		buf->st_rsize= 0;
+X	}
+X	else {
+X		buf->st_mode |= S_IFREG;
+X		if (pb.f.ioFlFndrInfo.fdType == 'APPL')
+X			buf->st_mode |= 0111;
+X		buf->st_size= pb.f.ioFlLgLen;
+X		buf->st_rsize= pb.f.ioFlRLgLen;
+X	}
+X	buf->st_mtime= pb.f.ioFlMdDat - TIMEDIFF;
+X	return 0;
+X}
+END_OF_FILE
+if test 1246 -ne `wc -c <'stat.c'`; then
+    echo shar: \"'stat.c'\" unpacked with wrong size!
+fi
+# end of 'stat.c'
+fi
+if test -f 'stat.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'stat.h'\"
+else
+echo shar: Extracting \"'stat.h'\" \(412 characters\)
+sed "s/^X//" >'stat.h' <<'END_OF_FILE'
+X/* Include file belonging to stat emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+Xstruct stat {
+X	unsigned short st_mode;
+X	unsigned long st_size;
+X	unsigned long st_rsize; /* Resource size -- nonstandard */
+X	unsigned long st_mtime;
+X};
+X
+X#define S_IFMT	0170000L
+X#define S_IFDIR	0040000L
+X#define S_IFREG 0100000L
+X#define S_IREAD    0400
+X#define S_IWRITE   0200
+X#define S_IEXEC    0100
+END_OF_FILE
+if test 412 -ne `wc -c <'stat.h'`; then
+    echo shar: \"'stat.h'\" unpacked with wrong size!
+fi
+# end of 'stat.h'
+fi
+if test -f 'sync.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'sync.c'\"
+else
+echo shar: Extracting \"'sync.c'\" \(360 characters\)
+sed "s/^X//" >'sync.c' <<'END_OF_FILE'
+X/* The equivalent of the Unix 'sync' system call: FlushVol.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987).
+X   For now, we only flush the default volume
+X   (since that's the only volume written to by MacB). */
+X
+X#include "macdefs.h"
+X
+Xint
+Xsync()
+X{
+X	if (FlushVol((StringPtr)0, 0) == noErr)
+X		return 0;
+X	else {
+X		errno= ENODEV;
+X		return -1;
+X	}
+X}
+END_OF_FILE
+if test 360 -ne `wc -c <'sync.c'`; then
+    echo shar: \"'sync.c'\" unpacked with wrong size!
+fi
+# end of 'sync.c'
+fi
+if test -f 'time.c' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'time.c'\"
+else
+echo shar: Extracting \"'time.c'\" \(254 characters\)
+sed "s/^X//" >'time.c' <<'END_OF_FILE'
+X/* Time emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+X#include "macdefs.h"
+X#include <OSUtils.h>
+X
+Xlong
+Xtime(p)
+X	long *p;
+X{
+X	long secs;
+X	
+X	GetDateTime(&secs);
+X	secs -= TIMEDIFF;
+X	if (p != NULL)
+X		*p= secs;
+X	return secs;
+X}
+END_OF_FILE
+if test 254 -ne `wc -c <'time.c'`; then
+    echo shar: \"'time.c'\" unpacked with wrong size!
+fi
+# end of 'time.c'
+fi
+if test -f 'time.h' -a "${1}" != "-c" ; then 
+  echo shar: Will not clobber existing file \"'time.h'\"
+else
+echo shar: Extracting \"'time.h'\" \(293 characters\)
+sed "s/^X//" >'time.h' <<'END_OF_FILE'
+X/* Include file for localtime emulator.
+X   Public domain by Guido van Rossum, CWI, Amsterdam (July 1987). */
+X
+Xstruct tm {
+X	int tm_sec;
+X	int tm_min;
+X	int tm_hour;
+X	int tm_mday;
+X	int tm_mon;
+X	int tm_year;
+X	int tm_wday;
+X	/*
+X	int tm_yday;
+X	int tm_isdst;
+X	*/
+X};
+X
+Xstruct tm *gmtime(), *localtime();
+END_OF_FILE
+if test 293 -ne `wc -c <'time.h'`; then
+    echo shar: \"'time.h'\" unpacked with wrong size!
+fi
+# end of 'time.h'
+fi
+echo shar: End of archive 1 \(of 1\).
+cp /dev/null ark1isdone
+MISSING=""
+for I in 1 ; do
+    if test ! -f ark${I}isdone ; then
+	MISSING="${MISSING} ${I}"
+    fi
+done
+if test "${MISSING}" = "" ; then
+    echo You have the archive.
+    rm -f ark[1-9]isdone
+else
+    echo You still need to unpack the following archives:
+    echo "        " ${MISSING}
+fi
+##  End of shell archive.
+exit 0

@@ -1,0 +1,121 @@
+Sat Jan  9 19:50:52 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib2.tex: Documented float arg of  time.sleep().
+
+Tue Jan  5 23:50:44 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib4.tex: Documented posix.nice(incr).
+
+Fri Jan  1 17:43:18 1993  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib2.tex: documented new floating point return value of time.time().
+
+Mon Dec 21 22:57:22 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib4.tex: module socket: documented fileno(), getsockname(), getpeername().
+
+Fri Dec 11 13:45:06 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added Jack's doc for imageop.
+
+Wed Dec  9 13:27:20 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added JH's crypto extensions to lib5.tex.
+
+Tue Dec  8 18:37:14 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Remove warning about closing socket from socket.fromfd() (it is now dupped)
+
+* lib4.tex: added description of socket.fromfd(fd, family, type, proto)
+
+Sun Nov  1 13:22:20 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Documented optional third arg of string.index(s, sub, i)
+
+Sun Sep 20 23:35:00 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Documented new module regsub (sub, gsub, split) and explained
+  behaviour of string.splitfields(s, ''), returning [s].
+
+Sat Sep 12 13:05:48 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added __oct__ and __hex__ as special numeric class instance methods.
+
+Mon Sep  7 23:38:53 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Documented improved {set,get}sockopt.
+
+* Documented built-in 'struct' module.
+
+Thu Sep  3 23:28:44 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Documented $PYTHONSTARTUP and sys.exitfunc (tut.tex, lib2.tex)
+
+* Added new to imgfile and audioop (lib4.tex)
+
+Thu Aug 13 14:29:31 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* ref.tex: documented special methods of user classes to implement
+  numbers, sequences, mappings
+
+* lib1.tex: documented coerce()
+
+Sun Aug  9 14:12:52 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* tut.tex: Adapted description of try...finally to current reality.
+
+* lib4.tex: Documented waitpid() separate from wait().
+
+Fri Aug  7 18:07:50 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* tut.tex: added chapter Classes
+
+* lib4.tex: added thread module
+
+Sat Aug  1 02:06:53 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib1.tex: documented sort(cmpfunc).
+
+Tue Jul  7 10:45:56 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Additions to audioop by Jack.
+
+Fri Jul  3 10:09:28 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+a
+* lib2.tex: add a warning about quadrupling backslashes in regular expressions
+
+* lib4.tex: slight rephrasing of select; added dbm module
+
+* lib5.tex: add more explanation of how to use stdwin and select together
+
+* Makefile: always create .ps files; add qua to 'all' target;
+  added 'clobber' target
+
+Tue Jun 23 10:28:03 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Documented new module select; and slight cosmetic changes elsewhere.
+
+Mon Jun 22 16:36:28 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib5.tex: Added stdwin.connectionnumber() and stdwin.fileno().
+
+Fri Jun  5 15:06:58 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib4.tex: added getsockopt and setsockopt to section on sockets.
+
+Wed Jun  3 17:53:22 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib5.tex: added new modules by Jack: imgfile, sunaudiodev, audioop.
+  New chapters are SUN SPARC MACHINES ONLY and AUDIO TOOLS.
+
+Sat May  9 18:01:12 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib4.tex: posix: added get{eg,eu,g,u}id().
+
+Wed May  6 10:57:34 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* lib4.tex: posixpath: changed docs for ismount() (now stats p an d p/..)
+
+-------------------------------------------------------------------------------
+^^^ Log entries after release of 0.9.6 ^^^
+-------------------------------------------------------------------------------

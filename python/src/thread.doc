@@ -1,0 +1,50 @@
+void init_thread(void);
+		Initialise the package.  Can be called explicitly, but will
+		be called automatically when the first start_new_thread or
+		allocate_lock is called.
+int start_new_thread(void (*func)(void *), void *arg);
+		Start a new thread.  In the new thread, func(arg) will be
+		called.  The thread exits when func returns.
+		Returns 1 if a thread could successfully be started, 0
+		otherwise.
+void exit_thread(void);
+		Exit current thread.  Equivalent to returning from the
+		above-mentioned func.
+		Does not return.
+
+typedef ... type_lock;
+		Opaque type for a lock.  This is a pointer type.
+type_lock allocate_lock(void);
+		Allocate a lock structure and return an opaque pointer to it.
+		Return 0 if not successful.
+void free_lock(type_lock lock);
+		Deallocate a lock.
+int acquire_lock(type_lock lock, int waitflag);
+		Try to acquire a lock.  Return 1 if the lock could
+		succesfully be acquired, 0 otherwise.
+		If waitflag is set (i.e. != 0), wait until the lock
+		can be acquired.
+void release_lock(type_lock lock);
+		Release the lock.
+
+void exit_prog(int status);
+		Exit the application with exit status "status".
+		Does not return.
+
+Do we need condition variables?
+What sort of support is needed for interrupts?
+
+Because on the Sun, threads are implemented in a single Unix process,
+it is usually not a good idea to call blocking system calls.  When
+linked against the -lnbio library (non blocking I/O) you get versions
+of some of the blocking system calls that won't block the whole
+process.
+
+It is not safe to call exit(), since the behaviour is different on SGI
+and Sun.  On Sun, it will kill the whole application, whereas on SGI
+it will only kill the calling thread.
+
+It is safe to call exit_thread() from the main thread, but the
+behaviour on Suns and SGI's will be different.  On the Sun, the
+process will continue to run, but on the SGI, the parent process's
+wait will return.  The other threads will continue to run, however.

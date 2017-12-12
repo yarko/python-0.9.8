@@ -1,0 +1,3 @@
+This directory contains the source for the Python interpreter.
+
+For building instructions read the file ../misc/BUILD.

@@ -1,0 +1,7 @@
+#! /usr/local/bin/esh
+sed '
+    / connection from /d
+    / waiting for next request/d
+    / sending [^ ]* to /d
+    / closing connection to /d
+    ' ${1-@log}

@@ -1,0 +1,46 @@
+Ftp availability of Python
+--------------------------
+
+The compressed tar image of Python is available by anonymous ftp on
+the following sites; the filename will be "python<version>.tar.Z",
+where <version> is something like "0.9.8":
+
+Site			IP address 		Directory
+
+ftp.cwi.nl		192.16.184.180		/pub/python
+wuarchive.wustl.edu	128.252.135.4		/pub
+
+(The version on wuarchive is likely to evaporate some time after it is
+installed; I will try to make sure that the version on ftp.cwi.nl is
+always there.)
+
+The following files are alwo available from the same locations:
+MacPython<version>.hqx is a binhex'ed Macintosh binary;
+python<version>.zip is a ZIPped PC binary; pythondoc-ps<version>.tar.Z
+is a compressed tar file containing PostScript of the main Python
+documentation (since not everybody has installed TeX and LaTeX);
+dl.tar.Z and dl-dld.tar.Z are dynamic loading packages;
+maclibunix.shar contains some files needed by the Mac port.
+
+If you are using STDWIN with Python (my Standard Window interface,
+highly recommended if you are using X11 or a Mac), you should fetch
+STDWIN as well.  The filename is "stdwin<version>.tar.Z" in the same
+locations as the Python distribution (but /pub/stdwin instead of
+/pub/python on ftp.cwi.nl); <version> is currently 0.9.7.  Python
+0.9.7 needs STDWIN 0.9.7, previous versions will cause undefined
+symbols at link time.
+
+Please don't ask me to mail you the files.  Here's a hint (originally
+from the sci.space FAQ) on what you might do if you have no Internet
+ftp access:
+
+|   Sites not connected to the Internet cannot use FTP directly, but
+|   there are a few automated FTP servers which operate via email.
+|   Send mail containing only the word HELP to ftpmail@decwrl.dec.com
+|   or bitftp@pucc.princeton.edu, and the servers will send you
+|   instructions on how to make requests.
+
+Make sure to turn on binary mode in ftp when fetching the file.  Use
+uncompress to decompress the .Z file.  Use tar to unpack the .tar file
+resulting from decompression.  Please don't mail me for help, try
+finding a local ftp or UNIX guru!

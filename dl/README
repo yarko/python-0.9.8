@@ -1,0 +1,60 @@
+This is dl version 1.6, created 7-Jan-92.
+
+DL is a dynamic loader package for use on Irix. 
+It may or may not run on other unix systems with a little hacking. If your
+system has the ldfcn routines (-lmld) and either SysV shared memory or the
+mmap() system call you have a fair chance.
+
+If you need compatability with other systems there is a companion
+package, dl-dld, which provides the dl interface but uses GNU dld to
+implement it. GNU dld (and dl-dld, consequently) runs on a lot of unix
+systems (but not on sgi). dl-dld can be gotten with ftp from
+ftp.cwi.nl:/pub/dl-dld-1.1.tar.Z.
+
+The dl library has been tested under Irix 4.0.2 and 4.0.5F on an Indigo, but it
+should probably work on all machines under 4.0, and probably under
+older releases as well (Older releases have worked under Irix 3.5, but
+this version has not been tested on that platform).
+Please let me know if you use this on another platform (also if it
+didn't work).
+
+There are some barely-working test programs in the 'test' directory. A
+simple test is './test sub.o sub02'. This will load sub.o, call
+routine sub02() which will in turn call submain() from the main
+program. 
+
+The package is updated fairly regularly (about once every few months)
+as bugs are fixed and features are added. The newest version is always
+available for ftp on ftp.cwi.nl in /pub/dl-X.Y.tar.Z, where X.Y is the
+current version number.
+
+Here are three gotchas that might cause trouble to the unsuspecting:
+
+-  WARNING: there is a bug in the 3.10 loader which effectively stops
+   'ld -A' from working. This dl can work together with a patched
+   version of ld 3.10 that is available thru SGI to work around the bug.
+
+-  I received a note from Brian McClendon from SGI, bam@sgi.com, who said
+   that there was a bug in the R4000 that might influence this package on
+   the Crimsons. I don't fully understand what the problem might be, but
+   here's the note:
+	This is just a note since you're doing a package on dynamic loading.
+
+	There is a bug in the R4000s that we work around in the kernel, but
+	the work-around depends upon executing .text only.  If you mmap
+	and execute .data, you may run into this problem.  To avoid it,
+	remind all R4000 users to compile dynamically linked code 
+	with the -Wb,-dwalignbr flag.
+
+	Later we will make the loader fix this for all code, but for now
+	the ccom-piler needs to know.
+
+-  Dl does not like other packages messing around with VM space.
+   Examples of packages that do so have mostly to do with
+   multiple-threads: the mpc library, the arena stuff, etc. There are
+   some routines to help you write multi-threaded programs that use
+   dynamic loading, see the dlother man page. (SGI: it would be *very*
+   helpful if there was some way to query the VM system as to what
+   ranges of VM space are in use!)
+
+Jack Jansen, Centrum voor Wiskunde en Informatica, Jack.Jansen@cwi.nl

@@ -1,0 +1,28 @@
+Wed Sep  2 22:59:30 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Changed python.man to document an old change in $PYTHONPATH
+  and the addition of $PYTHONSTARTUP.
+
+Fri Aug  7 00:27:33 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Got rid of CLASSES (now in ../doc/tut.tex)
+
+* updated BUILD to the use of the Configure.py script
+
+Wed Jun  3 16:30:01 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added warning about directly executable scripts to DYNLOAD.
+
+Mon Apr 13 16:54:44 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added a section on mkvalue() to EXTENDING and added more text on
+  errors.  Also added some more section headers and made minor
+  corrections.  The file ERRORS is no unnecessary.
+
+Thu Apr  6 23:45:50 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Incorporated Tim's changes to python-mode.el, it's now version 1.06.
+
+-------------------------------------------------------------------------------
+^^^ Log entries after release of 0.9.6 ^^^
+-------------------------------------------------------------------------------

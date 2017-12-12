@@ -1,0 +1,36 @@
+This is dl-dld, a dynamic linking interface, version 1.1.
+
+Dl-dld is a re-implementation of the high-level *interface* of Jack
+Jansen's "dl" dynamic loading package, on top of the *implementation*
+of Wilson Ho's (GNU) dynamic loading package "dld" (version 3.2.3).
+
+This makes it possible to write programs with simple dynamic loading
+requirements (just load a module and call a function from it; no
+unloading facilities) to run without source changes (using the dl
+interface) on a larger number of platforms: using the original dl on
+SGI MIPS machines (Irix 4.0), and using dl-dld on DEC VAX (Ultrix),
+Sun 3 (SunOS 3.4 and 4.0), Sparc (SunOS 4.0), Sequent Symmetry (Dynix)
+and Atari ST.
+
+Version 1.1 adds the function dl_loadmod_mult(), which was added to dl,
+and fixes a tiny memory leak -- thanks to Martin-D. Lacasse for this
+contribution.
+
+To build dl-dld, edit the DLD path definition in the Makefile and type
+make.
+
+To use dl-dld, you must link with both ./libdl.a and (...)/libdld.a.
+You must also avoid sing shared libraries, as dld doesn't (yet)
+understand them.  This is a price you have to pay to use dynamic
+loading.  On SunOS, this boils down to linking with -Bstatic unless
+you use gcc, since gcc also doesn't understand shared libraries.
+
+Of course, the low-level interface of Jack's dl package is not
+implemented in dl-dld.
+
+(If you don't know where to get dld, try anonymous ftp to
+wuarchive.wustl.edu:/mirrors2/gnu/dld-3.2.3.tar.Z.  Jack's dld can be
+found at ftp.cwi.nl:/pub/dl-<version>.tar.Z, where <version> is
+currently 1.5.)
+
+--Guido van Rossum, CWI, Amsterdam <guido@cwi.nl>

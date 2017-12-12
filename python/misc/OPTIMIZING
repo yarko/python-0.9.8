@@ -1,0 +1,18 @@
+Ideas for optimizations.
+
+The parser should use an arena-style allocator.  It may be necessary
+to change to linked-allocation for children.  (I have high hopes for
+this one!)
+
+Extracting string items (s[i]) can be implemented differently: keep an
+array of 256 objects indexed by character.  (Also do this for
+newstringobject()?  Other string ops?  How about special-casing '' as
+well?)
+
+Using dictinsert with getstringvalue(v) as key is silly; the
+dictinsert function creates an object to hold the string which is
+deleted again if the key already exists (the normal case).
+
+Also dictinsert is almost always used in conjunction with dictremove.
+Better to have a single function that does both -- this saves code in
+the caller.

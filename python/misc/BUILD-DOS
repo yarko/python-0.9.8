@@ -1,0 +1,24 @@
+Building Python on MS-DOS
+-------------------------
+
+I don't really know how to do this -- the MS-DOS port was done by Mark
+Anacker <dsinet!marka@quick.com>.
+
+Mark used TurboC; I don't know how much of this applies to MSC.
+
+There is no STDWIN for MS-DOS yet.
+
+Since MS-DOS truncates filenames to 8 + 3 characters, many source
+filenames are truncated.  For TurboC, it was necessary to change
+all #include statements in the source files to use the truncated
+filename, e.g., #include "allobjects.h" becomes #include "allobjec.h".
+This would be trivial with a Python script, but that has an obvious
+drawback... you haven't built Python yet.  A UNIX shell script would
+also be easy, but not everybody receives these sources on UNIX (or do
+they?).  So for now, just use the editor...
+
+The file posixmodule.c is usable on MS-DOS (it contains #ifdef MSDOS
+where necessary to disable some functions).  However I have been
+adding UNIX functions so you may have to comment out more stuff that
+isn't supported under MS-DOS.
+

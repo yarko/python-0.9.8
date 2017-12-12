@@ -1,0 +1,145 @@
+(dld) dld hello.o
+(dld) hello
+hello world!
+1
+(dld) dld print_arg.o
+(dld) print_arg 1 2 arg3 blah blah blah
+blah
+blah
+blah
+arg3
+2
+1
+print_arg
+7
+(dld) ul hello.o
+(dld) hello
+illegal command
+(dld) dld list-undefined.o
+(dld) list_undefined
+Function list_undefined not executable!
+(dld) dld ../../libdld.a
+(dld) list_undefined
+No undefined symbols
+1
+(dld) uls list_undefined
+(dld) dld list-undefined.o
+(dld) list_undefinded
+illegal command
+(dld) dld ../../libdld.a
+(dld) list_undefined
+No undefined symbols
+1
+(dld) dld need.o ../../libdld.a
+(dld) need random
+1: random
+2
+(dld) random
+illegal command
+(dld) list_undefined
+There are a total of 1 undefined symbols:
+1: _random
+1
+(dld) dld /lib/libc.a
+(dld) random
+2078917053
+(dld) random
+143302914
+(dld) uls random
+(dld) random
+illegal command
+(dld) dld get-sym.o ../../libdld.a
+(dld) get_symbol dld_undefined_sym_count
+1: address = 0x140c8, value = 0x0
+2
+(dld) dld read-a.out.o
+(dld) get_symbol dld_undefined_sym_count
+1: address = 0x140c8, value = 0x2
+2
+(dld) list_undefined
+There are a total of 2 undefined symbols:
+1: _perror
+2: _fread
+1
+(dld) dld /lib/libc.a
+(dld) read_a_out hello.o
+Header information:
+magic = 0407, text size = 48, data size = 0
+bss size = 0, syms size = 312, entry point = 0x0, trsize = 36, drsize = 0
+
+
+Text relocation info
+Address = 0x1c, local offset = 20
+extern = 1, relocation type = 6, addend = -28
+Address = 0x18, local offset = 4
+extern = 0, relocation type = 11, addend = 0
+Address = 0x14, local offset = 4
+extern = 0, relocation type = 8, addend = 0
+
+
+string = gcc_compiled.
+Type = 0x4, value = 0x00000000
+string = hello.c
+Type = 0x64, value = 0x00000000
+string = int:t1=r1;-2147483648;2147483647;
+Type = 0x80, value = 0x00000000
+string = char:t2=r2;0;127;
+Type = 0x80, value = 0x00000000
+string = long int:t3=r1;-2147483648;2147483647;
+Type = 0x80, value = 0x00000000
+string = unsigned int:t4=r1;0;-1;
+Type = 0x80, value = 0x00000000
+string = long unsigned int:t5=r1;0;-1;
+Type = 0x80, value = 0x00000000
+string = short int:t6=r1;-32768;32767;
+Type = 0x80, value = 0x00000000
+string = long long int:t7=r1;0;-1;
+Type = 0x80, value = 0x00000000
+string = short unsigned int:t8=r1;0;65535;
+Type = 0x80, value = 0x00000000
+string = long long unsigned int:t9=r1;0;-1;
+Type = 0x80, value = 0x00000000
+string = signed char:t10=r1;-128;127;
+Type = 0x80, value = 0x00000000
+string = unsigned char:t11=r1;0;255;
+Type = 0x80, value = 0x00000000
+string = float:t12=r1;4;0;
+Type = 0x80, value = 0x00000000
+string = double:t13=r1;8;0;
+Type = 0x80, value = 0x00000000
+string = long double:t14=r1;8;0;
+Type = 0x80, value = 0x00000000
+string = void:t15=15
+Type = 0x80, value = 0x00000000
+string = _hello
+Type = 0x5, value = 0x00000010
+string = 
+Type = 0x44, value = 0x00000010
+string = 
+Type = 0x44, value = 0x00000014
+string = _printf
+Type = 0x1, value = 0x00000000
+string = 
+Type = 0x44, value = 0x00000024
+string = _iobuf:T16=s20_cnt:1,0,32;_ptr:17=*11,32,32;_base:17,64,32;_bufsiz:1,96,32;_flag:6,128,16;_file:2,144,8;;
+Type = 0x80, value = 0x00000000
+string = hello:F1
+Type = 0x24, value = 0x00000010
+string = 
+Type = 0xc0, value = 0x00000014
+string = 
+Type = 0xe0, value = 0x00000024
+2
+(dld) dld test-define.o ../../libdld.a
+(dld) test_define
+print_global should now give 12345
+1
+(dld) print_global
+the value of global_int is 12345
+1
+(dld) dld remove.o ../../libdld.a
+(dld) test_remove global_int
+2
+(dld) print_global
+Function print_global not executable!
+(dld) 

@@ -1,0 +1,43 @@
+Thu Dec 10 00:17:03 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Adapted ancient code in pdeps.py and objgraph.py to new times
+
+* Add methfix.py to fix old method syntax.
+
+* Changed lots of occurrences of /usr/local/python to .../bin/python
+
+Fri Nov  6 16:58:43 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Handle ^C more graceful in xxci
+
+Wed Sep 16 16:14:47 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Added .fdc and .rgb to ignored suffixes in xxci.py.
+
+Mon Aug 31 12:51:12 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* Changed ptags.py and eptags.py to use regex and not to import path.
+
+(earlier:)
+
+* Changed pi.py so all Long constants have an L suffix, not l; and
+  added an output() function to move the I/O out of the algorithm.
+
+* Changed dutree.py to cope with filenames containing spaces.
+
+Mon Aug 10 12:42:43 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* new: pp.py (emulate some Perl command line options)
+
+Fri Jun  5 15:07:23 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* h2py.py: fix regexp that finds comments to avoid looping on
+  unterminated comments.
+
+Mon May 11 09:53:36 1992  Guido van Rossum  (guido@voorn.cwi.nl)
+
+* from.py: Catch IOError, not RuntimeError on opening mailbox file
+
+-------------------------------------------------------------------------------
+^^^ Log entries after release of 0.9.6 ^^^
+-------------------------------------------------------------------------------

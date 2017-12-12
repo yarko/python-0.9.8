@@ -1,0 +1,65 @@
+Module to read and write AIFF-compliant files.
+
+This module implements a class Aiff with a number of methods to help
+manipulate AIFF format files.
+
+Initialization.
+===============
+
+a = Aiff().init(file, mode)
+
+file refers to an AIFF file, mode is one of 'r', 'rf', 'w', or 'wf'.
+The modes 'r' and 'rf' are for reading a file, the modes 'w' and 'wf'
+are for writing a file.  When the mode is 'rf' or 'wf', the "file"
+argument should be an open file, otherwise it should be a string
+naming a file.
+
+Reading.
+========
+
+When the file is opened using one of "a = Aiff().init(file, 'r')" or
+"a = Aiff().init(file, 'rf')", the following values can be used.
+
+a.nchannels -- integer giving the number of channels defined in the
+	file.
+a.nsampframes -- integer giving the number of sound frames.
+a.sampwidth -- integer giving the size of a sample in bytes.
+a.samprate -- integer giving the sampling frequency.
+
+Actually, the values of nchannels, sampwidth, and samprate are
+constants from the AL module.  nchannels can be one of AL.MONO or
+AL.STEREO; sampwidth can be one of AL.SAMPLE_8, AL.SAMPLE_16, or
+AL.SAMPLE_24; samprate can be one of AL.RATE_48000, AL.RATE_44100,
+AL.RATE_32000, AL.RATE_22050, AL_RATE_16000, AL.RATE_11025, or
+AL.RATE_8000.  It is, however, possible to do arithmetic with these
+values.  The size of the sound portion of the file is
+nchannels * sampwidth * samprate * nsampframes.
+
+The data can be read using "a.readsamps(nframes)".  This gives a
+string consisting of at most nframes sound frames.
+
+Writing.
+========
+
+When the file is opened using one of "a = Aiff().init(file, 'w')" or
+"a = Aiff().init(file, 'wf')", you should first set the sound
+parameters.  This can be done by assigning to a.nchannels,
+a.sampwidth, and a.samprate.  a.nsampframes should not be assigned.
+This is done automatically.  If the file is not seekable (e.g. a
+pipe), you must also use "a.setnsamps(nframes)" to set the number of
+frames.
+
+It is then possible to write sound frames to the file using
+"a.writesamps(sound)" or "a.writesampsraw(sound)".  The two methods
+are interchangeable, but if setnsamps() wasn't used, writesamps() will
+patch the header in the output file to reflect the actual size.  When
+large amounts of data are to be written, using writesampsraw() is more
+efficient.  If setnsamps() wasn't used, it is important to use either
+writesamps() or destroy() when all data was written.
+
+Finishing off.
+==============
+
+To finish off, call "a.destroy()".  Especially when a file was written
+using writesampsraw(), it is important to use destroy or one final
+invocation of writesamps().

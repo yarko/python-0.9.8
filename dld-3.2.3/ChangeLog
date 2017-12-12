@@ -1,0 +1,280 @@
+Thu May 30 00:15:31 1991  W. Wilson Ho  (how at sundrops)
+
+	* version 3.2.3 released.
+
+	* update doc/dld.texinfo to reflect changes in 3.2.3.
+
+	* replace CSE-90-25.ps by the more up-to-date SPE.ps.
+	
+Thu May 30 00:06:33 1991  Gnu Software Packages  (gnu at dudley)
+
+	* in test/reload: put in hack so that it works on sequent symmetry.
+
+	* dld.c: add conditionally compiled code for Sequent Symmetry.
+
+Wed May 29 22:19:44 1991  W. Wilson Ho  (how at sundrops)
+
+	* begin works for version 3.2.3.
+
+Tue Nov 13 11:01:43 1990  W. Wilson Ho  (how at ivy)
+
+	* put in my new email address in README and dld.texinfo.
+
+Thu Nov  8 14:23:02 1990  W. Wilson Ho  (how at ivy)
+
+	* merge in patch from Edgar Roeder that port dld to atari.
+
+	* Version 3.2.2.
+
+Mon Oct  1 11:30:14 1990  W. Wilson Ho  (how at sundrops)
+
+	* Version 3.2.1 released.
+
+	* rename file_executable.c to file_exec.c
+		 list_undefined.c to list_undef.c
+		 unlink_file.c to ul_file.c
+		 unlink_symbol.c to ul_symbol.c
+
+	* add error.c: dld_perror:
+	  * similar to perror, but for the dld error codes.
+
+Sat Sep 29 01:01:45 1990  W. Wilson Ho  (how at sundrops)
+
+	* finish updating the texinfo manual.
+
+Fri Sep 28 17:25:38 1990  W. Wilson Ho  (how at sundrops)
+
+	* new file remove.c; new function dld_remove_defined_symbol()
+
+	* rename and export:
+	  executable_flags_up_to_date	-> _dld_exec_flags_valid
+	  patch_all_files ()		-> _dld_patch_all_files ()
+
+	* problem with explicitly defining and referencing symbols:
+	  * the unlink/garbage collection mechanism is based on the
+	    assumption that the unit for link and unlink is a module/object
+	    file.  There is no cross-referencing information in the per
+	    symbol basis.
+	  * Solution: don't make any reference link between the dummy
+	    entry and other entries.  don't touch the reference count of
+	    the dummy entry.
+	    
+	    * when a library module defines a symbol explicitly
+	      referenced by the user, all connections between this
+	      symbol and the dummy entry are removed.  This module is
+	      then treated as if it is explicitly loaded in by the user.
+
+Thu Sep 27 20:32:34 1990  W. Wilson Ho  (how at sundrops)
+
+	* test/general: new test functions:
+	  * list-undefined.c, get-sym.c
+	  * update script to add calls to these new functions
+
+	* update Makefile to include the new source files.
+
+	* put the following function in a separate file:
+	  dld_get_func	    --> get_func.c
+	  dld_get_symbol    --> get_symbol.c
+
+	* rename and export the following functions:
+	  getsym_soft() --> _dld_getsym_soft()
+	  unlink_entry() --> _dld_unlink_entry()
+
+Tue Sep 25 00:09:29 1990  W. Wilson Ho  (how at sundrops)
+
+	* new dld error code DLD_EBADNTYPE: invalid n_type value.
+
+	* dld.h: add declarations for the new functions dld_define() and
+	  dld_create_reference().
+
+	* new file dld_mk_dymmy.c; new function _dld_create_dummy_entry():
+	  * use internally by dld_create_reference and dld_define to
+	  create a dummy file_entry to associate with all the "dangling"
+	  symbols. 
+
+	* new file dld_ref.c; new function dld_create_reference():
+	  * allow explicit reference to a symbol so that the library
+	    routine defining it can be forced to load.
+
+	* new file dld_define.c;new function dld_define():
+	  * allow explicit definition of a symbol.
+	  * requires the name, n_type and n_value.
+
+	* dld.c: export the following and rename:
+	  env -> _dld_eny
+	  latest_entry -> _dld_latest_entry
+	  xmalloc -> _dld_malloc
+	  getsym -> _dld_getsym
+	  enter_global_ref -> _dld_enter_global_ref
+
+	* create defs.h to hold all the definition of data structures
+	  shared among the dld source files.
+
+	* add call to setjmp() in all exported dld function (if necessary)
+	  so that the call to longjmp in fatal() will not fail.
+
+Mon Sep 24 12:13:27 1990  W. Wilson Ho  (how at sundrops)
+
+	* rewrite the Makefiles.
+
+Fri Sep 21 12:35:27 1990  W. Wilson Ho  (how at sundrops)
+
+	* reliminate all uses of alloca().  For most parts the change are
+	  minor, but see "Ugly kludge" in symdef_library().
+
+Fri Sep 21 02:52:24 1990  Edgar Roeder  (edgar at megamaster)
+
+	* added st_read_header to convert TOS file header to unix style
+	file header (requires modified ld to include dbx symbols in TOS
+	executables)
+
+Thu Sep 20 14:33:26 1990  W. Wilson Ho  (how at sundrops)
+
+	* Version 3.2.1.
+	
+	* rename undefined_global_sym_count to dld_undefined_sym_count.
+	  Also make this variable global and include its decl. in dld.h.
+
+	* new function dld_list_undefined_sym(): returns an array of
+	  (char *), each of which points to the name of an undefined
+	  symbols.  This array should be freed by the user.
+	  (Modified from suggestion by Jan Wielemaker (jan@swi.psy.uva.nl).
+
+	* clear all common blocks to zero when they are allocated.
+	  (Bug reported by Jan Wielemaker).
+
+	* subfile_wanted_p(): return 1 also for files that only define
+	  global variables (commons).
+	  (Bug reported by Jan Wielemaker).
+
+Tue Sep 18 03:59:22 1990  Edgar Roeder  (edgar at megamaster)
+
+	* added ABSOLUTE_FILENAME_P predicate and relocation code for the
+	Atari ST under TOS (including a consistency check against the
+	current basepage).
+
+Fri Sep 14 22:16:14 1990  Edgar Roeder  (edgar at megamaster)
+
+	* added a separate DLDPATH environment variable in
+	dld_find_executable so that users may specify a special path for
+	object modules.
+
+Fri Sep  7 02:20:38 1990  W. Wilson Ho  (how at sundrops)
+
+	* finish dld.texinfo.
+
+Fri Aug 24 02:01:08 1990  W. Wilson Ho  (how at iris)
+
+	* update the manpages to reflect the changes of function names.
+
+	* add new function dld_get_bare_symbol() -- same as dld_get_symbol
+	except that no underscore (_) is prepended.
+
+Thu Aug 23 00:41:44 1990  W. Wilson Ho  (how at sundrops)
+
+	* put in changes to optimize the memory overhead:
+	  * the nlist array is freed after the required entries (external
+	    symbol definitions or references) have been inserted into the
+	    symtab.
+	  * relocation of local symbol references is done only once.
+	    Afterwards, only the relocation info of external references
+	    are saved and the rest is discarded.
+	  * new structure "dld_reloc_info" is defined.  "file_entry" uses this.
+	  * loading of text and data segments is moved up frond and done
+	    in read_file_symbols ().  New function read_text_and_data() is
+	    added.
+	  * relocate_entry_symbols () now takes care of relocating local
+	    references also.  A call to relocate_local_refs() is added.
+	  * New function: relocate_local_refs().
+	    Read in the relocation info, perform the relocation by calling
+	    do_local_relocation(), which also recorded the relocation
+	    entry for external references.  When these are done, free the
+	    nlist array.
+	  * perform_relocation() now works only on the new dld_reloc_info
+	    structure. 
+
+Wed Aug 22 00:11:08 1990  W. Wilson Ho  (how at sundrops)
+
+	* remove the field "refs" from defintion of symbol.
+	  remove the function digest, change enter_global_ref() and
+	  relocate_symbol_address() so that they modify sp->value directly.
+
+	* version 3.2
+
+	* rename which() to dld_which().
+
+	* rename all extern function to begin with "dld_"
+
+	* in dld_init, leave the value of {text,data,bss}_start_address of
+	the root module as zero, so that if the root module is unlinked,
+	kill_entry will not attempt to free these (invalid) addresses.
+
+	* include error handling in dld_init(). (setjmp and clean_up).
+
+Tue Aug 21 17:16:08 1990  W. Wilson Ho  (how at sundrops)
+
+	* add the already_unlink flag to struct file_entry so that no
+	  module can be (soft) unlinked twice.
+
+	* fix bug in relocate_symbol_address():
+	  while reading the text and data segments in core, only read in
+	  a_text+a_data bytes, do not count the a_bss.
+	  The object file does *not* contain the bss segment, only the
+	  executing process does.
+
+Mon Jun 11 14:24:57 1990  W. Wilson Ho  (how at snowball)
+
+	* version 3.1.1.
+
+	* rename dld() to dlink()
+
+Thu May  3 11:17:53 1990  W. Wilson Ho  (how at iris)
+
+	* relocate_symbol_address(): zero the bss segment read in from the
+	  object files.
+
+Tue May  1 20:56:20 1990  W. Wilson Ho  (how at snowball)
+
+	* modify get_symbol(), get_func(), unlink_by_symbol() and
+	  function_executable_p() so tha a '_' is always prepended to the
+	  given named before lookup.
+
+	* modify the test programs to accomodate the above changes.
+
+Tue Apr 24 13:25:21 1990  W. Wilson Ho  (how at snowball)
+
+	* dld susccessfully ported to sunOS4.0.  However, programs using
+	  dld cannot be linked with the system's shared library.
+
+	* update test/read-a.out.c to take care of sparc's data structure
+	  of relocation info.
+
+	* merge in the relocation function for sparc, only
+	  perform_relocation needs to be modified.  Also add in the
+	  RELOC_* macros.
+
+	* attempt to port to Sun OS 4.0.  Differences of the two systems
+	  includes:
+
+	  <sys/exec.h>:	 OS4.0 has two more fields (a_dynamic and
+			 a_toolversion), both of them can be safely
+			 ignored.
+
+	  <sys/nlist.h>: same
+
+	  <sys/a.out.h>: Compatible between Sun3's running OS3.4 and
+			 OS4.0.  struct relocation_info is renamed to
+			 reloc_info_68k in OS4.0, and the unused bits of
+			 the structure in OS3.4 is now used.  This has no
+			 effect on dld.
+
+			 For sparc, structure of reloc_info_sparc is
+			 different, so is the way that addresses should be
+			 relocated.  This is not compatible with the
+			 Sun3's.
+
+	* History:
+
+	  * in this version, add new function function_executable_p() which
+	    returns true if the given function can be safely executed.
+

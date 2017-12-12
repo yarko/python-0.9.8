@@ -1,0 +1,22 @@
+Newsgroups: alt.sources
+Subject: dl-dld 1.1 (dynamic loading interface)
+
+Archive-name: dl-dld/part01
+Submitted-by: Guido.van.Rossum@cwi.nl
+Version: 1.1
+
+Almost a year ago I posted version 1.0 of this little library, which
+mimics the interface of Jack Jansen's "dl" package (dynamic loading
+for the SGI) on top of Wilson Ho's (GNU) dynamic loading package
+"dld", version 3.2.3 (dynamic loading for several other systems).
+
+Version 1.1 adds two features that are new in Jack's dl:
+dl_setmessage() and dl_loadlod_mult().  I'd like to thank Martin-D.
+Lacasse for the latter contribution.
+
+(If you don't know where to get dld, try anonymous ftp to
+wuarchive.wustl.edu:/mirrors2/gnu/dld-3.2.3.tar.Z.  Jack's dld can be
+found at ftp.cwi.nl:/pub/dl-1.5.tar.Z.)
+
+--Guido van Rossum, CWI, Amsterdam <Guido.van.Rossum@cwi.nl>
+

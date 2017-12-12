@@ -1,0 +1,24 @@
+Module fcntl
+============
+
+fcntl(fd, op, arg):
+	fd is a file descriptor
+	op is an opcode (see fcntl(2) and <fcntl.h>)
+	if arg is a string:
+		it is a binary struct passed as argument,
+		e.g. created by struct.pack();
+		it is copied to a buffer whose address is passed
+		to the real fcntl call;
+		the contents of the buffer after a successful call
+		is returned from the Python function
+	if arg is an int:
+		it is passed as the fcntl argument;
+		the return value from the real fcntl is
+		returned from the Python function
+	if arg is missing:
+		it is treated as the int value 0.
+
+ioctl(fd, op, arg):
+	fd is a file descriptor
+	op is an opcode (see <sys/ioctl.h> and various other places)
+	arg is treated as for fcntl

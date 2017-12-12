@@ -1,0 +1,450 @@
+Python history
+--------------
+
+This file contains the release messages for previous Python releases
+(slightly edited to adapt them to the format of this file).  As you
+read on you go back to the dark ages of Python's history.
+
+==================================
+==> RELEASE 0.9.6 (6 Apr 1992) <==
+==================================
+
+Misc news in 0.9.6:
+- Restructured the misc subdirectory
+- Reference manual completed, library manual much extended (with indexes!)
+- the GNU Readline library is now distributed standard with Python
+- the script "../demo/scripts/classfix.py" fixes Python modules using old
+  class syntax
+- Emacs python-mode.el (was python.el) vastly improved (thanks, Tim!)
+- Because of the GNU copyleft business I am not using the GNU regular
+  expression implementation but a free re-implementation by Tatu Ylonen
+  that recently appeared in comp.sources.misc (Bravo, Tatu!)
+
+New features in 0.9.6:
+- stricter try stmt syntax: cannot mix except and finally clauses on 1 try
+- New module 'os' supplants modules 'mac' and 'posix' for most cases;
+  module 'path' is replaced by 'os.path'
+- os.path.split() return value differs from that of old path.split()
+- sys.exc_type, sys.exc_value, sys.exc_traceback are set to the exception
+  currently being handled
+- sys.last_type, sys.last_value, sys.last_traceback remember last unhandled
+  exception
+- New function string.expandtabs() expands tabs in a string
+- Added times() interface to posix (user & sys time of process & children)
+- Added uname() interface to posix (returns OS type, hostname, etc.)
+- New built-in function execfile() is like exec() but from a file
+- Functions exec() and eval() are less picky about whitespace/newlines
+- New built-in functions getattr() and setattr() access arbitrary attributes
+- More generic argument handling in built-in functions (see "./EXTENDING")
+- Dynamic loading of modules written in C or C++ (see "./DYNLOAD")
+- Division and modulo for long and plain integers with negative operands
+  have changed; a/b is now floor(float(a)/float(b)) and a%b is defined
+  as a-(a/b)*b.  So now the outcome of divmod(a,b) is the same as
+  (a/b, a%b) for integers.  For floats, % is also changed, but of course
+  / is unchanged, and divmod(x,y) does not yield (x/y, x%y)...
+- A function with explicit variable-length argument list can be declared
+  like this: def f(*args): ...; or even like this: def f(a, b, *rest): ...
+- Code tracing and profiling features have been added, and two source
+  code debuggers are provided in the library (pdb.py, tty-oriented,
+  and wdb, window-oriented); you can now step through Python programs!
+  See sys.settrace() and sys.setprofile(), and "../lib/pdb.doc"
+- '==' is now the only equality operator; "../demo/scripts/eqfix.py" is
+  a script that fixes old Python modules
+- Plain integer right shift now uses sign extension
+- Long integer shift/mask operations now simulate 2's complement
+  to give more useful results for negative operands
+- Changed/added range checks for long/plain integer shifts
+- Options found after "-c command" are now passed to the command in sys.argv
+  (note subtle incompatiblity with "python -c command -- -options"!)
+- Module stdwin is better protected against touching objects after they've
+  been closed; menus can now also be closed explicitly
+- Stdwin now uses its own exception (stdwin.error)
+
+New features in 0.9.5 (released as Macintosh application only, 2 Jan 1992):
+- dictionary objects can now be compared properly; e.g., {}=={} is true
+- new exception SystemExit causes termination if not caught;
+  it is raised by sys.exit() so that 'finally' clauses can clean up,
+  and it may even be caught.  It does work interactively!
+- new module "regex" implements GNU Emacs style regular expressions;
+  module "regexp" is rewritten in Python for backward compatibility
+- formal parameter lists may contain trailing commas
+
+Bugs fixed in 0.9.6:
+- assigning to or deleting a list item with a negative index dumped core
+- divmod(-10L,5L) returned (-3L, 5L) instead of (-2L, 0L)
+
+Bugs fixed in 0.9.5:
+- masking operations involving negative long integers gave wrong results
+
+
+===================================
+==> RELEASE 0.9.4 (24 Dec 1991) <==
+===================================
+
+- new function argument handling (see below)
+- built-in apply(func, args) means func(args[0], args[1], ...)
+- new, more refined exceptions
+- new exception string values (NameError = 'NameError' etc.)
+- better checking for math exceptions
+- for sequences (string/tuple/list), x[-i] is now equivalent to x[len(x)-i]
+- fixed list assignment bug: "a[1:1] = a" now works correctly
+- new class syntax, without extraneous parentheses
+- new 'global' statement to assign global variables from within a function
+
+
+New class syntax
+----------------
+
+You can now declare a base class as follows:
+
+	class B:			# Was: class B():
+		def some_method(self): ...
+		...
+
+and a derived class thusly:
+
+	class D(B):			# Was: class D() = B():
+		def another_method(self, arg): ...
+
+Multiple inheritance looks like this:
+
+	class M(B, D):			# Was: class M() = B(), D():
+		def this_or_that_method(self, arg): ...
+
+The old syntax is still accepted by Python 0.9.4, but will disappear
+in Python 1.0 (to be posted to comp.sources).
+
+
+New 'global' statement
+----------------------
+
+Every now and then you have a global variable in a module that you
+want to change from within a function in that module -- say, a count
+of calls to a function, or an option flag, etc.  Until now this was
+not directly possible.  While several kludges are known that
+circumvent the problem, and often the need for a global variable can
+be avoided by rewriting the module as a class, this does not always
+lead to clearer code.
+
+The 'global' statement solves this dilemma.  Its occurrence in a
+function body means that, for the duration of that function, the
+names listed there refer to global variables.  For instance:
+
+	total = 0.0
+	count = 0
+
+	def add_to_total(amount):
+		global total, count
+		total = total + amount
+		count = count + 1
+
+'global' must be repeated in each function where it is needed.  The
+names listed in a 'global' statement must not be used in the function
+before the statement is reached.
+
+Remember that you don't need to use 'global' if you only want to *use*
+a global variable in a function; nor do you need ot for assignments to
+parts of global variables (e.g., list or dictionary items or
+attributes of class instances).  This has not changed; in fact
+assignment to part of a global variable was the standard workaround.
+
+
+New exceptions
+--------------
+
+Several new exceptions have been defined, to distinguish more clearly
+between different types of errors.
+
+name			meaning					was
+
+AttributeError		reference to non-existing attribute	NameError
+IOError			unexpected I/O error			RuntimeError
+ImportError		import of non-existing module or name	NameError
+IndexError		invalid string, tuple or list index	RuntimeError
+KeyError		key not in dictionary			RuntimeError
+OverflowError		numeric overflow			RuntimeError
+SyntaxError		invalid syntax				RuntimeError
+ValueError		invalid argument value			RuntimeError
+ZeroDivisionError	division by zero			RuntimeError
+
+The string value of each exception is now its name -- this makes it
+easier to experimentally find out which operations raise which
+exceptions; e.g.:
+
+	>>> KeyboardInterrupt
+	'KeyboardInterrupt'
+	>>>
+
+
+New argument passing semantics
+------------------------------
+
+Off-line discussions with Steve Majewski and Daniel LaLiberte have
+convinced me that Python's parameter mechanism could be changed in a
+way that made both of them happy (I hope), kept me happy, fixed a
+number of outstanding problems, and, given some backward compatibility
+provisions, would only break a very small amount of existing code --
+probably all mine anyway.  In fact I suspect that most Python users
+will hardly notice the difference.  And yet it has cost me at least
+one sleepless night to decide to make the change...
+
+Philosophically, the change is quite radical (to me, anyway): a
+function is no longer called with either zero or one argument, which
+is a tuple if there appear to be more arguments.  Every function now
+has an argument list containing 0, 1 or more arguments.  This list is
+always implemented as a tuple, and it is a (run-time) error if a
+function is called with a different number of arguments than expected.
+
+What's the difference? you may ask.  The answer is, very little unless
+you want to write variadic functions -- functions that may be called
+with a variable number of arguments.  Formerly, you could write a
+function that accepted one or more arguments with little trouble, but
+writing a function that could be called with either 0 or 1 argument
+(or more) was next to impossible.  This is now a piece of cake: you
+can simply declare an argument that receives the entire argument
+tuple, and check its length -- it will be of size 0 if there are no
+arguments.
+
+Another anomaly of the old system was the way multi-argument methods
+(in classes) had to be declared, e.g.:
+
+	class Point():
+		def init(self, (x, y, color)): ...
+		def setcolor(self, color): ...
+		dev moveto(self, (x, y)): ...
+		def draw(self): ...
+
+Using the new scheme there is no need to enclose the method arguments
+in an extra set of parentheses, so the above class could become:
+
+	class Point:
+		def init(self, x, y, color): ...
+		def setcolor(self, color): ...
+		dev moveto(self, x, y): ...
+		def draw(self): ...
+
+That is, the equivalence rule between methods and functions has
+changed so that now p.moveto(x,y) is equivalent to Point.moveto(p,x,y)
+while formerly it was equivalent to Point.moveto(p,(x,y)).
+
+A special backward compatibility rule makes that the old version also
+still works: whenever a function with exactly two arguments (at the top
+level) is called with more than two arguments, the second and further
+arguments are packed into a tuple and passed as the second argument.
+This rule is invoked independently of whether the function is actually a
+method, so there is a slight chance that some erroneous calls of
+functions expecting two arguments with more than that number of
+arguments go undetected at first -- when the function tries to use the
+second argument it may find it is a tuple instead of what was expected.
+Note that this rule will be removed from future versions of the
+language; it is a backward compatibility provision *only*.
+
+Two other rules and a new built-in function handle conversion between
+tuples and argument lists:
+
+Rule (a): when a function with more than one argument is called with a
+single argument that is a tuple of the right size, the tuple's items
+are used as arguments.
+
+Rule (b): when a function with exactly one argument receives no
+arguments or more than one, that one argument will receive a tuple
+containing the arguments (the tuple will be empty if there were no
+arguments).
+
+
+A new built-in function, apply(), was added to support functions that
+need to call other functions with a constructed argument list.  The call
+
+	apply(function, tuple)
+
+is equivalent to
+
+	function(tuple[0], tuple[1], ..., tuple[len(tuple)-1])
+
+
+While no new argument syntax was added in this phase, it would now be
+quite sensible to add explicit syntax to Python for default argument
+values (as in C++ or Modula-3), or a "rest" argument to receive the
+remaining arguments of a variable-length argument list.
+
+
+========================================================
+==> Release 0.9.3 (never made available outside CWI) <==
+========================================================
+
+- string sys.version shows current version (also printed on interactive entry)
+- more detailed exceptions, e.g., IOError, ZeroDivisionError, etc.
+- 'global' statement to declare module-global variables assigned in functions.
+- new class declaration syntax: class C(Base1, Base2, ...): suite
+  (the old syntax is still accepted -- be sure to convert your classes now!)
+- C shifting and masking operators: << >> ~ & ^ | (for ints and longs).
+- C comparison operators: == != (the old = and <> remain valid).
+- floating point numbers may now start with a period (e.g., .14).
+- definition of integer division tightened (always truncates towards zero).
+- new builtins hex(x), oct(x) return hex/octal string from (long) integer.
+- new list method l.count(x) returns the number of occurrences of x in l.
+- new SGI module: al (Indigo and 4D/35 audio library).
+- the FORMS interface (modules fl and FL) now uses FORMS 2.0
+- module gl: added lrect{read,write}, rectzoom and pixmode;
+  added (non-GL) functions (un)packrect.
+- new socket method: s.allowbroadcast(flag).
+- many objects support __dict__, __methods__ or __members__.
+- dir() lists anything that has __dict__.
+- class attributes are no longer read-only.
+- classes support __bases__, instances support __class__ (and __dict__).
+- divmod() now also works for floats.
+- fixed obscure bug in eval('1            ').
+
+
+====================================
+==> Release 0.9.2 (Autumn 1991): <==
+====================================
+
+Highlights
+----------
+
+- tutorial now (almost) complete; library reference reorganized
+- new syntax: continue statement; semicolons; dictionary constructors;
+  restrictions on blank lines in source files removed
+- dramatically improved module load time through precompiled modules
+- arbitrary precision integers: compute 2 to the power 1000 and more...
+- arithmetic operators now accept mixed type operands, e.g., 3.14/4
+- more operations on list: remove, index, reverse; repetition
+- improved/new file operations: readlines, seek, tell, flush, ...
+- process management added to the posix module: fork/exec/wait/kill etc.
+- BSD socket operations (with example servers and clients!)
+- many new STDWIN features (color, fonts, polygons, ...)
+- new SGI modules: font manager and FORMS library interface
+
+
+Extended list of changes in 0.9.2
+---------------------------------
+
+Here is a summary of the most important user-visible changes in 0.9.2,
+in somewhat arbitrary order.  Changes in later versions are listed in
+the "highlights" section above.
+
+
+1. Changes to the interpreter proper
+
+- Simple statements can now be separated by semicolons.
+  If you write "if t: s1; s2", both s1 and s2 are executed
+  conditionally.
+- The 'continue' statement was added, with semantics as in C.
+- Dictionary displays are now allowed on input: {key: value, ...}.
+- Blank lines and lines bearing only a comment no longer need to
+  be indented properly.  (A completely empty line still ends a multi-
+  line statement interactively.)
+- Mixed arithmetic is supported, 1 compares equal to 1.0, etc.
+- Option "-c command" to execute statements from the command line
+- Compiled versions of modules are cached in ".pyc" files, giving a
+  dramatic improvement of start-up time
+- Other, smaller speed improvements, e.g., extracting characters from
+  strings, looking up single-character keys, and looking up global
+  variables
+- Interrupting a print operation raises KeyboardInterrupt instead of
+  only cancelling the print operation
+- Fixed various portability problems (it now passes gcc with only
+  warnings -- more Standard C compatibility will be provided in later
+  versions)
+- Source is prepared for porting to MS-DOS
+- Numeric constants are now checked for overflow (this requires
+  standard-conforming strtol() and strtod() functions; a correct
+  strtol() implementation is provided, but the strtod() provided
+  relies on atof() for everything, including error checking
+
+
+2. Changes to the built-in types, functions and modules
+
+- New module socket: interface to BSD socket primitives
+- New modules pwd and grp: access the UNIX password and group databases
+- (SGI only:) New module "fm" interfaces to the SGI IRIX Font Manager
+- (SGI only:) New module "fl" interfaces to Mark Overmars' FORMS library
+- New numeric type: long integer, for unlimited precision
+	- integer constants suffixed with 'L' or 'l' are long integers
+	- new built-in function long(x) converts int or float to long
+	- int() and float() now also convert from long integers
+- New built-in function:
+	- pow(x, y) returns x to the power y
+- New operation and methods for lists:
+	- l*n returns a new list consisting of n concatenated copies of l
+	- l.remove(x) removes the first occurrence of the value x from l
+	- l.index(x) returns the index of the first occurrence of x in l
+	- l.reverse() reverses l in place
+- New operation for tuples:
+	- t*n returns a tuple consisting of n concatenated copies of t
+- Improved file handling:
+	- f.readline() no longer restricts the line length, is faster,
+	  and isn't confused by null bytes; same for raw_input()
+	- f.read() without arguments reads the entire (rest of the) file
+	- mixing of print and sys.stdout.write() has different effect
+- New methods for files:
+	- f.readlines() returns a list containing the lines of the file,
+	  as read with f.readline()
+	- f.flush(), f.tell(), f.seek() call their stdio counterparts
+	- f.isatty() tests for "tty-ness"
+- New posix functions:
+	- _exit(), exec(), fork(), getpid(), getppid(), kill(), wait()
+	- popen() returns a file object connected to a pipe
+	- utime() replaces utimes() (the latter is not a POSIX name)
+- New stdwin features, including:
+	- font handling
+	- color drawing
+	- scroll bars made optional
+	- polygons
+	- filled and xor shapes
+	- text editing objects now have a 'settext' method
+
+
+3. Changes to the standard library
+
+- Name change: the functions path.cat and macpath.cat are now called
+  path.join and macpath.join
+- Added new modules: formatter, mutex, persist, sched, mainloop
+- Added some modules and functionality to the "widget set" (which is
+  still under development, so please bear with me):
+	DirList, FormSplit, TextEdit, WindowSched
+- Fixed module testall to work non-interactively
+- Module string:
+	- added functions join() and joinfields()
+	- fixed center() to work correct and make it "transitive"
+- Obsolete modules were removed: util, minmax
+- Some modules were moved to the demo directory
+
+
+4. Changes to the demonstration programs
+
+- Added new useful scipts: byteyears, eptags, fact, from, lfact,
+  objgraph, pdeps, pi, primes, ptags, which
+- Added a bunch of socket demos
+- Doubled the speed of ptags
+- Added new stdwin demos: microedit, miniedit
+- Added a windowing interface to the Python interpreter: python (most
+  useful on the Mac)
+- Added a browser for Emacs info files: demo/stdwin/ibrowse
+  (yes, I plan to put all STDWIN and Python documentation in texinfo
+  form in the future)
+
+
+5. Other changes to the distribution
+
+- An Emacs Lisp file "python.el" is provided to facilitate editing
+  Python programs in GNU Emacs (slightly improved since posted to
+  gnu.emacs.sources)
+- Some info on writing an extension in C is provided
+- Some info on building Python on non-UNIX platforms is provided
+
+
+=====================================
+==> Release 0.9.1 (February 1991) <==
+=====================================
+
+- Micro changes only
+- Added file "patchlevel.h"
+
+
+=====================================
+==> Release 0.9.0 (February 1991) <==
+=====================================
+
+Original posting to alt.sources.

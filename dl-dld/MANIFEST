@@ -1,0 +1,17 @@
+   File Name		Archive #	Description
+-----------------------------------------------------------
+ MANIFEST                   1	This shipping list
+ Makefile                   1	Build recipe
+ README                     1	Explanation of what this is
+ dl.h                       1	Interface header file
+ dl_error.c                 1	Error interface
+ dl_findlibs.c              1	Function to read a ".libs" file
+ dl_getbinary.c             1	Function to turn argv[0] into a pathname
+ dl_loadmod.c               1	The main function
+ strerror.c                 1	A PD re-implementation of ANSI C strerror()
+ test                       1	Test program subdirectory
+ test/Makefile              1	
+ test/sub.c                 1	
+ test/sub.libs              1	
+ test/sub2.c                1	
+ test/test.c                1	

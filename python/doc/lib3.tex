@@ -1,0 +1,285 @@
+%% Master: lib.tex
+\chapter{Standard Modules}
+
+The following standard modules are defined.  They are available in one
+of the directories in the default module search path (try printing
+\code{sys.path} to find out the default search path.)
+
+\section{Standard Module \sectcode{string}}
+
+\stmodindex{string}
+
+This module defines some constants useful for checking character
+classes, some exceptions, and some useful string functions.
+The constants are:
+
+\renewcommand{\indexsubitem}{(data in module string)}
+\begin{datadesc}{digits}
+  The string \code{'0123456789'}.
+\end{datadesc}
+
+\begin{datadesc}{hexdigits}
+  The string \code{'0123456789abcdefABCDEF'}.
+\end{datadesc}
+
+\begin{datadesc}{letters}
+  The concatenation of the strings \code{lowercase} and
+  \code{uppercase} described below.
+\end{datadesc}
+
+\begin{datadesc}{lowercase}
+  The string \code{'abcdefghijklmnopqrstuvwxyz'}.
+\end{datadesc}
+
+\begin{datadesc}{octdigits}
+  The string \code{'01234567'}.
+\end{datadesc}
+
+\begin{datadesc}{uppercase}
+  The string \code{'ABCDEFGHIJKLMNOPQRSTUVWXYZ'}.
+\end{datadesc}
+
+\begin{datadesc}{whitespace}
+  A string containing all characters that are considered whitespace,
+  i.e., space, tab and newline.  This definition is used by
+  \code{split()} and \code{strip()}.
+\end{datadesc}
+
+The exceptions are:
+
+\renewcommand{\indexsubitem}{(exception in module string)}
+\begin{excdesc}{atoi_error}
+Exception raised by
+\code{atoi}
+when a non-numeric string argument is detected.
+The exception argument is the offending string.
+\end{excdesc}
+
+\begin{excdesc}{index_error}
+Exception raised by \code{index} when \var{sub} is not found.  The
+argument are the offending arguments to index: \code{(\var{s}, \var{sub})}.
+\end{excdesc}
+
+The functions are:
+
+\renewcommand{\indexsubitem}{(in module string)}
+\begin{funcdesc}{atoi}{s}
+Converts a string to a number.  The string must consist of one or more
+digits, optionally preceded by a sign (\samp{+} or \samp{-}).
+\end{funcdesc}
+
+\begin{funcdesc}{expandtabs}{s\, tabsize}
+Expand tabs in a string, i.e. replace them by one or more spaces,
+depending on the current column and the given tab size.  The column
+number is reset to zero after each newline occurring in the string.
+This doesn't understand other non-printing characters or escape
+sequences.
+\end{funcdesc}
+
+\begin{funcdesc}{index}{s\, sub\, i}
+Returns the lowest index in \var{s} not smaller than \var{i} where the
+substring \var{sub} is found.  Raise \code{index_error} when \var{sub}
+does not occur as a substring of \var{s} with index at least \var{i}.
+If \var{i} is omitted, it defaults to \code{0}.
+\end{funcdesc}
+
+\begin{funcdesc}{lower}{s}
+Convert letters to lower case.
+\end{funcdesc}
+
+\begin{funcdesc}{split}{s}
+Returns a list of the whitespace-delimited words of the string
+\var{s}.
+\end{funcdesc}
+
+\begin{funcdesc}{splitfields}{s\, sep}
+  Returns a list containing the fields of the string \var{s}, using
+  the string \var{sep} as a separator.  The list will have one more
+  items than the number of non-overlapping occurrences of the
+  separator in the string.  Thus, \code{string.splitfields(\var{s}, '
+  ')} is not the same as \code{string.split(\var{s})}, as the latter
+  only returns non-empty words.  As a special case,
+  \code{splitfields(\var{s}, '')} returns \code{[\var{s}]}, for any string
+  \var{s}.  (See also \code{regsub.split()}.)
+\end{funcdesc}
+
+\begin{funcdesc}{join}{words}
+Concatenate a list or tuple of words with intervening spaces.
+\end{funcdesc}
+
+\begin{funcdesc}{joinfields}{words\, sep}
+Concatenate a list or tuple of words with intervening separators.
+It is always true that
+\code{string.joinfields(string.splitfields(\var{t}, \var{sep}), \var{sep})}
+equals \var{t}.
+\end{funcdesc}
+
+\begin{funcdesc}{strip}{s}
+Removes leading and trailing whitespace from the string
+\var{s}.
+\end{funcdesc}
+
+\begin{funcdesc}{swapcase}{s}
+Converts lower case letters to upper case and vice versa.
+\end{funcdesc}
+
+\begin{funcdesc}{upper}{s}
+Convert letters to upper case.
+\end{funcdesc}
+
+\begin{funcdesc}{ljust}{s\, width}
+\funcline{rjust}{s\, width}
+\funcline{center}{s\, width}
+These functions respectively left-justify, right-justify and center a
+string in a field of given width.
+They return a string that is at least
+\var{width}
+characters wide, created by padding the string
+\var{s}
+with spaces until the given width on the right, left or both sides.
+The string is never truncated.
+\end{funcdesc}
+
+\begin{funcdesc}{zfill}{s\, width}
+Pad a numeric string on the left with zero digits until the given
+width is reached.  Strings starting with a sign are handled correctly.
+\end{funcdesc}
+
+\section{Standard Module \sectcode{rand}}
+
+\stmodindex{rand} This module implements a pseudo-random number
+generator with an interface similar to \code{rand()} in C.  It defines
+the following functions:
+
+\renewcommand{\indexsubitem}{(in module rand)}
+\begin{funcdesc}{rand}{}
+Returns an integer random number in the range [0 ... 32768).
+\end{funcdesc}
+
+\begin{funcdesc}{choice}{s}
+Returns a random element from the sequence (string, tuple or list)
+\var{s}.
+\end{funcdesc}
+
+\begin{funcdesc}{srand}{seed}
+Initializes the random number generator with the given integral seed.
+When the module is first imported, the random number is initialized with
+the current time.
+\end{funcdesc}
+
+\section{Standard Module \sectcode{whrandom}}
+
+\stmodindex{whrandom}
+This module implements a Wichmann-Hill pseudo-random number generator.
+It defines the following functions:
+
+\renewcommand{\indexsubitem}{(in module whrandom)}
+\begin{funcdesc}{random}{}
+Returns the next random floating point number in the range [0.0 ... 1.0).
+\end{funcdesc}
+
+\begin{funcdesc}{seed}{x\, y\, z}
+Initializes the random number generator from the integers
+\var{x},
+\var{y}
+and
+\var{z}.
+When the module is first imported, the random number is initialized
+using values derived from the current time.
+\end{funcdesc}
+
+\section{Standard Module \sectcode{regsub}}
+
+\stmodindex{regsub}
+This module defines a number of functions useful for working with
+regular expressions (see built-in module \code{regex}).
+
+\renewcommand{\indexsubitem}{(in module regsub)}
+\begin{funcdesc}{sub}{pat\, repl\, str}
+Replace the first occurrence of pattern \var{pat} in string
+\var{str} by replacement \var{repl}.  If the pattern isn't found,
+the string is returned unchanged.  The pattern may be a string or an
+already compiled pattern.  The replacement may contain references
+\samp{\e \var{digit}} to subpatterns and escaped backslashes.
+\end{funcdesc}
+
+\begin{funcdesc}{gsub}{pat\, repl\, str}
+Replace all (non-overlapping) occurrences of pattern \var{pat} in
+string \var{str} by replacement \var{repl}.  The same rules as for
+\code{sub()} apply.  Empty matches for the pattern are replaced only
+when not adjacent to a previous match, so e.g.
+\code{gsub('', '-', 'abc')} returns \code{'-a-b-c-'}.
+\end{funcdesc}
+
+\begin{funcdesc}{split}{str\, pat}
+Split the string \var{str} in fields separated by delimiters matching
+the pattern \var{pat}, and return a list containing the fields.  Only
+non-empty matches for the pattern are considered, so e.g.
+\code{split('a:b', ':*')} returns \code{['a', 'b']} and
+\code{split('abc', '')} returns \code{['abc']}.
+\end{funcdesc}
+
+\section{Standard Module \sectcode{os}}
+
+\stmodindex{os}
+This module provides a more portable way of using operating system
+(OS) dependent functionality than importing an OS dependent built-in
+module like \code{posix}.
+
+When the optional built-in module \code{posix} is available, this
+module exports the same functions and data as \code{posix}; otherwise,
+it searches for an OS dependent built-in module like \code{mac} and
+exports the same functions and data as found there.  The design of all
+Python's built-in OS dependen modules is such that as long as the same
+functionality is available, it uses the same interface; e.g., the
+function \code{os.stat(\var{file})} returns stat info about a \var{file} in a
+format compatible with the POSIX interface.
+
+Extensions peculiar to a particular OS are also available through the
+\code{os} module, but using them is of course a threat to portability!
+
+Note that after the first time \code{os} is imported, there is \emph{no}
+performance penalty in using functions from \code{os} instead of
+directly from the OS dependent built-in module, so there should be
+\emph{no} reason not to use \code{os}!
+
+In addition to whatever the correct OS dependent module exports, the
+following variables are always exported by \code{os}:
+
+\renewcommand{\indexsubitem}{(in module os)}
+\begin{datadesc}{name}
+The name of the OS dependent module imported, e.g. \code{'posix'} or
+\code{'mac'}.
+\end{datadesc}
+
+\begin{datadesc}{path}
+The corresponding OS dependent standard module for pathname
+operations, e.g., \code{posixpath} or \code{macpath}.  Thus, (given
+the proper imports), \code{os.path.split(\var{file})} is equivalent to but
+more portable than \code{posixpath.split(\var{file})}.
+\end{datadesc}
+
+\begin{datadesc}{curdir}
+The constant string used by the OS to refer to the current directory,
+e.g. \code{'.'} for POSIX or \code{':'} for the Mac.
+\end{datadesc}
+
+\begin{datadesc}{pardir}
+The constant string used by the OS to refer to the parent directory,
+e.g. \code{'..'} for POSIX or \code{'::'} for the Mac.
+\end{datadesc}
+
+\begin{datadesc}{sep}
+The character used by the OS to separate pathname components, e.g.
+\code{'/'} for POSIX or \code{':'} for the Mac.  Note that knowing this
+is not sufficient to be able to parse or concatenate pathnames---better
+use \code{os.path.split()} and \code{os.path.join()}---but it is
+occasionally useful.
+\end{datadesc}
+
+% PM
+% commands
+% cmp?
+% *cache?
+% localtime?
+% calendar?

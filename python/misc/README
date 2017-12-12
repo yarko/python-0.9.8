@@ -1,0 +1,29 @@
+Python misc subdirectory
+------------------------
+
+This directory contains miscellaneous additional documentation (the
+main documentation is in ../doc), and some other files that come in
+handy in one situation or another.
+
+Main files found here
+---------------------
+
+README		The file you're reading now
+BLURB		A quick description of Python for newcomers
+BUILD		Building instructions for UNIX
+NEWS		What's new in this release
+python.man	UNIX man page for the python interpreter;
+		use nroff -man or (di)troff -man to format it
+python-mode.el	Emacs mode for editing Python programs (thanks, Tim!)
+HISTORY		News from previous releases
+
+Additional files found here
+---------------------------
+
+EXTENDING	How to write your own "built-in" modules in C or C++
+DYNLOAD		How to use dynamic loading to load your own C or C++ modules
+BUILD-MAC	Hints for building Python on the Macintosh
+BUILD-DOS	Hints for building Python on MS-DOS (untested)
+DESIGN		Some notes on Python's design (read this before you criticize!)
+FTP		Details about FTP avaiability
+[ix]386-alloca.s  Versions of alloca for some architectures and assemblers
