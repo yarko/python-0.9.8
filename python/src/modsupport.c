@@ -4,10 +4,10 @@ Netherlands.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the names of Stichting Mathematisch
 Centrum or CWI not be used in advertising or publicity pertaining to
 distribution of the software without specific, written prior permission.
@@ -110,13 +110,14 @@ do_arg(arg, p_format, p_va)
 	va_list *p_va;
 {
 	char *format = *p_format;
-	va_list va = *p_va;
-	
+	va_list va;
+    va_copy(va, *p_va);  /* va_copy(to, from) */
+
 	if (arg == NULL)
 		return 0; /* Incomplete tuple or list */
-	
+
 	switch (*format++) {
-	
+
 	case '(': /* tuple, distributed over C parameters */ {
 		int i, n;
 		if (!is_tupleobject(arg))
@@ -151,7 +152,7 @@ do_arg(arg, p_format, p_va)
 			return 0;
 		break;
 		}
-	
+
 	case 'i': /* int */ {
 		int *p = va_arg(va, int *);
 		if (is_intobject(arg))
@@ -160,7 +161,7 @@ do_arg(arg, p_format, p_va)
 			return 0;
 		break;
 		}
-	
+
 	case 'l': /* long int */ {
 		long *p = va_arg(va, long *);
 		if (is_intobject(arg))
@@ -169,7 +170,7 @@ do_arg(arg, p_format, p_va)
 			return 0;
 		break;
 		}
-	
+
 	case 'f': /* float */ {
 		float *p = va_arg(va, float *);
 		if (is_floatobject(arg))
@@ -180,7 +181,7 @@ do_arg(arg, p_format, p_va)
 			return 0;
 		break;
 		}
-	
+
 	case 'd': /* double */ {
 		double *p = va_arg(va, double *);
 		if (is_floatobject(arg))
@@ -191,7 +192,7 @@ do_arg(arg, p_format, p_va)
 			return 0;
 		break;
 		}
-	
+
 	case 'c': /* char */ {
 		char *p = va_arg(va, char *);
 		if (is_stringobject(arg) && getstringsize(arg) == 1)
@@ -200,7 +201,7 @@ do_arg(arg, p_format, p_va)
 			return 0;
 		break;
 		}
-	
+
 	case 's': /* string */ {
 		char **p = va_arg(va, char **);
 		if (is_stringobject(arg))
@@ -218,7 +219,7 @@ do_arg(arg, p_format, p_va)
 		}
 		break;
 		}
-	
+
 	case 'z': /* string, may be NULL (None) */ {
 		char **p = va_arg(va, char **);
 		if (arg == None)
@@ -241,7 +242,7 @@ do_arg(arg, p_format, p_va)
 		}
 		break;
 		}
-	
+
 	case 'S': /* string object */ {
 		object **p = va_arg(va, object **);
 		if (is_stringobject(arg))
@@ -250,7 +251,7 @@ do_arg(arg, p_format, p_va)
 			return 0;
 		break;
 		}
-	
+
 	case 'O': /* object */ {
 		object **p = va_arg(va, object **);
 		*p = arg;
@@ -261,12 +262,12 @@ do_arg(arg, p_format, p_va)
 		fprintf(stderr, "bad do_arg format: x%x '%c'\n",
 			format[-1], format[-1]);
 		return 0;
-	
+
 	}
-	
-	*p_va = va;
+
+	va_copy(*p_va, va);
 	*p_format = format;
-	
+
 	return 1;
 }
 
@@ -300,7 +301,7 @@ int getargs(va_alist) va_dcl
 		}
 		return 1;
 	}
-	
+
 	f = format;
 	ok = do_arg(arg, &f, &va) && *f == '\0';
 	va_end(va);
@@ -438,9 +439,9 @@ do_mkvalue(p_format, p_va)
 	char **p_format;
 	va_list *p_va;
 {
-	
+
 	switch (*(*p_format)++) {
-	
+
 	case '(':
 		return do_mktuple(p_format, p_va, ')',
 				  countformat(*p_format, ')'));
@@ -449,10 +450,10 @@ do_mkvalue(p_format, p_va)
 	case 'h':
 	case 'i':
 		return newintobject((long)va_arg(*p_va, int));
-		
+
 	case 'l':
 		return newintobject((long)va_arg(*p_va, long));
-		
+
 	case 'f':
 	case 'd':
 		return newfloatobject((double)va_arg(*p_va, double));
@@ -463,7 +464,7 @@ do_mkvalue(p_format, p_va)
 			p[0] = va_arg(*p_va, int);
 			return newsizedstringobject(p, 1);
 		}
-	
+
 	case 's':
 	case 'z':
 		{
@@ -487,7 +488,7 @@ do_mkvalue(p_format, p_va)
 			}
 			return v;
 		}
-	
+
 	case 'S':
 	case 'O':
 		{
@@ -506,11 +507,11 @@ do_mkvalue(p_format, p_va)
 					   "NULL object passed to mkvalue");
 			return v;
 		}
-	
+
 	default:
 		err_setstr(SystemError, "bad format char passed to mkvalue");
 		return NULL;
-	
+
 	}
 }
 
@@ -530,7 +531,7 @@ object *mkvalue(va_alist) va_dcl
 	va_start(va, format);
 #else
 	char *format;
-	
+
 	va_start(va);
 	format = va_arg(va, char *);
 #endif
