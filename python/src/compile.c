@@ -4,10 +4,10 @@ Netherlands.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the names of Stichting Mathematisch
 Centrum or CWI not be used in advertising or publicity pertaining to
 distribution of the software without specific, written prior permission.
@@ -41,7 +41,10 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 #include <ctype.h>
 
+#include <errno.h>
+/*
 extern int errno;
+*/
 
 #define OFF(x) offsetof(codeobject, x)
 
@@ -233,7 +236,7 @@ com_init(c, filename)
 	c->c_nblocks = 0;
 	c->c_filename = filename;
 	return 1;
-	
+
   fail_0:
   	DECREF(c->c_names);
   fail_1:
@@ -947,42 +950,42 @@ com_comparison(c, n)
 	com_expr(c, CHILD(n, 0));
 	if (NCH(n) == 1)
 		return;
-	
+
 	/****************************************************************
 	   The following code is generated for all but the last
 	   comparison in a chain:
-	   
+
 	   label:	on stack:	opcode:		jump to:
-	   
+
 			a		<code to load b>
 			a, b		DUP_TOP
 			a, b, b		ROT_THREE
 			b, a, b		COMPARE_OP
 			b, 0-or-1	JUMP_IF_FALSE	L1
 			b, 1		POP_TOP
-			b		
-	
+			b
+
 	   We are now ready to repeat this sequence for the next
 	   comparison in the chain.
-	   
+
 	   For the last we generate:
-	   
+
 	   		b		<code to load c>
 	   		b, c		COMPARE_OP
-	   		0-or-1		
-	   
+	   		0-or-1
+
 	   If there were any jumps to L1 (i.e., there was more than one
 	   comparison), we generate:
-	   
+
 	   		0-or-1		JUMP_FORWARD	L2
 	   L1:		b, 0		ROT_TWO
 	   		0, b		POP_TOP
 	   		0
 	   L2:
 	****************************************************************/
-	
+
 	anchor = 0;
-	
+
 	for (i = 2; i < NCH(n); i += 2) {
 		com_expr(c, CHILD(n, i));
 		if (i+2 < NCH(n)) {
@@ -1001,7 +1004,7 @@ com_comparison(c, n)
 			com_addbyte(c, POP_TOP);
 		}
 	}
-	
+
 	if (anchor) {
 		int anchor2 = 0;
 		com_addfwref(c, JUMP_FORWARD, &anchor2);
@@ -1199,7 +1202,7 @@ com_assign(c, n, assigning)
 	/* Loop to avoid trivial recursion */
 	for (;;) {
 		switch (TYPE(n)) {
-		
+
 		case exprlist:
 		case testlist:
 			if (NCH(n) > 1) {
@@ -1208,7 +1211,7 @@ com_assign(c, n, assigning)
 			}
 			n = CHILD(n, 0);
 			break;
-		
+
 		case test:
 		case and_test:
 		case not_test:
@@ -1227,7 +1230,7 @@ com_assign(c, n, assigning)
 			}
 			n = CHILD(n, 0);
 			break;
-		
+
 		case factor: /* ('+'|'-'|'~') factor | atom trailer* */
 			if (TYPE(CHILD(n, 0)) != atom) { /* '+'|'-'|'~' */
 				err_setstr(SyntaxError,
@@ -1247,7 +1250,7 @@ com_assign(c, n, assigning)
 			}
 			n = CHILD(n, 0);
 			break;
-		
+
 		case atom:
 			switch (TYPE(CHILD(n, 0))) {
 			case LPAR:
@@ -1280,13 +1283,13 @@ com_assign(c, n, assigning)
 				return;
 			}
 			break;
-		
+
 		default:
 			fprintf(stderr, "node type %d\n", TYPE(n));
 			err_setstr(SystemError, "com_assign: bad node");
 			c->c_errors++;
 			return;
-		
+
 		}
 	}
 }
@@ -1508,21 +1511,21 @@ com_for_stmt(c, n)
    meaning that the 'finally' clause is entered even if things
    go wrong again in an exception handler.  Note that this is
    not the case for exception handlers: at most one is entered.
-   
+
    Code generated for "try: S finally: Sf" is as follows:
-   
+
 		SETUP_FINALLY	L
 		<code for S>
 		POP_BLOCK
 		LOAD_CONST	<nil>
 	L:	<code for Sf>
 		END_FINALLY
-   
+
    The special instructions use the block stack.  Each block
    stack entry contains the instruction that created it (here
    SETUP_FINALLY), the level of the value stack at the time the
    block stack entry was created, and a label (here L).
-   
+
    SETUP_FINALLY:
 	Pushes the current value stack level and the label
 	onto the block stack.
@@ -1534,24 +1537,24 @@ com_for_stmt(c, n)
 	Pops a variable number of entries from the *value* stack
 	and re-raises the exception they specify.  The number of
 	entries popped depends on the (pseudo) exception type.
-   
+
    The block stack is unwound when an exception is raised:
    when a SETUP_FINALLY entry is found, the exception is pushed
    onto the value stack (and the exception condition is cleared),
    and the interpreter jumps to the label gotten from the block
    stack.
-   
+
    Code generated for "try: S except E1, V1: S1 except E2, V2: S2 ...":
    (The contents of the value stack is shown in [], with the top
    at the right; 'tb' is trace-back info, 'val' the exception's
    associated value, and 'exc' the exception.)
-   
+
    Value stack		Label	Instruction	Argument
    []				SETUP_EXCEPT	L1
    []				<code for S>
    []				POP_BLOCK
    []				JUMP_FORWARD	L0
-   
+
    [tb, val, exc]	L1:	DUP				)
    [tb, val, exc, exc]		<evaluate E1>			)
    [tb, val, exc, exc, E1]	COMPARE_OP	EXC_MATCH	) only if E1
@@ -1562,16 +1565,16 @@ com_for_stmt(c, n)
    [tb]				POP
    []				<code for S1>
    				JUMP_FORWARD	L0
-   
+
    [tb, val, exc, 0]	L2:	POP
    [tb, val, exc]		DUP
    .............................etc.......................
 
    [tb, val, exc, 0]	Ln+1:	POP
    [tb, val, exc]	   	END_FINALLY	# re-raise exception
-   
+
    []			L0:	<next statement>
-   
+
    Of course, parts are not generated if Vi or Ei is not present.
 */
 
@@ -1588,7 +1591,7 @@ com_try_stmt(c, n)
 
 	/* XXX This can be simplified because except and finally can
 	   no longer be mixed in a single try statement */
-	
+
 	if (NCH(n) > 3 && TYPE(CHILD(n, NCH(n)-3)) != except_clause) {
 		/* Have a 'finally' clause */
 		com_addfwref(c, SETUP_FINALLY, &finally_anchor);
@@ -1804,18 +1807,18 @@ com_node(c, n)
 	node *n;
 {
 	switch (TYPE(n)) {
-	
+
 	/* Definition nodes */
-	
+
 	case funcdef:
 		com_funcdef(c, n);
 		break;
 	case classdef:
 		com_classdef(c, n);
 		break;
-	
+
 	/* Trivial parse tree nodes */
-	
+
 	case stmt:
 	case small_stmt:
 	case flow_stmt:
@@ -1831,14 +1834,14 @@ com_node(c, n)
 				com_node(c, CHILD(n, i));
 		}
 		break;
-	
+
 	case compound_stmt:
 		com_addoparg(c, SET_LINENO, n->n_lineno);
 		com_node(c, CHILD(n, 0));
 		break;
 
 	/* Statement nodes */
-	
+
 	case expr_stmt:
 		com_expr_stmt(c, n);
 		break;
@@ -1887,9 +1890,9 @@ com_node(c, n)
 	case suite:
 		com_suite(c, n);
 		break;
-	
+
 	/* Expression nodes */
-	
+
 	case testlist:
 		com_list(c, n, 0);
 		break;
@@ -1932,7 +1935,7 @@ com_node(c, n)
 	case atom:
 		com_atom(c, n);
 		break;
-	
+
 	default:
 		fprintf(stderr, "node type %d\n", TYPE(n));
 		err_setstr(SystemError, "com_node: unexpected node type");
@@ -2039,9 +2042,9 @@ compile_node(c, n)
 	node *n;
 {
 	com_addoparg(c, SET_LINENO, n->n_lineno);
-	
+
 	switch (TYPE(n)) {
-	
+
 	case single_input: /* One interactive command */
 		/* NEWLINE | simple_stmt | compound_stmt NEWLINE */
 		n = CHILD(n, 0);
@@ -2050,27 +2053,27 @@ compile_node(c, n)
 		com_addoparg(c, LOAD_CONST, com_addconst(c, None));
 		com_addbyte(c, RETURN_VALUE);
 		break;
-	
+
 	case file_input: /* A whole file, or built-in function exec() */
 		com_file_input(c, n);
 		com_addoparg(c, LOAD_CONST, com_addconst(c, None));
 		com_addbyte(c, RETURN_VALUE);
 		break;
-	
+
 	case expr_input: /* Built-in function eval() */
 		com_node(c, CHILD(n, 0));
 		com_addbyte(c, RETURN_VALUE);
 		break;
-	
+
 	case eval_input: /* Built-in function input() */
 		com_node(c, CHILD(n, 0));
 		com_addbyte(c, RETURN_VALUE);
 		break;
-	
+
 	case funcdef: /* A function definition */
 		compile_funcdef(c, n);
 		break;
-	
+
 	case classdef: /* A class definition */
 		/* classdef: 'class' NAME
 			['(' testlist ')' |'(' ')' ['=' baselist]]
@@ -2079,7 +2082,7 @@ compile_node(c, n)
 		com_addbyte(c, LOAD_LOCALS);
 		com_addbyte(c, RETURN_VALUE);
 		break;
-	
+
 	default:
 		fprintf(stderr, "node type %d\n", TYPE(n));
 		err_setstr(SystemError, "compile_node: unexpected node type");
@@ -2092,29 +2095,29 @@ compile_node(c, n)
    Attempt to replace all LOAD_NAME instructions that refer to a local
    variable with LOAD_LOCAL instructions, and all that refer to a global
    variable with LOAD_GLOBAL instructions.
-   
+
    To find all local variables, we check all STORE_NAME and IMPORT_FROM
    instructions.  This yields all local variables, including arguments,
    function definitions, class definitions and import statements.
-   
+
    There is one leak: 'from foo import *' introduces local variables
    that we can't know while compiling.  If this is the case, LOAD_GLOBAL
    instructions are not generated -- LOAD_NAME is left in place for
    globals, since it first checks for globals (LOAD_LOCAL is still used
    for recognized locals, since it doesn't hurt).
-   
+
    This optimization means that using the same name as a global and
    as a local variable within the same scope is now illegal, which
    is a change to the language!  Also using eval() to introduce new
    local variables won't work.  But both were bad practice at best.
-   
+
    The optimization doesn't save much: basically, it saves one
    unsuccessful dictionary lookup per global (or built-in) variable
    reference.  On the (slow!) Mac Plus, with 4 local variables,
    this saving was measured to be about 0.18 ms.  We might save more
    by using a different data structure to hold local variables, like
    an array indexed by variable number.
-   
+
    NB: this modifies the string object co->co_code!
 */
 
@@ -2139,8 +2142,8 @@ optimizer(co)
 		err_clear();
 		return; /* For now, this is OK */
 	}
-	
-	next_instr = (unsigned char *) GETSTRINGVALUE(co->co_code); 
+
+	next_instr = (unsigned char *) GETSTRINGVALUE(co->co_code);
 	for (;;) {
 		opcode = NEXTOP();
 		if (opcode == STOP_CODE)
@@ -2155,9 +2158,9 @@ optimizer(co)
 			}
 		}
 	}
-	
+
 	star_used = (dictlookup(locals, "*") != NULL);
-	next_instr = (unsigned char *) GETSTRINGVALUE(co->co_code); 
+	next_instr = (unsigned char *) GETSTRINGVALUE(co->co_code);
 	for (;;) {
 		cur_instr = next_instr;
 		opcode = NEXTOP();
@@ -2176,7 +2179,7 @@ optimizer(co)
 			}
 		}
 	}
-	
+
 	DECREF(locals);
 }
 
