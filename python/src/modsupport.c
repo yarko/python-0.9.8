@@ -268,6 +268,7 @@ do_arg(arg, p_format, p_va)
 	va_copy(*p_va, va);
 	*p_format = format;
 
+    va_end(va);
 	return 1;
 }
 
