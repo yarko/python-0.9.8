@@ -94,7 +94,9 @@ SYSVDEF=	-DSYSV
 # Additional flags to the C compiler are defined in ADDCFLAG.
 # Use this for instance to pass -g, -O, -D... or -I... to the compiler.
 ##edit
-ADDCFLAGS=	
+ADDCFLAGS=	-m32
+#ADDCFLAGS=	-m32 -pedantic-errors -std=c89
+#ADDCFLAGS=	-std=c89
 ##endg
 
 ##group
