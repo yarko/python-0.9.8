@@ -4,10 +4,10 @@ Amsterdam, The Netherlands.
 
                         All Rights Reserved
 
-Permission to use, copy, modify, and distribute this software and its 
-documentation for any purpose and without fee is hereby granted, 
+Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose and without fee is hereby granted,
 provided that the above copyright notice appear in all copies and that
-both that copyright notice and this permission notice appear in 
+both that copyright notice and this permission notice appear in
 supporting documentation, and that the names of Stichting Mathematisch
 Centrum or CWI not be used in advertising or publicity pertaining to
 distribution of the software without specific, written prior permission.
@@ -78,7 +78,8 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 /* XXX Aren't these always declared in unistd.h? */
 extern char *strerror PROTO((int));
 extern int chmod PROTO((const char *, mode_t));
-extern char *getcwd PROTO((char *, int)); /* XXX or size_t? */
+/* in unistd.h:
+extern char *getcwd PROTO((char *, int)); *//* XXX or size_t? */
 extern int mkdir PROTO((const char *, mode_t));
 extern int chdir PROTO((const char *));
 extern int link PROTO((const char *, const char *));
@@ -591,7 +592,7 @@ posix_exec(self, args)
 	argvlist[argc] = NULL;
 
 	execv(path, argvlist);
-	
+
 	/* If we get here it's definitely an error */
 
 	DEL(argvlist);
@@ -990,16 +991,16 @@ void
 initposix()
 {
 	object *m, *d, *v;
-	
+
 	m = initmodule("posix", posix_methods);
 	d = getmoduledict(m);
-	
+
 	/* Initialize posix.environ dictionary */
 	v = convertenviron();
 	if (v == NULL || dictinsert(d, "environ", v) != 0)
 		fatal("can't define posix.environ");
 	DECREF(v);
-	
+
 	/* Initialize posix.error exception */
 	PosixError = newstringobject("posix.error");
 	if (PosixError == NULL || dictinsert(d, "error", PosixError) != 0)
