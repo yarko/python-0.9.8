@@ -77,13 +77,14 @@ OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 /* XXX Aren't these always declared in unistd.h? */
 extern char *strerror PROTO((int));
-extern int chmod PROTO((const char *, mode_t));
 /* in unistd.h:
-extern char *getcwd PROTO((char *, int)); *//* XXX or size_t? */
+extern int chmod PROTO((const char *, mode_t));
+extern char *getcwd PROTO((char *, int));
 extern int mkdir PROTO((const char *, mode_t));
 extern int chdir PROTO((const char *));
 extern int link PROTO((const char *, const char *));
 extern int rename PROTO((const char *, const char *));
+*/
 extern int rmdir PROTO((const char *));
 extern int stat PROTO((const char *, struct stat *));
 extern int unlink PROTO((const char *));
@@ -379,8 +380,8 @@ posix_nice(self, args)
 #ifdef i386
 int
 rename(from, to)
-	char *from;
-	char *to;
+	const char *from;
+	const char *to;
 {
 	int status;
 	/* XXX Shouldn't this unlink the destination first? */
