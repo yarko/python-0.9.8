@@ -1,2 +1,5 @@
 *.o
 *.s
+*.a
+*.pyc
+python
