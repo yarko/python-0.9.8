@@ -9,5 +9,5 @@ There are a number of notes, but this is a start-up set of notes:
 
 - You should be able to successfully run Configure.py with python2.7.**14
 
-![PTF-Source.jpeg]
-![PTF-Source-listing.jpeg]
+![](https://github.com/yarko/python-0.9.8/blob/main/PTF-Source.jpeg)
+![](https://github.com/yarko/python-0.9.8/blob/main/PTF-Source-listing.jpeg)
